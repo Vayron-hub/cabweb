@@ -1,1 +1,85 @@
 /* You can add global styles to this file, and also import other style files */
+
+/* PrimeIcons */
+@import 'primeicons/primeicons.css';
+
+/* Global Styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #f8f9fa;
+}
+
+.main-container {
+  min-height: 100vh;
+}
+
+.header-green {
+  background: linear-gradient(135deg, #4a7c59 0%, #5a8c6a 100%);
+  color: white;
+}
+
+.card-hover {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card-hover:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+}
+
+/* PrimeNG Custom Styles */
+.p-card {
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  border: 1px solid #e5e7eb;
+}
+
+.p-button {
+  border-radius: 8px;
+  padding: 0.75rem 1.5rem;
+  font-weight: 500;
+}
+
+.p-button-primary {
+  background: linear-gradient(135deg, #4a7c59 0%, #5a8c6a 100%);
+  border: none;
+}
+
+.p-button-primary:hover {
+  background: linear-gradient(135deg, #3a6b49 0%, #4a7b5a 100%);
+}
+
+.p-inputtext {
+  border-radius: 8px;
+  border: 1px solid #d1d5db;
+  padding: 0.75rem;
+}
+
+.p-inputtext:focus {
+  border-color: #4a7c59;
+  box-shadow: 0 0 0 2px rgba(74, 124, 89, 0.2);
+}
+
+.p-message {
+  border-radius: 8px;
+}
+
+.p-datatable {
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.p-datatable .p-datatable-header {
+  background: #f8f9fa;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.p-chart {
+  border-radius: 12px;
+}
