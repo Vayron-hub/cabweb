@@ -1,0 +1,93 @@
+<!-- Landing Page basada en Pantalla 4 -->
+<div class="landing-container">
+  
+  <!-- Header con gradiente verde -->
+  <div class="landing-header">
+    <div class="header-content">
+      <div class="logo-section">
+        <div class="cab-logo">
+          <i class="pi pi-recycle"></i>
+          <span class="logo-text">CAB</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Contenido principal -->
+  <div class="main-content">
+    
+    <!-- Título de la sección -->
+    <div class="section-title">
+      <h1>Información Pública</h1>
+    </div>
+
+    <!-- Cards principales -->
+    <div class="cards-container">
+      
+      <!-- Card Zona Popular -->
+      <div class="info-card" (click)="onCardClick('zona')">
+        <div class="card-icon">
+          <i class="pi pi-map-marker"></i>
+        </div>
+        <div class="card-content">
+          <h3>Zona popular</h3>
+          <p>Los tres lugares más visitados en la zona metropolitana</p>
+        </div>
+        <div class="card-arrow">
+          <i class="pi pi-chevron-right"></i>
+        </div>
+      </div>
+
+      <!-- Card Basura Popular -->
+      <div class="info-card" (click)="onCardClick('basura')">
+        <div class="card-icon">
+          <img src="assets/images/trash-icon.png" alt="Trash Icon" class="card-image">
+        </div>
+        <div class="card-content">
+          <h3>Basura popular</h3>
+          <p>Las tres categorías de residuos más frecuentes en la región</p>
+        </div>
+        <div class="card-arrow">
+          <i class="pi pi-chevron-right"></i>
+        </div>
+      </div>
+
+      <!-- Card Horario Popular -->
+      <div class="info-card" (click)="onCardClick('horario')">
+        <div class="card-icon">
+          <i class="pi pi-clock"></i>
+        </div>
+        <div class="card-content">
+          <h3>Horario popular</h3>
+          <p>Los tres horarios más populares durante el día</p>
+        </div>
+        <div class="card-arrow">
+          <i class="pi pi-chevron-right"></i>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Pantalla 8 label (como se ve en la imagen) -->
+    <div class="screen-label">
+      <span>Pantalla 8</span>
+    </div>
+
+  </div>
+
+  <!-- Footer con logo CAB circular -->
+  <div class="landing-footer">
+    <div class="circular-logo">
+      <div class="logo-circle">
+        <i class="pi pi-recycle"></i>
+        <span class="logo-badge">CAB</span>
+      </div>
+      <p class="footer-text">Por favor ingresa tus credenciales</p>
+      <div class="footer-inputs">
+        <input type="text" placeholder="Usuario" class="footer-input">
+        <button class="login-btn">Ingresar</button>
+      </div>
+    </div>
+  </div>
+
+</div>
