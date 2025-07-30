@@ -11,9 +11,15 @@
       <div class="header-center">
         <div class="location-selector-container">
           <i class="pi pi-map-marker location-icon"></i>
-          <select [(ngModel)]="selectedLocation" (change)="onLocationChange()" class="location-dropdown">
+          <select 
+            [(ngModel)]="selectedLocation" 
+            (change)="onLocationChange()" 
+            class="location-dropdown"
+            [disabled]="isLoadingZonas">
+            <option value="" disabled *ngIf="isLoadingZonas">Cargando zonas...</option>
             <option *ngFor="let location of locations" [value]="location">{{location}}</option>
           </select>
+          <i class="pi pi-spin pi-spinner" *ngIf="isLoadingZonas" style="margin-left: 8px; color: #666;"></i>
         </div>
       </div>
       
@@ -112,7 +118,6 @@
       </div>
     </div>
 
-    <!-- Grid Principal -->
     <div class="main-dashboard-grid">
       
       <!-- Panel Izquierdo - Clasificadores -->
@@ -124,16 +129,16 @@
           <div class="classifier-info">
             <h3>{{classifier.name}}</h3>
             <div class="classifier-counters">
-              <span class="counter blue">
-                <i class="counter-dot blue"></i>
-                {{classifier.activeCount}}
-              </span>
-              <span class="counter green">
-                <i class="counter-dot green"></i>
+              <span class="counter blue" title="Detecciones de valorizable/reciclables">
+                <i class="pi pi-trash blue"></i>
                 {{classifier.inactiveCount}}
               </span>
-              <span class="counter gray">
-                <i class="counter-dot gray"></i>
+              <span class="counter green" title="Detecciones de residuos orgánicos">
+                <i class="pi pi-trash green"></i>
+                {{classifier.activeCount}}
+              </span>
+              <span class="counter gray" title="Detecciones de desechos generales">
+                <i class="pi pi-trash gray"></i>
                 {{classifier.pendingCount}}
               </span>
             </div>
@@ -184,9 +189,67 @@
 
     <!-- Sección Últimas Detecciones -->
     <div class="recent-detections">
-      <h2>Últimas detecciones...</h2>
-      <div class="detections-content">
-        <!-- Contenido de detecciones aquí -->
+      <div class="recent-detections-header">
+        <h2>Últimas detecciones</h2>
+        <button 
+          class="refresh-btn-small"
+          (click)="loadUltimasDetecciones()"
+          [disabled]="isLoadingDetecciones"
+          title="Actualizar detecciones">
+          <i class="pi" [class.pi-refresh]="!isLoadingDetecciones" [class.pi-spin]="isLoadingDetecciones" [class.pi-spinner]="isLoadingDetecciones"></i>
+        </button>
+      </div>
+      
+      <div class="detections-list" *ngIf="!isLoadingDetecciones">
+        <div class="detection-card" *ngFor="let detection of ultimasDetecciones; trackBy: trackDetectionById">
+          <div class="detection-icon-wrapper">
+            <div class="detection-icon" [style.background-color]="getDetectionTypeColor(detection.tipoResiduo)">
+              <i class="pi" [ngClass]="getDetectionTypeIcon(detection.tipoResiduo)"></i>
+            </div>
+          </div>
+          
+          <div class="detection-content">
+            <div class="detection-main-info">
+              <div class="detection-type-label">{{detection.tipoResiduo}}</div>
+              <div class="detection-time">{{formatDetectionTime(detection.fecha)}}</div>
+            </div>
+            
+            <div class="detection-secondary-info">
+              <div class="detection-location">
+                <i class="pi pi-map-marker"></i>
+                <span>{{detection.clasificador}} - {{detection.zona}}</span>
+              </div>
+              <div class="detection-confidence">
+                <i class="pi pi-percentage"></i>
+                <span>{{detection.confianza}}% confianza</span>
+              </div>
+            </div>
+            
+            <div class="detection-status-wrapper">
+              <span class="status-badge" [ngClass]="detection.estado.toLowerCase()">
+                <i class="pi" [ngClass]="detection.estado === 'Confirmada' ? 'pi-check' : 'pi-clock'"></i>
+                {{detection.estado}}
+              </span>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Mensaje cuando no hay detecciones -->
+        <div class="no-detections" *ngIf="ultimasDetecciones.length === 0">
+          <div class="no-detections-icon">
+            <i class="pi pi-info-circle"></i>
+          </div>
+          <div class="no-detections-text">
+            <h3>No hay detecciones recientes</h3>
+            <p>Las nuevas detecciones aparecerán aquí cuando se procesen</p>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Indicador de carga -->
+      <div class="loading-detections" *ngIf="isLoadingDetecciones">
+        <i class="pi pi-spin pi-spinner"></i>
+        <p>Cargando detecciones...</p>
       </div>
     </div>
 
@@ -210,9 +273,10 @@
         </button>
         <button 
           class="btn-secondary"
-          (click)="refreshStatistics()">
-          <i class="pi pi-refresh"></i>
-          Actualizar
+          (click)="refreshStatistics()"
+          [disabled]="isLoadingStats">
+          <i class="pi" [class.pi-refresh]="!isLoadingStats" [class.pi-spin]="isLoadingStats" [class.pi-spinner]="isLoadingStats"></i>
+          {{isLoadingStats ? 'Actualizando...' : 'Actualizar'}}
         </button>
       </div>
     </div>
@@ -228,17 +292,17 @@
         </div>
         <div class="module-chart">
           <div class="bar-chart-container">
-            <div class="chart-bar" [style.height.%]="85">
-              <div class="bar-value">85</div>
+            <div class="chart-bar" [style.height.%]="deteccionesPorHora[0]">
+              <div class="bar-value">{{deteccionesPorHora[0]}}</div>
             </div>
-            <div class="chart-bar" [style.height.%]="65">
-              <div class="bar-value">65</div>
+            <div class="chart-bar" [style.height.%]="deteccionesPorHora[1]">
+              <div class="bar-value">{{deteccionesPorHora[1]}}</div>
             </div>
-            <div class="chart-bar" [style.height.%]="75">
-              <div class="bar-value">75</div>
+            <div class="chart-bar" [style.height.%]="deteccionesPorHora[2]">
+              <div class="bar-value">{{deteccionesPorHora[2]}}</div>
             </div>
-            <div class="chart-bar" [style.height.%]="90">
-              <div class="bar-value">90</div>
+            <div class="chart-bar" [style.height.%]="deteccionesPorHora[3]">
+              <div class="bar-value">{{deteccionesPorHora[3]}}</div>
             </div>
           </div>
           <div class="chart-labels">
@@ -258,17 +322,17 @@
         </div>
         <div class="module-chart">
           <div class="bar-chart-container">
-            <div class="chart-bar" [style.height.%]="92">
-              <div class="bar-value">92</div>
+            <div class="chart-bar" [style.height.%]="clasificacionesExitosas[0]">
+              <div class="bar-value">{{clasificacionesExitosas[0]}}</div>
             </div>
-            <div class="chart-bar" [style.height.%]="78">
-              <div class="bar-value">78</div>
+            <div class="chart-bar" [style.height.%]="clasificacionesExitosas[1]">
+              <div class="bar-value">{{clasificacionesExitosas[1]}}</div>
             </div>
-            <div class="chart-bar" [style.height.%]="88">
-              <div class="bar-value">88</div>
+            <div class="chart-bar" [style.height.%]="clasificacionesExitosas[2]">
+              <div class="bar-value">{{clasificacionesExitosas[2]}}</div>
             </div>
-            <div class="chart-bar" [style.height.%]="95">
-              <div class="bar-value">95</div>
+            <div class="chart-bar" [style.height.%]="clasificacionesExitosas[3]">
+              <div class="bar-value">{{clasificacionesExitosas[3]}}</div>
             </div>
           </div>
           <div class="chart-labels">
@@ -288,17 +352,17 @@
         </div>
         <div class="module-chart">
           <div class="bar-chart-container">
-            <div class="chart-bar" [style.height.%]="70">
-              <div class="bar-value">70</div>
+            <div class="chart-bar" [style.height.%]="flujoTransporte[0]">
+              <div class="bar-value">{{flujoTransporte[0]}}</div>
             </div>
-            <div class="chart-bar" [style.height.%]="45">
-              <div class="bar-value">45</div>
+            <div class="chart-bar" [style.height.%]="flujoTransporte[1]">
+              <div class="bar-value">{{flujoTransporte[1]}}</div>
             </div>
-            <div class="chart-bar" [style.height.%]="60">
-              <div class="bar-value">60</div>
+            <div class="chart-bar" [style.height.%]="flujoTransporte[2]">
+              <div class="bar-value">{{flujoTransporte[2]}}</div>
             </div>
-            <div class="chart-bar" [style.height.%]="80">
-              <div class="bar-value">80</div>
+            <div class="chart-bar" [style.height.%]="flujoTransporte[3]">
+              <div class="bar-value">{{flujoTransporte[3]}}</div>
             </div>
           </div>
           <div class="chart-labels">
@@ -318,17 +382,17 @@
         </div>
         <div class="module-chart">
           <div class="bar-chart-container">
-            <div class="chart-bar" [style.height.%]="88">
-              <div class="bar-value">88</div>
+            <div class="chart-bar" [style.height.%]="actividadUsuarios[0]">
+              <div class="bar-value">{{actividadUsuarios[0]}}</div>
             </div>
-            <div class="chart-bar" [style.height.%]="72">
-              <div class="bar-value">72</div>
+            <div class="chart-bar" [style.height.%]="actividadUsuarios[1]">
+              <div class="bar-value">{{actividadUsuarios[1]}}</div>
             </div>
-            <div class="chart-bar" [style.height.%]="95">
-              <div class="bar-value">95</div>
+            <div class="chart-bar" [style.height.%]="actividadUsuarios[2]">
+              <div class="bar-value">{{actividadUsuarios[2]}}</div>
             </div>
-            <div class="chart-bar" [style.height.%]="63">
-              <div class="bar-value">63</div>
+            <div class="chart-bar" [style.height.%]="actividadUsuarios[3]">
+              <div class="bar-value">{{actividadUsuarios[3]}}</div>
             </div>
           </div>
           <div class="chart-labels">
@@ -358,6 +422,14 @@
           (click)="exportUsersData()">
           <i class="pi pi-download"></i>
           Exportar
+        </button>
+        <button 
+          class="btn-secondary"
+          (click)="loadUsers()"
+          [disabled]="isLoadingUsers"
+          title="Actualizar usuarios">
+          <i class="pi" [class.pi-refresh]="!isLoadingUsers" [class.pi-spin]="isLoadingUsers" [class.pi-spinner]="isLoadingUsers"></i>
+          {{isLoadingUsers ? 'Actualizando...' : 'Actualizar'}}
         </button>
         <button 
           class="btn-success"
@@ -429,7 +501,7 @@
     </div>
 
     <!-- Tabla de usuarios -->
-    <div class="users-table-container">
+    <div class="users-table-container" *ngIf="!isLoadingUsers">
       <table class="users-table">
         <thead>
           <tr>
@@ -516,6 +588,12 @@
       </div>
     </div>
 
+    <!-- Indicador de carga para usuarios -->
+    <div class="loading-container" *ngIf="isLoadingUsers" style="text-align: center; padding: 40px;">
+      <i class="pi pi-spin pi-spinner" style="font-size: 2rem; color: #4a7c59;"></i>
+      <p style="margin-top: 16px; color: #666;">Cargando usuarios del sistema...</p>
+    </div>
+
     <!-- Acciones masivas -->
     <div class="bulk-actions" *ngIf="selectedUsers.length > 0">
       <div class="selected-count">
@@ -569,13 +647,16 @@
     <!-- Lista de clasificadores simple -->
     <div class="classifiers-simple-section">
       <div class="classifiers-header-simple">
-        <h2>Clasificadores 10 | 15</h2>
+        <h2>
+          Clasificadores {{getActiveCount()}} | {{getTotalCount()}}
+          <i class="pi pi-spin pi-spinner" *ngIf="isLoadingClasificadores" style="margin-left: 8px; font-size: 14px; color: #666;"></i>
+        </h2>
         <button class="add-classifier-btn">
           <i class="pi pi-plus"></i>
         </button>
       </div>
       
-      <div class="classifiers-simple-list">
+      <div class="classifiers-simple-list" *ngIf="!isLoadingClasificadores">
         <div class="classifier-simple-item" *ngFor="let classifier of getCurrentClassifiers()">
           <div class="classifier-device-icon">
             <div class="device-screen"></div>
@@ -583,21 +664,33 @@
           <div class="classifier-simple-info">
             <h3>{{classifier.name}}</h3>
             <div class="classifier-simple-counters">
-              <span class="simple-counter blue">
-                <i class="pi pi-user"></i>
-                {{classifier.activeCount}}
-              </span>
-              <span class="simple-counter green">
-                <i class="pi pi-user"></i>
+              <span class="simple-counter blue" title="Detecciones de valorizable/reciclables">
+                <i class="pi pi-trash"></i>
                 {{classifier.inactiveCount}}
               </span>
-              <span class="simple-counter gray">
-                <i class="pi pi-user"></i>
+              <span class="simple-counter green" title="Detecciones de residuos orgánicos">
+                <i class="pi pi-trash"></i>
+                {{classifier.activeCount}}
+              </span>
+              <span class="simple-counter gray" title="Detecciones de desechos generales">
+                <i class="pi pi-trash"></i>
                 {{classifier.pendingCount}}
               </span>
             </div>
           </div>
         </div>
+      </div>
+      
+      <!-- Indicador de carga para clasificadores -->
+      <div class="loading-container" *ngIf="isLoadingClasificadores" style="text-align: center; padding: 40px;">
+        <i class="pi pi-spin pi-spinner" style="font-size: 2rem; color: #4a7c59;"></i>
+        <p style="margin-top: 16px; color: #666;">Cargando clasificadores...</p>
+      </div>
+      
+      <!-- Mensaje cuando no hay clasificadores -->
+      <div class="no-data-container" *ngIf="!isLoadingClasificadores && getCurrentClassifiers().length === 0" style="text-align: center; padding: 40px;">
+        <i class="pi pi-info-circle" style="font-size: 2rem; color: #999;"></i>
+        <p style="margin-top: 16px; color: #666;">No hay clasificadores disponibles para esta zona</p>
       </div>
     </div>
 

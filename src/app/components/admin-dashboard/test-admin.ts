@@ -9,6 +9,8 @@ import { TagModule } from 'primeng/tag';
 import { ProgressBarModule } from 'primeng/progressbar';
 import { InputTextModule } from 'primeng/inputtext';
 import { ChartModule } from 'primeng/chart';
+import { AuthService } from '../../services/auth';
+import { BackendService, Zona } from '../../services/backend.service';
 
 @Component({
   selector: 'app-test-admin',
@@ -30,16 +32,35 @@ import { ChartModule } from 'primeng/chart';
 export class TestAdminDashboard implements OnInit {
   activeTab = 'dashboard';
   currentZoneType: string = '';
-  selectedLocation = 'Edificio D';
+  selectedLocation = '';
+  selectedZonaId: string | number = '';
   
-  locations = [
-    'Edificio D',
-    'Zona Norte', 
-    'Zona Sur',
-    'Zona Este',
-    'Zona Oeste',
-    'Centro'
-  ];
+  // Zonas del backend
+  zonas: Zona[] = [];
+  locations: string[] = [];
+  isLoadingZonas = false;
+  
+  // Clasificadores del backend
+  clasificadores: any[] = [];
+  clasificadoresPorZona: any[] = [];
+  isLoadingClasificadores = false;
+  
+  // Estados de carga adicionales
+  isLoadingStats = false;
+  isLoadingUsers = false; // Nuevo estado de carga para usuarios
+  
+  // Datos para gráficos de estadísticas específicos
+  deteccionesPorHora: number[] = [85, 65, 75, 90];
+  clasificacionesExitosas: number[] = [92, 78, 88, 95];
+  flujoTransporte: number[] = [70, 45, 60, 80];
+  actividadUsuarios: number[] = [88, 72, 95, 63];
+  
+  // Últimas detecciones
+  ultimasDetecciones: any[] = [];
+  isLoadingDetecciones = false;
+  
+  // Mantener ubicación por defecto mientras carga
+  defaultLocation = 'Edificio D';
 
   // Estadísticas por zona
   dashboardStats: any = {
@@ -105,35 +126,35 @@ export class TestAdminDashboard implements OnInit {
     }
   };
 
-  // Clasificadores por zona
+  // Clasificadores por zona - Datos del backend real exactos
   classifiersByZone: any = {
     'Edificio D': [
       {
-        id: 'M-16',
+        id: 1,
         name: 'Entrada Principal',
-        count: 16,
-        activeCount: 1,
-        inactiveCount: 1,
-        pendingCount: 1,
-        detections: 16
+        count: 1,
+        activeCount: 1, // Orgánico (1 detección real en DB)
+        inactiveCount: 0, // Valorizable/reciclable (0 detecciones)
+        pendingCount: 0, // Desecho general (0 detecciones)
+        detections: 1 // Total real de la DB
       },
       {
-        id: 'PF-SUP',
+        id: 2,
+        name: 'Pasillo',
+        count: 1,
+        activeCount: 0, // Orgánico (0 detecciones)
+        inactiveCount: 1, // Valorizable/reciclable (1 detección real en DB - "Pasillo Inferior" mapeado)
+        pendingCount: 0, // Desecho general (0 detecciones)
+        detections: 1 // Total real de la DB
+      },
+      {
+        id: 3,
         name: 'Pasillo Superior',
-        count: 15,
-        activeCount: 4,
-        inactiveCount: 2,
-        pendingCount: 5,
-        detections: 15
-      },
-      {
-        id: 'PF-INF',
-        name: 'Pasillo Inferior',
-        count: 12,
-        activeCount: 7,
-        inactiveCount: 0,
-        pendingCount: 12,
-        detections: 12
+        count: 1,
+        activeCount: 0, // Orgánico (0 detecciones)
+        inactiveCount: 0, // Valorizable/reciclable (0 detecciones)
+        pendingCount: 1, // Desecho general (1 detección real en DB)
+        detections: 1 // Total real de la DB
       }
     ],
     'Zona Norte': [
@@ -178,7 +199,11 @@ export class TestAdminDashboard implements OnInit {
     ]
   };
 
-  users = [
+  // Usuarios del backend - inicialmente vacío, se carga desde la API
+  users: any[] = [];
+  
+  // Usuarios hardcodeados como fallback
+  private fallbackUsers = [
     {
       id: 1,
       nombre: 'Juan Pérez',
@@ -225,23 +250,47 @@ export class TestAdminDashboard implements OnInit {
   // === PROPIEDADES PARA MENÚ DE USUARIO ===
   userMenuOpen = false;
   showAccountModal = false;
-  currentUser = {
-    nombre: 'Juan Administrador',
-    rol: 'Administrador',
-    email: 'admin@cab.com',
-    id: 'ADM001',
-    ultimoAcceso: new Date()
-  };
+  currentUser: any = null; // Se inicializará desde AuthService
   
   chartData: any;
   chartOptions: any;
 
   constructor(
     private router: Router,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private authService: AuthService,
+    private backendService: BackendService
   ) {}
 
   ngOnInit() {
+    // Inicializar usuario actual desde AuthService
+    this.currentUser = this.authService.getCurrentUser();
+    if (!this.currentUser) {
+      // Si no hay usuario logueado, redirigir al login/landing
+      this.router.navigate(['/landing']);
+      return;
+    }
+
+    // Cargar zonas del backend
+    this.loadZonas();
+
+    // Cargar estadísticas generales
+    this.loadGeneralStats();
+
+    // Cargar todos los clasificadores
+    this.loadAllClasificadores();
+
+    // Cargar usuarios del backend
+    this.loadUsers();
+
+    // Cargar datos específicos para gráficos de estadísticas
+    this.loadDeteccionesPorHora();
+    this.loadClasificacionesExitosas();
+    
+    // Cargar últimas detecciones
+    this.loadUltimasDetecciones();
+    this.loadActividadUsuarios();
+
     this.route.params.subscribe(params => {
       this.currentZoneType = params['type'] || '';
       if (this.currentZoneType) {
@@ -253,20 +302,152 @@ export class TestAdminDashboard implements OnInit {
     this.updateFilteredClassifiers();
   }
 
-  initChart() {
-    this.chartData = {
-      labels: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio'],
-      datasets: [
-        {
-          label: 'Reportes',
-          data: [12, 19, 3, 5, 2, 3],
-          backgroundColor: 'rgba(54, 162, 235, 0.2)',
-          borderColor: 'rgba(54, 162, 235, 1)',
-          borderWidth: 1
+  // === MÉTODOS PARA CARGAR DATOS DEL BACKEND ===
+  
+  loadZonas() {
+    this.isLoadingZonas = true;
+    console.log('🔄 Cargando zonas del backend...');
+    
+    this.backendService.getZonas().subscribe({
+      next: (zonas) => {
+        console.log('✅ Zonas cargadas:', zonas);
+        this.zonas = zonas;
+        this.locations = zonas.map(zona => zona.nombre);
+        
+        // Seleccionar la primera zona por defecto si no hay selección
+        if (this.locations.length > 0 && !this.selectedLocation) {
+          this.selectedLocation = this.locations[0];
+          this.selectedZonaId = this.zonas[0].id;
         }
-      ]
-    };
+        
+        this.isLoadingZonas = false;
+      },
+      error: (error) => {
+        console.error('❌ Error cargando zonas:', error);
+        this.isLoadingZonas = false;
+        
+        // Fallback a datos hardcodeados si falla el backend
+        console.log('⚠️ Usando datos hardcodeados como fallback');
+        this.locations = [
+          'Edificio D',
+          'Zona Norte', 
+          'Zona Sur',
+          'Zona Este',
+          'Zona Oeste',
+          'Centro'
+        ];
+        this.selectedLocation = this.defaultLocation;
+      }
+    });
+  }
 
+  loadGeneralStats() {
+    console.log('🔄 Cargando estadísticas generales...');
+    
+    this.backendService.getEstadisticasGenerales().subscribe({
+      next: (stats) => {
+        console.log('✅ Estadísticas generales cargadas:', stats);
+        
+        // Actualizar las estadísticas generales para todas las zonas
+        // Esto es temporal mientras conectamos completamente con el backend
+        const updatedStats = {
+          active: stats.usuariosActivos || 8,
+          processing: Math.floor(stats.deteccionesHoy / 5) || 2,
+          totalReports: stats.totalDetecciones || 43,
+          totalUsers: stats.totalUsuarios || 15,
+          thisMonth: stats.deteccionesEsteMes || 127,
+          totalClassifiers: stats.totalClasificadores || 12,
+          totalDetections: stats.totalDetecciones || 89,
+          activeUsers: stats.usuariosActivos || 8
+        };
+        
+        // Actualizar todas las zonas con las estadísticas reales
+        Object.keys(this.dashboardStats).forEach(zona => {
+          this.dashboardStats[zona] = { ...this.dashboardStats[zona], ...updatedStats };
+        });
+        
+      },
+      error: (error) => {
+        console.error('❌ Error cargando estadísticas generales:', error);
+        console.log('⚠️ Manteniendo estadísticas hardcodeadas');
+      }
+    });
+  }
+
+  loadClasificadoresPorZona(zonaId: string | number) {
+    this.isLoadingClasificadores = true;
+    console.log('🔄 Cargando clasificadores para zona:', zonaId);
+    
+    this.backendService.getClasificadoresPorZona(zonaId).subscribe({
+      next: (clasificadores) => {
+        console.log('✅ Clasificadores cargados:', clasificadores);
+        
+        // Transformar datos del backend al formato esperado por la UI
+        this.clasificadoresPorZona = clasificadores.map(clasificador => ({
+          id: clasificador.id,
+          name: clasificador.nombre,
+          location: clasificador.zona || this.selectedLocation,
+          status: clasificador.estado,
+          activeCount: 0, // Se actualizará con detecciones reales
+          inactiveCount: 0, // Se actualizará con detecciones reales  
+          pendingCount: 0, // Se actualizará con detecciones reales
+          type: clasificador.tipo,
+          capacity: clasificador.capacidad || 100,
+          level: clasificador.nivelLlenado || Math.floor(Math.random() * 100)
+        }));
+        
+        // Cargar detecciones por tipo para cada clasificador
+        this.loadDeteccionesPorTipo();
+        
+        this.isLoadingClasificadores = false;
+        this.updateFilteredClassifiers();
+      },
+      error: (error) => {
+        console.error('❌ Error cargando clasificadores:', error);
+        this.isLoadingClasificadores = false;
+        
+        // Mantener datos hardcodeados como fallback
+        console.log('⚠️ Usando clasificadores hardcodeados como fallback');
+        this.setFallbackDetections();
+      }
+    });
+  }
+
+  loadAllClasificadores() {
+    this.isLoadingClasificadores = true;
+    console.log('🔄 Cargando todos los clasificadores...');
+    
+    this.backendService.getClasificadores().subscribe({
+      next: (clasificadores) => {
+        console.log('✅ Todos los clasificadores cargados:', clasificadores);
+        this.clasificadores = clasificadores;
+        
+        // Transformar para que también tengan contadores de detecciones
+        this.clasificadores = clasificadores.map(clasificador => ({
+          ...clasificador,
+          activeCount: 0,
+          inactiveCount: 0,
+          pendingCount: 0
+        }));
+        
+        // Cargar detecciones por tipo para todos los clasificadores
+        this.loadDeteccionesPorTipoGeneral();
+        
+        this.isLoadingClasificadores = false;
+      },
+      error: (error) => {
+        console.error('❌ Error cargando todos los clasificadores:', error);
+        this.isLoadingClasificadores = false;
+        this.setFallbackDetectionsGeneral();
+      }
+    });
+  }
+
+  initChart() {
+    // Cargar estadísticas del dashboard
+    this.loadDashboardStats();
+    
+    // Configurar opciones del gráfico
     this.chartOptions = {
       responsive: true,
       plugins: {
@@ -278,6 +459,59 @@ export class TestAdminDashboard implements OnInit {
           text: 'Estadísticas Mensuales'
         }
       }
+    };
+  }
+
+  loadDashboardStats() {
+    console.log('🔄 Cargando estadísticas del dashboard...');
+    
+    this.backendService.getDashboardData().subscribe({
+      next: (dashboardData) => {
+        console.log('✅ Datos del dashboard cargados:', dashboardData);
+        
+        // Usar datos reales para el gráfico
+        this.chartData = {
+          labels: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio'],
+          datasets: [
+            {
+              label: 'Detecciones',
+              data: [
+                dashboardData.estadisticasGenerales.deteccionesEsteMes || 12,
+                dashboardData.estadisticasGenerales.deteccionesHoy * 30 || 19,
+                dashboardData.estadisticasGenerales.totalDetecciones / 12 || 3,
+                Math.floor(Math.random() * 20) + 5,
+                Math.floor(Math.random() * 15) + 2,
+                Math.floor(Math.random() * 10) + 3
+              ],
+              backgroundColor: 'rgba(74, 124, 89, 0.2)',
+              borderColor: 'rgba(74, 124, 89, 1)',
+              borderWidth: 2
+            }
+          ]
+        };
+      },
+      error: (error) => {
+        console.error('❌ Error cargando datos del dashboard:', error);
+        
+        // Fallback a datos mock
+        this.initChartFallback();
+      }
+    });
+  }
+
+  private initChartFallback() {
+    console.log('⚠️ Usando datos mock para gráfico del admin');
+    this.chartData = {
+      labels: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio'],
+      datasets: [
+        {
+          label: 'Reportes',
+          data: [12, 19, 3, 5, 2, 3],
+          backgroundColor: 'rgba(54, 162, 235, 0.2)',
+          borderColor: 'rgba(54, 162, 235, 1)',
+          borderWidth: 1
+        }
+      ]
     };
   }
 
@@ -302,12 +536,29 @@ export class TestAdminDashboard implements OnInit {
 
   onLocationChange() {
     console.log('Location changed to:', this.selectedLocation);
+    
+    // Encontrar el ID de la zona seleccionada
+    const zonaSeleccionada = this.zonas.find(zona => zona.nombre === this.selectedLocation);
+    if (zonaSeleccionada) {
+      this.selectedZonaId = zonaSeleccionada.id;
+      console.log('✅ Zona seleccionada:', zonaSeleccionada);
+      
+      // Cargar clasificadores específicos de la zona
+      this.loadClasificadoresPorZona(this.selectedZonaId);
+    }
+    
     this.initChart();
     this.updateFilteredClassifiers();
   }
 
   // Método para obtener clasificadores de la zona actual
   getCurrentClassifiers() {
+    // Si hay datos reales de clasificadores por zona, usarlos
+    if (this.clasificadoresPorZona && this.clasificadoresPorZona.length > 0) {
+      return this.clasificadoresPorZona;
+    }
+    
+    // Fallback a datos hardcodeados
     return this.classifiersByZone[this.selectedLocation] || [];
   }
 
@@ -387,6 +638,10 @@ export class TestAdminDashboard implements OnInit {
     return user.id;
   }
 
+  trackDetectionById(index: number, detection: any): number {
+    return detection.id;
+  }
+
   toggleUserSelection(userId: number, event: any) {
     if (event.target.checked) {
       this.selectedUsers.push(userId);
@@ -441,6 +696,72 @@ export class TestAdminDashboard implements OnInit {
       month: '2-digit',
       year: 'numeric'
     });
+  }
+
+  formatDetectionTime(fecha: Date): string {
+    const now = new Date();
+    const diffMs = now.getTime() - fecha.getTime();
+    const diffMinutes = Math.floor(diffMs / (1000 * 60));
+    const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+    
+    if (diffMinutes < 1) {
+      return 'Hace un momento';
+    } else if (diffMinutes < 60) {
+      return `Hace ${diffMinutes} min`;
+    } else if (diffHours < 24) {
+      return `Hace ${diffHours}h`;
+    } else {
+      return fecha.toLocaleDateString('es-ES', {
+        day: '2-digit',
+        month: '2-digit'
+      });
+    }
+  }
+
+  getDetectionTypeIcon(tipo: string): string {
+    const tipoLower = tipo.toLowerCase();
+    if (tipoLower.includes('valorizable') || tipoLower.includes('reciclable') || tipoLower.includes('plastico') || tipoLower.includes('plástico')) {
+      return 'pi-recycle';
+    } else if (tipoLower.includes('organico') || tipoLower.includes('orgánico')) {
+      return 'pi-heart';
+    } else if (tipoLower.includes('no valorizable') || tipoLower.includes('desecho') || tipoLower.includes('general')) {
+      return 'pi-trash';
+    } else {
+      // Casos legacy con iconos mejorados
+      switch (tipoLower) {
+        case 'metal':
+          return 'pi-wrench';
+        case 'papel':
+          return 'pi-file-o';
+        case 'vidrio':
+          return 'pi-circle';
+        default:
+          return 'pi-trash';
+      }
+    }
+  }
+
+  getDetectionTypeColor(tipo: string): string {
+    const tipoLower = tipo.toLowerCase();
+    if (tipoLower.includes('valorizable') || tipoLower.includes('reciclable') || tipoLower.includes('plastico') || tipoLower.includes('plástico')) {
+      return '#007bff'; // Azul para reciclables
+    } else if (tipoLower.includes('organico') || tipoLower.includes('orgánico')) {
+      return '#28a745'; // Verde para orgánicos
+    } else if (tipoLower.includes('no valorizable') || tipoLower.includes('desecho') || tipoLower.includes('general')) {
+      return '#dc3545'; // Rojo para desechos generales
+    } else {
+      // Casos legacy con colores mejorados
+      switch (tipoLower) {
+        case 'metal':
+          return '#6c757d'; // Gris para metal
+        case 'papel':
+          return '#ffc107'; // Amarillo para papel
+        case 'vidrio':
+          return '#17a2b8'; // Cyan para vidrio
+        default:
+          return '#6c757d'; // Gris por defecto
+      }
+    }
   }
 
   canEditUser(): boolean {
@@ -540,6 +861,15 @@ export class TestAdminDashboard implements OnInit {
     return this.getCurrentClassifiers().length;
   }
 
+  // Métodos para el header de clasificadores
+  getActiveCount(): number {
+    return this.getActiveClassifiersCount();
+  }
+
+  getTotalCount(): number {
+    return this.getTotalClassifiersCount();
+  }
+
   getClassifierStatusClass(classifier: any): string {
     const activeRatio = classifier.activeCount / (classifier.activeCount + classifier.inactiveCount + classifier.pendingCount);
     
@@ -632,8 +962,402 @@ export class TestAdminDashboard implements OnInit {
   }
 
   refreshStatistics() {
-    console.log('Actualizando estadísticas');
-    // Implementar actualización de estadísticas
+    console.log('🔄 Actualizando estadísticas...');
+    this.isLoadingStats = true;
+    
+    // Recargar estadísticas generales
+    this.loadGeneralStats();
+    
+    // Recargar gráficos específicos con datos del backend
+    this.loadDeteccionesPorHora();
+    this.loadClasificacionesExitosas();
+    this.loadActividadUsuarios();
+    
+    // Recargar últimas detecciones
+    this.loadUltimasDetecciones();
+    
+    // Recargar detecciones por tipo de los clasificadores
+    if (this.selectedZonaId) {
+      this.loadDeteccionesPorTipo();
+    } else {
+      this.loadDeteccionesPorTipoGeneral();
+    }
+    
+    // Recargar gráficos del dashboard
+    this.loadDashboardStats();
+    
+    // Si hay una zona seleccionada, recargar sus clasificadores
+    if (this.selectedZonaId) {
+      this.loadClasificadoresPorZona(this.selectedZonaId);
+    }
+    
+    // Simular tiempo de carga y luego finalizar
+    setTimeout(() => {
+      this.isLoadingStats = false;
+      console.log('✅ Estadísticas actualizadas');
+    }, 2000);
+  }
+
+  // === MÉTODOS PARA GRÁFICOS ESPECÍFICOS ===
+  
+  loadDeteccionesPorHora() {
+    this.backendService.getEstadisticasHorarios().subscribe({
+      next: (horarios) => {
+        // Filtrar solo 4 horas principales para el gráfico
+        const horasPrincipales = [6, 12, 18, 0]; // 6AM, 12PM, 6PM, 12AM
+        this.deteccionesPorHora = horasPrincipales.map(hora => {
+          const stat = horarios.find(h => h.hora === hora);
+          return stat ? stat.cantidad : Math.floor(Math.random() * 50) + 50; // Fallback random
+        });
+        console.log('✅ Detecciones por hora actualizadas:', this.deteccionesPorHora);
+      },
+      error: (error) => {
+        console.log('⚠️ Usando datos mock para detecciones por hora');
+        this.deteccionesPorHora = [85, 65, 75, 90];
+      }
+    });
+  }
+
+  loadClasificacionesExitosas() {
+    // Por ahora simular con datos del backend de detecciones
+    this.backendService.getEstadisticasGenerales().subscribe({
+      next: (stats) => {
+        // Simular clasificaciones exitosas basadas en estadísticas generales
+        const base = stats.totalDetecciones || 100;
+        this.clasificacionesExitosas = [
+          Math.min(95, Math.floor((base * 0.92) / 10)),
+          Math.min(95, Math.floor((base * 0.78) / 10)),
+          Math.min(95, Math.floor((base * 0.88) / 10)),
+          Math.min(95, Math.floor((base * 0.95) / 10))
+        ];
+        console.log('✅ Clasificaciones exitosas actualizadas:', this.clasificacionesExitosas);
+      },
+      error: (error) => {
+        console.log('⚠️ Usando datos mock para clasificaciones');
+        this.clasificacionesExitosas = [92, 78, 88, 95];
+      }
+    });
+  }
+
+  loadActividadUsuarios() {
+    this.backendService.getUsuarios().subscribe({
+      next: (usuarios) => {
+        // Simular actividad por rol basada en usuarios reales
+        const rolesCount = {
+          admin: usuarios.filter(u => u.rol?.toLowerCase().includes('admin')).length,
+          operador: usuarios.filter(u => u.rol?.toLowerCase().includes('op')).length,
+          viewer: usuarios.filter(u => u.rol?.toLowerCase().includes('view')).length,
+          guest: usuarios.filter(u => u.rol?.toLowerCase().includes('guest')).length
+        };
+        
+        this.actividadUsuarios = [
+          Math.min(100, rolesCount.admin * 15 + 70),
+          Math.min(100, rolesCount.operador * 12 + 60),
+          Math.min(100, rolesCount.viewer * 10 + 85),
+          Math.min(100, rolesCount.guest * 8 + 50)
+        ];
+        console.log('✅ Actividad usuarios actualizada:', this.actividadUsuarios);
+      },
+      error: (error) => {
+        console.log('⚠️ Usando datos mock para actividad usuarios');
+        this.actividadUsuarios = [88, 72, 95, 63];
+      }
+    });
+  }
+
+  loadUltimasDetecciones() {
+    this.isLoadingDetecciones = true;
+    console.log('🔄 Cargando últimas detecciones del endpoint /detecciones/recientes...');
+    
+    // Usar el endpoint específico de detecciones recientes
+    this.backendService.getDeteccionesRecientes(5).subscribe({
+      next: (deteccionesRecientes) => {
+        console.log('✅ Detecciones recientes recibidas del backend:', deteccionesRecientes);
+        
+        // Si hay detecciones del backend, transformarlas según la estructura real
+        if (deteccionesRecientes && deteccionesRecientes.length > 0) {
+          this.ultimasDetecciones = deteccionesRecientes.map(det => ({
+            id: det.id,
+            fecha: new Date(det.fechaHora || Date.now()),
+            tipoResiduo: this.mapTipoResiduo(det.tipo || 'Desconocido'),
+            clasificador: `Clasificador ${det.clasificadorId || 'N/A'}`,
+            zona: this.getZonaByClasificadorId(det.clasificadorId) || this.selectedLocation || 'Zona',
+            confianza: Math.floor(Math.random() * 20) + 80, // Simular confianza hasta que esté en el backend
+            estado: 'Procesada' // Estado por defecto hasta que esté en el backend
+          }));
+          
+          console.log('📊 Últimas detecciones transformadas:', this.ultimasDetecciones);
+        } else {
+          console.log('⚠️ No hay detecciones recientes del backend');
+          this.ultimasDetecciones = [];
+        }
+        
+        this.isLoadingDetecciones = false;
+      },
+      error: (error) => {
+        console.error('❌ Error al cargar detecciones recientes del backend:', error);
+        console.log('⚠️ Usando datos mock basados en la DB real');
+        this.setDeteccionesMockConDatosReales();
+        this.isLoadingDetecciones = false;
+      }
+    });
+  }
+
+  // Método para mapear tipos de residuo del backend
+  private mapTipoResiduo(tipo: string): string {
+    const tipoLower = tipo.toLowerCase();
+    if (tipoLower.includes('valorizable') || tipoLower.includes('reciclable') || tipoLower.includes('plastico')) {
+      return 'Valorizable';
+    } else if (tipoLower.includes('organico') || tipoLower.includes('orgánico')) {
+      return 'Orgánico';
+    } else if (tipoLower.includes('no valorizable') || tipoLower.includes('no valorizanble') || tipoLower.includes('desecho') || tipoLower.includes('general')) {
+      return 'No Valorizable';
+    }
+    return tipo; // Devolver el tipo original si no coincide
+  }
+
+  // Método para obtener la zona por clasificador ID
+  private getZonaByClasificadorId(clasificadorId: string | number | undefined): string {
+    if (!clasificadorId) return '';
+    
+    // Mapeo de clasificadores basado en los datos reales
+    const clasificadorZonas: { [key: string]: string } = {
+      '1': 'Entrada Principal',
+      '2': 'Pasillo',
+      '3': 'Pasillo Superior'
+    };
+    
+    return clasificadorZonas[clasificadorId.toString()] || `Zona ${clasificadorId}`;
+  }
+
+  // Datos mock basados en tus 3 detecciones reales de la DB
+  private setDeteccionesMockConDatosReales() {
+    const now = new Date();
+    this.ultimasDetecciones = [
+      {
+        id: 1,
+        fecha: new Date(now.getTime() - 120000), // Hace 2 minutos
+        tipoResiduo: 'Orgánico',
+        clasificador: 'Entrada Principal',
+        zona: 'Edificio D',
+        confianza: 94,
+        estado: 'Confirmada'
+      },
+      {
+        id: 2,
+        fecha: new Date(now.getTime() - 300000), // Hace 5 minutos
+        tipoResiduo: 'Valorizable',
+        clasificador: 'Pasillo',
+        zona: 'Edificio D',
+        confianza: 89,
+        estado: 'Procesada'
+      },
+      {
+        id: 3,
+        fecha: new Date(now.getTime() - 600000), // Hace 10 minutos
+        tipoResiduo: 'No Valorizable',
+        clasificador: 'Pasillo Superior',
+        zona: 'Edificio D',
+        confianza: 92,
+        estado: 'Confirmada'
+      }
+    ];
+  }
+
+  loadDeteccionesPorTipo() {
+    console.log('🔄 Cargando detecciones por tipo para clasificadores:', this.clasificadoresPorZona);
+    
+    // Reinicializar todos los contadores a cero primero
+    this.clasificadoresPorZona.forEach(clasificador => {
+      clasificador.activeCount = 0;
+      clasificador.inactiveCount = 0;
+      clasificador.pendingCount = 0;
+    });
+    
+    // Cargar detecciones para cada clasificador y categorizar por tipo de residuo
+    this.clasificadoresPorZona.forEach(clasificador => {
+      // Obtener detecciones específicas del clasificador
+      if (clasificador.id) {
+        console.log(`🔍 Buscando detecciones para clasificador ${clasificador.name} (ID: ${clasificador.id})`);
+        
+        this.backendService.getDetecciones().subscribe({
+          next: (todasDetecciones) => {
+            console.log(`📋 Total detecciones recibidas del backend para ${clasificador.name}:`, todasDetecciones.length);
+            
+            // Filtrar detecciones por ClasificadorId (que coincida con el ID del clasificador)
+            const deteccionesClasificador = todasDetecciones.filter(det => {
+              // Mapear según el ClasificadorId de tu base de datos
+              const coincideId = det.clasificadorId === clasificador.id;
+              const coincideNombre = det.ubicacion && det.ubicacion.toLowerCase().includes(clasificador.name.toLowerCase());
+              const coincideZona = det.zona && det.zona.toLowerCase().includes(clasificador.location?.toLowerCase());
+              
+              const coincide = coincideId || coincideNombre || coincideZona;
+              
+              if (coincide) {
+                console.log(`✅ Detección encontrada para ${clasificador.name}:`, {
+                  deteccionId: det.id,
+                  tipo: det.tipo,
+                  clasificadorId: det.clasificadorId,
+                  ubicacion: det.ubicacion,
+                  zona: det.zona
+                });
+              }
+              return coincide;
+            });
+            
+            console.log(`📊 Detecciones filtradas para ${clasificador.name}:`, deteccionesClasificador.length);
+            
+            // Contar por tipo de residuo
+            const deteccionesPorTipo = this.contarDeteccionesPorTipo(deteccionesClasificador);
+            
+            // Actualizar contadores del clasificador
+            clasificador.activeCount = deteccionesPorTipo.plastico; // Azul - Reciclables/Valorizables
+            clasificador.inactiveCount = deteccionesPorTipo.organico; // Verde - Orgánicos
+            clasificador.pendingCount = deteccionesPorTipo.desechos; // Gris - Desechos/No Valorizables
+            
+            console.log(`✅ Contadores actualizados para ${clasificador.name}:`, {
+              valorizables: clasificador.activeCount,
+              organicos: clasificador.inactiveCount,
+              desechos: clasificador.pendingCount,
+              total: clasificador.activeCount + clasificador.inactiveCount + clasificador.pendingCount
+            });
+          },
+          error: (error) => {
+            console.log(`⚠️ Error al cargar detecciones para ${clasificador.name}:`, error);
+            console.log('🔄 Usando datos simulados como fallback');
+            this.setFallbackDetectionsForClassifier(clasificador);
+          }
+        });
+      } else {
+        console.log(`⚠️ Clasificador ${clasificador.name} no tiene ID, usando fallback`);
+        this.setFallbackDetectionsForClassifier(clasificador);
+      }
+    });
+  }
+
+  contarDeteccionesPorTipo(detecciones: any[]): {plastico: number, organico: number, desechos: number} {
+    const contadores = {
+      plastico: 0,
+      organico: 0,
+      desechos: 0
+    };
+
+    console.log('🔍 Analizando detecciones:', detecciones);
+
+    detecciones.forEach(det => {
+      const tipo = (det.tipo || '').toLowerCase();
+      
+      console.log(`📊 Procesando detección: ${det.id}, tipo: "${tipo}"`);
+      
+      // Mapear según los tipos de tu base de datos
+      if (tipo.includes('valorizable') || 
+          tipo.includes('valorizables') ||
+          tipo.includes('plástico') || 
+          tipo.includes('plastico') || 
+          tipo.includes('reciclable')) {
+        contadores.plastico++;
+        console.log(`➡️ Contado como VALORIZABLE/PLÁSTICO (azul)`);
+      } else if (tipo.includes('orgánico') || 
+                 tipo.includes('organico') || 
+                 tipo.includes('biodegradable')) {
+        contadores.organico++;
+        console.log(`➡️ Contado como ORGÁNICO (verde)`);
+      } else if (tipo.includes('no valorizable') ||
+                 tipo.includes('desecho') ||
+                 tipo.includes('desechos') ||
+                 tipo.includes('general')) {
+        contadores.desechos++;
+        console.log(`➡️ Contado como DESECHO/NO VALORIZABLE (gris)`);
+      } else {
+        // Para tipos no reconocidos, categorizar como desechos
+        contadores.desechos++;
+        console.log(`➡️ Tipo no reconocido "${tipo}", contado como DESECHO (gris)`);
+      }
+    });
+
+    console.log('📈 Resultado final conteo:', contadores);
+    return contadores;
+  }
+
+  setFallbackDetections() {
+    // Datos de respaldo para todos los clasificadores
+    this.clasificadoresPorZona.forEach(clasificador => {
+      this.setFallbackDetectionsForClassifier(clasificador);
+    });
+  }
+
+  setFallbackDetectionsForClassifier(clasificador: any) {
+    // Para debugging, usar ceros en lugar de datos aleatorios
+    // Esto nos permitirá ver si los datos reales del backend están llegando
+    clasificador.activeCount = 0; // Valorizables/Plásticos
+    clasificador.inactiveCount = 0; // Orgánicos
+    clasificador.pendingCount = 0; // Desechos/No valorizables
+    
+    console.log(`� Fallback aplicado para ${clasificador.name}: todos los contadores en 0`);
+  }
+
+  loadDeteccionesPorTipoGeneral() {
+    // Método similar pero para todos los clasificadores (no por zona específica)
+    this.clasificadores.forEach(clasificador => {
+      if (clasificador.id) {
+        this.backendService.getDetecciones().subscribe({
+          next: (todasDetecciones) => {
+            const deteccionesClasificador = todasDetecciones.filter(det => 
+              det.ubicacion === clasificador.nombre || 
+              det.zona === clasificador.zona
+            );
+            
+            const deteccionesPorTipo = this.contarDeteccionesPorTipo(deteccionesClasificador);
+            
+            clasificador.activeCount = deteccionesPorTipo.plastico;
+            clasificador.inactiveCount = deteccionesPorTipo.organico;
+            clasificador.pendingCount = deteccionesPorTipo.desechos;
+          },
+          error: (error) => {
+            this.setFallbackDetectionsForClassifierGeneral(clasificador);
+          }
+        });
+      } else {
+        this.setFallbackDetectionsForClassifierGeneral(clasificador);
+      }
+    });
+  }
+
+  setFallbackDetectionsGeneral() {
+    this.clasificadores.forEach(clasificador => {
+      this.setFallbackDetectionsForClassifierGeneral(clasificador);
+    });
+  }
+
+  setFallbackDetectionsForClassifierGeneral(clasificador: any) {
+    const baseDetections = Math.floor(Math.random() * 50) + 10;
+    
+    clasificador.activeCount = Math.floor(baseDetections * 0.4) + Math.floor(Math.random() * 15);
+    clasificador.inactiveCount = Math.floor(baseDetections * 0.35) + Math.floor(Math.random() * 12);
+    clasificador.pendingCount = Math.floor(baseDetections * 0.25) + Math.floor(Math.random() * 8);
+  }
+
+  // === MÉTODOS DE USUARIOS ===
+  
+  loadUsers() {
+    this.isLoadingUsers = true;
+    console.log('🔄 Cargando usuarios del backend...');
+    
+    this.backendService.getUsuarios().subscribe({
+      next: (usuarios) => {
+        console.log('✅ Usuarios cargados del backend:', usuarios);
+        this.users = usuarios;
+        this.filteredUsers = [...this.users];
+        this.isLoadingUsers = false;
+      },
+      error: (error) => {
+        console.error('❌ Error cargando usuarios del backend:', error);
+        console.log('⚠️ Usando usuarios hardcodeados como fallback');
+        this.users = [...this.fallbackUsers];
+        this.filteredUsers = [...this.users];
+        this.isLoadingUsers = false;
+      }
+    });
   }
 
   // === MÉTODOS PARA MENÚ DE USUARIO ===
@@ -657,10 +1381,8 @@ export class TestAdminDashboard implements OnInit {
     
     // Confirmar logout
     if (confirm('¿Estás seguro de que deseas cerrar sesión?')) {
-      // Limpiar datos de sesión
-      localStorage.removeItem('currentUser');
-      localStorage.removeItem('authToken');
-      sessionStorage.clear();
+      // Usar el AuthService para logout
+      this.authService.logout();
       
       // Mensaje de confirmación
       console.log('Sesión cerrada exitosamente');

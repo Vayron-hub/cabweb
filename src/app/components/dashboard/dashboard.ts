@@ -5,6 +5,7 @@ import { CardModule } from 'primeng/card';
 import { ButtonModule } from 'primeng/button';
 import { ChartModule } from 'primeng/chart';
 import { AuthService } from '../../services/auth';
+import { BackendService, EstadisticasZonas, EstadisticasTipos, EstadisticasHorarios } from '../../services/backend.service';
 
 @Component({
   selector: 'app-dashboard',
@@ -24,11 +25,17 @@ export class Dashboard implements OnInit {
   zoneData: any;
   wasteData: any;
   scheduleData: any;
+  
+  // Estados de carga
+  isLoadingZones = false;
+  isLoadingWaste = false;
+  isLoadingSchedule = false;
 
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private authService: AuthService
+    private authService: AuthService,
+    private backendService: BackendService
   ) {
     this.currentUser = this.authService.getCurrentUser();
   }
@@ -72,11 +79,50 @@ export class Dashboard implements OnInit {
   }
 
   loadZoneData() {
+    this.isLoadingZones = true;
+    console.log('🔄 Cargando estadísticas de zonas...');
+    
     this.zoneData = {
-      title: 'Zonas Populares de Recolección',
-      subtitle: 'Distribución de actividad por zona geográfica'
+      title: 'Zonas con Mayor Actividad',
+      subtitle: 'Distribución de detecciones por zona'
     };
     
+    this.backendService.getEstadisticasZonas().subscribe({
+      next: (estadisticas: EstadisticasZonas[]) => {
+        console.log('✅ Estadísticas de zonas cargadas:', estadisticas);
+        
+        this.chartData = {
+          labels: estadisticas.map(stat => stat.nombre),
+          datasets: [
+            {
+              label: 'Cantidad de Detecciones',
+              data: estadisticas.map(stat => stat.totalDetecciones),
+              backgroundColor: [
+                '#4a7c59',
+                '#5a8c6a',
+                '#6b9d7b',
+                '#7cae8c',
+                '#8dbf9d',
+                '#9ed0ae'
+              ]
+            }
+          ]
+        };
+        
+        this.isLoadingZones = false;
+      },
+      error: (error) => {
+        console.error('❌ Error cargando estadísticas de zonas:', error);
+        this.isLoadingZones = false;
+        
+        // Fallback a datos mock
+        this.loadZoneDataFallback();
+      }
+    });
+  }
+
+  private loadZoneDataFallback() {
+    console.log('⚠️ Usando datos mock para zonas');
     this.chartData = {
       labels: ['Zona Norte', 'Zona Sur', 'Zona Este', 'Zona Oeste', 'Centro'],
       datasets: [
@@ -96,11 +142,50 @@ export class Dashboard implements OnInit {
   }
 
   loadWasteData() {
+    this.isLoadingWaste = true;
+    console.log('🔄 Cargando estadísticas de tipos de residuos...');
+    
     this.wasteData = {
       title: 'Tipos de Residuos Más Comunes',
       subtitle: 'Clasificación por categoría de residuos'
     };
     
+    this.backendService.getEstadisticasTipos().subscribe({
+      next: (estadisticas: EstadisticasTipos[]) => {
+        console.log('✅ Estadísticas de tipos cargadas:', estadisticas);
+        
+        this.chartData = {
+          labels: estadisticas.map(stat => stat.tipo),
+          datasets: [
+            {
+              label: 'Porcentaje (%)',
+              data: estadisticas.map(stat => stat.porcentaje),
+              backgroundColor: [
+                '#4a7c59',
+                '#5a8c6a',
+                '#6b9d7b',
+                '#7cae8c',
+                '#8dbf9d',
+                '#9ed0ae'
+              ]
+            }
+          ]
+        };
+        
+        this.isLoadingWaste = false;
+      },
+      error: (error) => {
+        console.error('❌ Error cargando estadísticas de tipos:', error);
+        this.isLoadingWaste = false;
+        
+        // Fallback a datos mock
+        this.loadWasteDataFallback();
+      }
+    });
+  }
+
+  private loadWasteDataFallback() {
+    console.log('⚠️ Usando datos mock para tipos de residuos');
     this.chartData = {
       labels: ['Orgánicos', 'Plásticos', 'Papel/Cartón', 'Vidrio', 'Metales', 'Otros'],
       datasets: [
@@ -121,11 +206,52 @@ export class Dashboard implements OnInit {
   }
 
   loadScheduleData() {
+    this.isLoadingSchedule = true;
+    console.log('🔄 Cargando estadísticas de horarios...');
+    
     this.scheduleData = {
       title: 'Horarios Más Activos',
       subtitle: 'Distribución de actividad por franja horaria'
     };
     
+    this.backendService.getEstadisticasHorarios().subscribe({
+      next: (estadisticas: EstadisticasHorarios[]) => {
+        console.log('✅ Estadísticas de horarios cargadas:', estadisticas);
+        
+        // Convertir horas a etiquetas legibles
+        const horariosLabels = estadisticas.map(stat => {
+          const hora = stat.hora;
+          const siguienteHora = hora + 1;
+          return `${hora.toString().padStart(2, '0')}:00-${siguienteHora.toString().padStart(2, '0')}:00`;
+        });
+        
+        this.chartData = {
+          labels: horariosLabels,
+          datasets: [
+            {
+              label: 'Nivel de Actividad',
+              data: estadisticas.map(stat => stat.cantidad),
+              backgroundColor: '#4a7c59',
+              borderColor: '#5a8c6a',
+              borderWidth: 2
+            }
+          ]
+        };
+        
+        this.isLoadingSchedule = false;
+      },
+      error: (error) => {
+        console.error('❌ Error cargando estadísticas de horarios:', error);
+        this.isLoadingSchedule = false;
+        
+        // Fallback a datos mock  
+        this.loadScheduleDataFallback();
+      }
+    });
+  }
+
+  private loadScheduleDataFallback() {
+    console.log('⚠️ Usando datos mock para horarios');
     this.chartData = {
       labels: ['6:00-9:00', '9:00-12:00', '12:00-15:00', '15:00-18:00', '18:00-21:00'],
       datasets: [

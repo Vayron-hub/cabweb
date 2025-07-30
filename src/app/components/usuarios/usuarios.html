@@ -1,0 +1,196 @@
+<!-- Header de Usuarios -->
+<div class="users-header">
+  <div class="users-title">
+    <h2>Gestión de Usuarios</h2>
+  </div>
+    <button 
+      class="btn-success"
+      (click)="addNewUser()">
+      <i class="pi pi-plus"></i>
+      Nuevo Usuario
+    </button>
+  </div>
+
+<!-- Filtros de búsqueda -->
+<div class="search-filters">
+  <div class="search-bar">
+    <div class="search-input-container">
+      <i class="pi pi-search search-icon"></i>
+      <input 
+        type="text" 
+        placeholder="Buscar usuarios por nombre o correo..."
+        [(ngModel)]="searchTerm"
+        (input)="filterUsers()"
+        class="search-input">
+    </div>
+  </div>
+  <div class="role-filters">
+    <label class="filter-label">Filtrar por rol:</label>
+    <div class="role-checkboxes">
+      <label class="checkbox-item" *ngFor="let role of roleOptions">
+        <input 
+          type="checkbox" 
+          [value]="role.value"
+          (change)="onRoleFilterChange($event)"
+          [checked]="selectedRoles.includes(role.value)">
+        <span class="checkmark"></span>
+        {{role.label}}
+      </label>
+    </div>
+  </div>
+</div>
+
+<!-- Estadísticas de usuarios -->
+<div class="users-stats">
+  <div class="stat-card">
+    <div class="stat-icon active">
+      <i class="pi pi-users"></i>
+    </div>
+    <div class="stat-info">
+      <span class="stat-number">{{getActiveUsersCount()}}</span>
+      <span class="stat-label">Usuarios Activos</span>
+    </div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon inactive">
+      <i class="pi pi-user-minus"></i>
+    </div>
+    <div class="stat-info">
+      <span class="stat-number">{{getInactiveUsersCount()}}</span>
+      <span class="stat-label">Usuarios Inactivos</span>
+    </div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon total">
+      <i class="pi pi-chart-bar"></i>
+    </div>
+    <div class="stat-info">
+      <span class="stat-number">{{getTotalUsersCount()}}</span>
+      <span class="stat-label">Total Usuarios</span>
+    </div>
+  </div>
+</div>
+
+<!-- Tabla de usuarios -->
+<div class="users-table-container" *ngIf="!isLoadingUsers">
+  <table class="users-table">
+    <thead>
+      <tr>
+        <th>
+          <input 
+            type="checkbox" 
+            (change)="selectAllUsers($event)"
+            [checked]="allUsersSelected()">
+        </th>
+        <th>Usuario</th>
+        <th>Email</th>
+        <th>Rol</th>
+        <th>Estado</th>
+        <th>Último Acceso</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let user of filteredUsers; trackBy: trackByUserId" 
+          [class.selected]="selectedUsers.includes(user.id)">
+        <td>
+          <input 
+            type="checkbox" 
+            [value]="user.id"
+            (change)="toggleUserSelection(user.id, $event)"
+            [checked]="selectedUsers.includes(user.id)">
+        </td>
+        <td>
+          <div class="user-info">
+            <div class="user-avatar">
+              <i class="pi pi-user"></i>
+            </div>
+            <div class="user-details">
+              <span class="user-name">{{user.nombre}}</span>
+              <span class="user-id">ID: {{user.id}}</span>
+            </div>
+          </div>
+        </td>
+        <td class="user-email">{{user.correo || 'Sin email'}}</td>
+        <td>
+          <span class="role-badge" [ngClass]="getRoleClass(user.rol)">
+            {{user.rol || 'Sin rol'}}
+          </span>
+        </td>
+        <td>
+          <span class="status-badge" [ngClass]="getStatusClass(user.estado)">
+            <i class="pi" [ngClass]="getStatusIcon(user.estado)"></i>
+            {{user.estado || 'Sin estado'}}
+          </span>
+        </td>
+        <td class="last-access">{{formatDate(user.ultimoAcceso)}}</td>
+        <td class="actions">
+          <button 
+            class="action-btn edit"
+            (click)="editUser(user)"
+            [disabled]="!canEditUser()"
+            title="Editar usuario">
+            <i class="pi pi-pencil"></i>
+          </button>
+          <button 
+            class="action-btn delete"
+            (click)="deleteUser(user)"
+            [disabled]="!canDeleteUser(user)"
+            title="Eliminar usuario">
+            <i class="pi pi-trash"></i>
+          </button>
+          <button 
+            class="action-btn toggle"
+            (click)="toggleUserStatus(user)"
+            [disabled]="!canEditUser()"
+            [title]="(user.estado === 'Activo') ? 'Desactivar usuario' : 'Activar usuario'">
+            <i class="pi" [ngClass]="(user.estado === 'Activo') ? 'pi-eye-slash' : 'pi-eye'"></i>
+          </button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  
+  <!-- Mensaje cuando no hay usuarios -->
+  <div class="no-users" *ngIf="filteredUsers.length === 0">
+    <i class="pi pi-users"></i>
+    <h3>No se encontraron usuarios</h3>
+    <p>No hay usuarios que coincidan con los filtros aplicados.</p>
+  </div>
+</div>
+
+<!-- Indicador de carga para usuarios -->
+<div class="loading-container" *ngIf="isLoadingUsers" style="text-align: center; padding: 40px;">
+  <i class="pi pi-spin pi-spinner" style="font-size: 2rem; color: #4a7c59;"></i>
+  <p style="margin-top: 16px; color: #666;">Cargando usuarios del sistema...</p>
+</div>
+
+<!-- Acciones masivas -->
+<div class="bulk-actions" *ngIf="selectedUsers.length > 0">
+  <div class="selected-count">
+    {{selectedUsers.length}} usuario(s) seleccionado(s)
+  </div>
+  <div class="bulk-buttons">
+    <button 
+      class="btn-warning"
+      (click)="bulkDeactivateUsers()"
+      [disabled]="!canEditUser()">
+      <i class="pi pi-eye-slash"></i>
+      Desactivar
+    </button>
+    <button 
+      class="btn-success"
+      (click)="bulkActivateUsers()"
+      [disabled]="!canEditUser()">
+      <i class="pi pi-eye"></i>
+      Activar
+    </button>
+    <button 
+      class="btn-danger"
+      (click)="bulkDeleteUsers()"
+      [disabled]="!canEditUser()">
+      <i class="pi pi-trash"></i>
+      Eliminar
+    </button>
+  </div>
+</div>

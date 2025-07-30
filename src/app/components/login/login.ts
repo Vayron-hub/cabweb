@@ -8,6 +8,7 @@ import { ButtonModule } from 'primeng/button';
 import { MessageModule } from 'primeng/message';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../services/auth';
+import { BackendService } from '../../services/backend.service';
 
 @Component({
   selector: 'app-login',
@@ -40,7 +41,8 @@ export class Login implements OnInit {
     private fb: FormBuilder,
     private authService: AuthService,
     private router: Router,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private backendService: BackendService
   ) {
     this.loginForm = this.fb.group({
       username: ['', [Validators.required]],
@@ -49,7 +51,7 @@ export class Login implements OnInit {
   }
 
   ngOnInit() {
-    this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/dashboard';
+    this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/admin';
     this.queryType = this.route.snapshot.queryParams['type'] || '';
     
     // Cargar credenciales recordadas si existen
@@ -63,27 +65,36 @@ export class Login implements OnInit {
       
       const { username, password } = this.loginForm.value;
       
-      // Simular delay de autenticación para mejor UX
-      setTimeout(() => {
-        if (this.authService.login(username, password)) {
-          // Guardar credenciales si el usuario quiere recordarlas
-          if (this.rememberMe) {
-            this.saveCredentials(username, password);
+      // Usar el nuevo sistema de autenticación con backend
+      this.authService.login(username, password).subscribe({
+        next: (success) => {
+          if (success) {
+            console.log('✅ Login exitoso');
+            
+            // Guardar credenciales si el usuario quiere recordarlas
+            if (this.rememberMe) {
+              this.saveCredentials(username, password);
+            } else {
+              this.clearSavedCredentials();
+            }
+            
+            // Navegación exitosa
+            if (this.queryType) {
+              this.router.navigate([this.returnUrl], { queryParams: { type: this.queryType } });
+            } else {
+              this.router.navigate([this.returnUrl]);
+            }
           } else {
-            this.clearSavedCredentials();
+            this.errorMessage = 'Usuario o contraseña incorrectos. Verifica tus credenciales e intenta nuevamente.';
+            this.isLoading = false;
           }
-          
-          // Navegación exitosa
-          if (this.queryType) {
-            this.router.navigate([this.returnUrl], { queryParams: { type: this.queryType } });
-          } else {
-            this.router.navigate([this.returnUrl]);
-          }
-        } else {
-          this.errorMessage = 'Usuario o contraseña incorrectos. Verifica tus credenciales e intenta nuevamente.';
+        },
+        error: (error) => {
+          console.error('❌ Error en login:', error);
+          this.errorMessage = 'Error al conectar con el servidor. Intenta nuevamente.';
           this.isLoading = false;
         }
-      }, 1500); // Simular tiempo de autenticación
+      });
     }
   }
 

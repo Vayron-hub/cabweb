@@ -1,0 +1,81 @@
+<div class="admin-layout">
+  <app-navbar
+    [selectedLocation]="selectedLocation"
+    [locations]="locations"
+    [isLoadingZonas]="isLoadingZonas"
+    [currentUser]="currentUser"
+    (locationChange)="onLocationChange($event)"
+    (logout)="onLogout()"
+    (viewMyAccount)="onViewMyAccount()">
+  </app-navbar>
+
+  <div class="dashboard-content">
+    <router-outlet></router-outlet>
+  </div>
+
+  <!-- Modal de Mi Cuenta -->
+  <div class="modal-overlay" *ngIf="showAccountModal" (click)="closeAccountModal()">
+    <div class="account-modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>Mi Cuenta</h2>
+        <button class="close-btn" (click)="closeAccountModal()">
+          <i class="pi pi-times"></i>
+        </button>
+      </div>
+      
+      <div class="modal-content">
+        <div class="account-info-section">
+          <div class="account-avatar">
+            <i class="pi pi-user"></i>
+          </div>
+          
+          <div class="account-details">
+            <div class="info-group">
+              <label>Nombre Completo</label>
+              <span>{{currentUser.nombre}}</span>
+            </div>
+            
+            <div class="info-group">
+              <label>Rol</label>
+              <span class="role-tag">{{currentUser.rol}}</span>
+            </div>
+            
+            <div class="info-group">
+              <label>Email</label>
+              <span>{{currentUser.email}}</span>
+            </div>
+            
+            <div class="info-group">
+              <label>ID de Usuario</label>
+              <span>{{currentUser.id}}</span>
+            </div>
+            
+            <div class="info-group">
+              <label>Último Acceso</label>
+              <span>{{formatAccountDate(currentUser.ultimoAcceso)}}</span>
+            </div>
+            
+            <div class="info-group">
+              <label>Estado de Cuenta</label>
+              <span class="status-active">
+                <i class="pi pi-check-circle"></i>
+                Activa
+              </span>
+            </div>
+          </div>
+        </div>
+        
+        <div class="account-actions">
+          <button class="btn-secondary">
+            <i class="pi pi-pencil"></i>
+            Editar Perfil
+          </button>
+          <button class="btn-warning">
+            <i class="pi pi-key"></i>
+            Cambiar Contraseña
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

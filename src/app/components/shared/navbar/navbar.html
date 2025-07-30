@@ -1,0 +1,100 @@
+<div class="dashboard-header">
+  <div class="header-content">
+    <div class="header-left">
+      <div class="logo-container">
+        <img src="assets/images/cab.png" alt="Logo" class="logo" />
+      </div>
+    </div>
+    
+    <div class="header-center">
+      <div class="location-selector-container">
+        <i class="pi pi-map-marker location-icon"></i>
+        <select 
+          [(ngModel)]="selectedLocation" 
+          (change)="onLocationChange()" 
+          class="location-dropdown"
+          [disabled]="isLoadingZonas">
+          <option value="" disabled *ngIf="isLoadingZonas">Cargando zonas...</option>
+          <option *ngFor="let location of locations" [value]="location">{{location}}</option>
+        </select>
+        <i class="pi pi-spin pi-spinner" *ngIf="isLoadingZonas" style="margin-left: 8px; color: #666;"></i>
+      </div>
+    </div>
+    
+    <div class="header-right">
+      <button class="header-btn help-btn">
+        <i class="pi pi-question-circle"></i>
+      </button>
+      <div class="user-menu-container">
+        <button 
+          class="header-btn user-btn"
+          (click)="toggleUserMenu()"
+          [class.active]="userMenuOpen">
+          <i class="pi pi-user"></i>
+        </button>
+        
+        <!-- Mini menú de usuario -->
+        <div class="user-dropdown" *ngIf="userMenuOpen">
+          <div class="user-info-header">
+            <div class="user-avatar-large">
+              <i class="pi pi-user"></i>
+            </div>
+            <div class="user-details-header">
+              <span class="user-name-header">{{currentUser.nombre}}</span>
+              <span class="user-role-header">{{currentUser.rol}}</span>
+            </div>
+          </div>
+          
+          <div class="menu-divider"></div>
+          
+          <div class="menu-options">
+            <button 
+              class="menu-option"
+              (click)="onViewMyAccount()">
+              <i class="pi pi-user-edit"></i>
+              <span>Ver mi cuenta</span>
+            </button>
+            <button 
+              class="menu-option logout"
+              (click)="onLogout()">
+              <i class="pi pi-sign-out"></i>
+              <span>Cerrar sesión</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Barra de Navegación -->
+<div class="nav-bar">
+  <button 
+    class="nav-item" 
+    routerLink="/admin/dashboard"
+    routerLinkActive="active">
+    <i class="pi pi-chart-bar"></i>
+    <span>Dashboard</span>
+  </button>
+  <button 
+    class="nav-item" 
+    routerLink="/admin/estadisticas"
+    routerLinkActive="active">
+    <i class="pi pi-chart-line"></i>
+    <span>Estadísticas</span>
+  </button>
+  <button 
+    class="nav-item" 
+    routerLink="/admin/usuarios"
+    routerLinkActive="active">
+    <i class="pi pi-users"></i>
+    <span>Usuarios</span>
+  </button>
+  <button 
+    class="nav-item" 
+    routerLink="/admin/clasificadores"
+    routerLinkActive="active">
+    <i class="pi pi-filter"></i>
+    <span>Clasificadores</span>
+  </button>
+</div>

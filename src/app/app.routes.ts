@@ -2,32 +2,46 @@ import { Routes } from '@angular/router';
 import { Landing } from './components/landing/landing';
 import { Login } from './components/login/login';
 import { Dashboard } from './components/dashboard/dashboard';
-import { TestAdminDashboard } from './components/admin-dashboard/test-admin';
+import { AdminLayoutComponent } from './components/admin-layout/admin-layout';
+import { DashboardHomeComponent } from './components/dashboard-home/dashboard-home';
 import { AuthGuard } from './guards/auth.guard';
 
 export const routes: Routes = [
   { path: '', component: Landing },
   { path: 'login', component: Login },
-  { path: 'login/:type', component: Login }, // Para recibir el tipo desde landing
+  { path: 'login/:type', component: Login },
   { 
+    // Redirigir dashboard viejo al nuevo admin layout
     path: 'dashboard', 
-    component: Dashboard,
-    canActivate: [AuthGuard]
+    redirectTo: '/admin',
+    pathMatch: 'full'
   },
   { 
-    path: 'dashboard/:type', // Para dashboard con tipo específico
-    component: Dashboard,
-    canActivate: [AuthGuard]
+    // Redirigir dashboard viejo con tipo al nuevo admin layout
+    path: 'dashboard/:type',
+    redirectTo: '/admin',
+    pathMatch: 'full'
   },
   { 
     path: 'admin', 
-    component: TestAdminDashboard,
-    canActivate: [AuthGuard]
-  },
-  { 
-    path: 'admin/:type', // Para admin con tipo específico de zona
-    component: TestAdminDashboard,
-    canActivate: [AuthGuard]
+    component: AdminLayoutComponent,
+    canActivate: [AuthGuard],
+    children: [
+      { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
+      { path: 'dashboard', component: DashboardHomeComponent },
+      {
+        path: 'estadisticas',
+        loadComponent: () => import('./components/estadisticas/estadisticas.js').then(m => m.EstadisticasComponent)
+      },
+      {
+        path: 'usuarios',
+        loadComponent: () => import('./components/usuarios/usuarios.js').then(m => m.UsuariosComponent)
+      },
+      {
+        path: 'clasificadores',
+        loadComponent: () => import('./components/clasificadores/clasificadores.js').then(m => m.ClasificadoresComponent)
+      }
+    ]
   },
   { path: '**', redirectTo: '' }
 ];

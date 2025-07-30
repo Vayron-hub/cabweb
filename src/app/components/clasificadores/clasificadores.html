@@ -1,0 +1,72 @@
+
+<!-- Sección de filtro de búsqueda -->
+<div class="classifiers-search-section">
+  <h2>Filtro de búsqueda</h2>
+  <div class="search-input-wrapper">
+    <input 
+      type="text" 
+      placeholder="Buscar clasificadores por nombre..."
+      [(ngModel)]="classifierSearchTerm"
+      (input)="filterClassifiers()"
+      class="classifier-search-input">
+    <button class="search-button">
+      <i class="pi pi-search"></i>
+    </button>
+  </div>
+</div>
+
+<!-- Lista de clasificadores completa -->
+<div class="classifiers-simple-section">
+  <div class="classifiers-header-simple">
+    <h2>
+      Clasificadores {{getActiveCount()}} | {{getTotalCount()}}
+      <i class="pi pi-spin pi-spinner" *ngIf="isLoadingClasificadores" style="margin-left: 8px; font-size: 14px; color: #666;"></i>
+    </h2>
+    <button class="add-classifier-btn">
+      <i class="pi pi-plus"></i>
+    </button>
+  </div>
+  
+  <div class="classifiers-simple-list" *ngIf="!isLoadingClasificadores">
+    <div class="classifier-simple-item" *ngFor="let classifier of getDisplayedClassifiers()">
+      <div class="classifier-device-icon">
+        <div class="device-screen"></div>
+      </div>
+      
+      <div class="classifier-simple-info">
+        <h3>{{classifier.name}}</h3>
+        <div class="classifier-simple-counters">
+          <span class="simple-counter blue" title="Detecciones de valorizable/reciclables">
+            <i class="pi pi-trash"></i>
+            {{classifier.inactiveCount || 0}}
+          </span>
+          <span class="simple-counter green" title="Detecciones de residuos orgánicos">
+            <i class="pi pi-trash"></i>
+            {{classifier.activeCount || 0}}
+          </span>
+          <span class="simple-counter gray" title="Detecciones de desechos generales">
+            <i class="pi pi-trash"></i>
+            {{classifier.pendingCount || 0}}
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Indicador de carga para clasificadores -->
+  <div class="loading-container" *ngIf="isLoadingClasificadores" style="text-align: center; padding: 40px;">
+    <i class="pi pi-spin pi-spinner" style="font-size: 2rem; color: #4a7c59;"></i>
+    <p style="margin-top: 16px; color: #666;">Cargando clasificadores...</p>
+  </div>
+  
+  <!-- Mensaje cuando no hay clasificadores -->
+  <div class="no-data-container" *ngIf="!isLoadingClasificadores && getDisplayedClassifiers().length === 0" style="text-align: center; padding: 40px;">
+    <i class="pi pi-info-circle" style="font-size: 2rem; color: #999;"></i>
+    <p style="margin-top: 16px; color: #666;" *ngIf="!classifierSearchTerm.trim()">
+      No hay clasificadores disponibles para esta zona
+    </p>
+    <p style="margin-top: 16px; color: #666;" *ngIf="classifierSearchTerm.trim()">
+      No se encontraron clasificadores que coincidan con "{{classifierSearchTerm}}"
+    </p>
+  </div>
+</div>

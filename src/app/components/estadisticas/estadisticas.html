@@ -1,0 +1,147 @@
+<!-- Header de Estadísticas -->
+<div class="statistics-header">
+  <div class="statistics-title">
+    <h2>Estadísticas</h2>
+    <p>Análisis general de datos para {{selectedLocation}}</p>
+  </div>
+  <div class="statistics-actions">
+    <button 
+      class="btn-primary"
+      (click)="exportStatisticsData()">
+      <i class="pi pi-download"></i>
+      Exportar
+    </button>
+    <button 
+      class="btn-secondary"
+      (click)="refreshStatistics()"
+      [disabled]="isLoadingStats">
+      <i class="pi" [class.pi-refresh]="!isLoadingStats" [class.pi-spin]="isLoadingStats" [class.pi-spinner]="isLoadingStats"></i>
+      {{isLoadingStats ? 'Actualizando...' : 'Actualizar'}}
+    </button>
+  </div>
+</div>
+
+<!-- Grid de Estadísticas -->
+<div class="statistics-grid">
+  
+  <!-- Módulo de Detecciones -->
+  <div class="stat-module">
+    <div class="module-header">
+      <h3>Módulo</h3>
+      <p>Detecciones por hora</p>
+    </div>
+    <div class="module-chart">
+      <div class="bar-chart-container">
+        <div class="chart-bar" [style.height.%]="deteccionesPorHora[0]">
+          <div class="bar-value">{{deteccionesPorHora[0]}}</div>
+        </div>
+        <div class="chart-bar" [style.height.%]="deteccionesPorHora[1]">
+          <div class="bar-value">{{deteccionesPorHora[1]}}</div>
+        </div>
+        <div class="chart-bar" [style.height.%]="deteccionesPorHora[2]">
+          <div class="bar-value">{{deteccionesPorHora[2]}}</div>
+        </div>
+        <div class="chart-bar" [style.height.%]="deteccionesPorHora[3]">
+          <div class="bar-value">{{deteccionesPorHora[3]}}</div>
+        </div>
+      </div>
+      <div class="chart-labels">
+        <span>6AM</span>
+        <span>12PM</span>
+        <span>6PM</span>
+        <span>12AM</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Módulo de Clasificación -->
+  <div class="stat-module">
+    <div class="module-header">
+      <h3>Módulo</h3>
+      <p>Clasificaciones exitosas</p>
+    </div>
+    <div class="module-chart">
+      <div class="bar-chart-container">
+        <div class="chart-bar" [style.height.%]="clasificacionesExitosas[0]">
+          <div class="bar-value">{{clasificacionesExitosas[0]}}</div>
+        </div>
+        <div class="chart-bar" [style.height.%]="clasificacionesExitosas[1]">
+          <div class="bar-value">{{clasificacionesExitosas[1]}}</div>
+        </div>
+        <div class="chart-bar" [style.height.%]="clasificacionesExitosas[2]">
+          <div class="bar-value">{{clasificacionesExitosas[2]}}</div>
+        </div>
+        <div class="chart-bar" [style.height.%]="clasificacionesExitosas[3]">
+          <div class="bar-value">{{clasificacionesExitosas[3]}}</div>
+        </div>
+      </div>
+      <div class="chart-labels">
+        <span>Lun</span>
+        <span>Mar</span>
+        <span>Mié</span>
+        <span>Jue</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Módulo de Transporte -->
+  <div class="stat-module">
+    <div class="module-header">
+      <h3>Módulo</h3>
+      <p>Flujo de transporte</p>
+    </div>
+    <div class="module-chart">
+      <div class="bar-chart-container">
+        <div class="chart-bar" [style.height.%]="flujoTransporte[0]">
+          <div class="bar-value">{{flujoTransporte[0]}}</div>
+        </div>
+        <div class="chart-bar" [style.height.%]="flujoTransporte[1]">
+          <div class="bar-value">{{flujoTransporte[1]}}</div>
+        </div>
+        <div class="chart-bar" [style.height.%]="flujoTransporte[2]">
+          <div class="bar-value">{{flujoTransporte[2]}}</div>
+        </div>
+        <div class="chart-bar" [style.height.%]="flujoTransporte[3]">
+          <div class="bar-value">{{flujoTransporte[3]}}</div>
+        </div>
+      </div>
+      <div class="chart-labels">
+        <span>Bus</span>
+        <span>Auto</span>
+        <span>Moto</span>
+        <span>Bike</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Módulo de Usuarios -->
+  <div class="stat-module">
+    <div class="module-header">
+      <h3>Módulo</h3>
+      <p>Actividad de usuarios</p>
+    </div>
+    <div class="module-chart">
+      <div class="bar-chart-container">
+        <div class="chart-bar" [style.height.%]="actividadUsuarios[0]">
+          <div class="bar-value">{{actividadUsuarios[0]}}</div>
+        </div>
+        <div class="chart-bar" [style.height.%]="actividadUsuarios[1]">
+          <div class="bar-value">{{actividadUsuarios[1]}}</div>
+        </div>
+        <div class="chart-bar" [style.height.%]="actividadUsuarios[2]">
+          <div class="bar-value">{{actividadUsuarios[2]}}</div>
+        </div>
+        <div class="chart-bar" [style.height.%]="actividadUsuarios[3]">
+          <div class="bar-value">{{actividadUsuarios[3]}}</div>
+        </div>
+      </div>
+      <div class="chart-labels">
+        <span>Admin</span>
+        <span>Op</span>
+        <span>View</span>
+        <span>Guest</span>
+      </div>
+    </div>
+  </div>
+
+</div>

@@ -1,0 +1,354 @@
+/* === ESTILOS PARA CLASIFICADORES SIMPLES === */
+
+/* Sección de búsqueda */
+.classifiers-search-section {
+  background: white;
+  padding: 30px;
+  margin-bottom: 20px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.classifiers-search-section h2 {
+  margin: 0 0 20px 0;
+  font-size: 20px;
+  color: #333;
+  font-weight: 600;
+}
+
+.search-input-wrapper {
+  position: relative;
+  max-width: 400px;
+}
+
+.classifier-search-input {
+  width: 100%;
+  padding: 12px 50px 12px 16px;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 16px;
+  transition: border-color 0.3s ease;
+}
+
+.classifier-search-input:focus {
+  outline: none;
+  border-color: #4a7c59;
+}
+
+.search-button {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: #4a7c59;
+  border: none;
+  border-radius: 6px;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.search-button:hover {
+  background: #3a6249;
+}
+
+/* Sección principal de clasificadores */
+.classifiers-simple-section {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  overflow: hidden;
+}
+
+.classifiers-header-simple {
+  background: linear-gradient(135deg, #4a7c59, #5a8a6b);
+  color: white;
+  padding: 20px 25px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.classifiers-header-simple h2 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.add-classifier-btn {
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  cursor: pointer;
+  font-size: 16px;
+  transition: all 0.3s ease;
+}
+
+.add-classifier-btn:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: scale(1.05);
+}
+
+/* Lista de clasificadores */
+.classifiers-simple-list {
+  padding: 0;
+}
+
+.classifier-simple-item {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 20px 25px;
+  border-bottom: 1px solid #f0f0f0;
+  transition: background 0.2s ease;
+}
+
+.classifier-simple-item:hover {
+  background: #f8f9fa;
+}
+
+.classifier-simple-item:last-child {
+  border-bottom: none;
+}
+
+/* Icono del dispositivo */
+.classifier-device-icon {
+  width: 50px;
+  height: 50px;
+  background: linear-gradient(135deg, #4a7c59, #5a8a6b);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  flex-shrink: 0;
+}
+
+.device-screen {
+  width: 30px;
+  height: 20px;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 3px;
+  position: relative;
+}
+
+.device-screen::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 20px;
+  height: 12px;
+  background: #4a7c59;
+  border-radius: 2px;
+}
+
+/* Información del clasificador */
+.classifier-simple-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.classifier-simple-info h3 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+}
+
+.classifier-simple-counters {
+  display: flex;
+  gap: 15px;
+  flex-wrap: wrap;
+}
+
+.simple-counter {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 500;
+  min-width: 60px;
+  justify-content: center;
+}
+
+.simple-counter.blue {
+  background: #e3f2fd;
+  color: #1976d2;
+}
+
+.simple-counter.green {
+  background: #e8f5e8;
+  color: #2e7d32;
+}
+
+.simple-counter.gray {
+  background: #f5f5f5;
+  color: #666;
+}
+
+.simple-counter.total {
+  background: #fff3e0;
+  color: #f57c00;
+  font-weight: 600;
+}
+
+.simple-counter i {
+  font-size: 12px;
+}
+
+/* Estados de carga y mensajes */
+.loading-container {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.no-data-container {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+/* Botones de acción */
+.classifier-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.action-btn {
+  width: 32px;
+  height: 32px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  transition: all 0.2s;
+}
+
+.action-btn.view {
+  background: #e8f4f8;
+  color: #1976d2;
+}
+
+.action-btn.view:hover {
+  background: #d1ecf1;
+}
+
+.action-btn.edit {
+  background: #fff3e0;
+  color: #f57c00;
+}
+
+.action-btn.edit:hover {
+  background: #ffe0b2;
+}
+
+.action-btn.delete {
+  background: #ffebee;
+  color: #d32f2f;
+}
+
+.action-btn.delete:hover {
+  background: #ffcdd2;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .classifiers-search-section {
+    padding: 20px;
+  }
+  
+  .classifiers-header-simple {
+    padding: 15px 20px;
+  }
+  
+  .classifiers-header-simple h2 {
+    font-size: 16px;
+  }
+  
+  .classifier-simple-item {
+    padding: 15px 20px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  
+  .classifier-device-icon {
+    width: 40px;
+    height: 40px;
+  }
+  
+  .device-screen {
+    width: 24px;
+    height: 16px;
+  }
+  
+  .device-screen::before {
+    width: 16px;
+    height: 10px;
+  }
+  
+  .classifier-simple-info {
+    width: 100%;
+  }
+  
+  .classifier-simple-counters {
+    gap: 10px;
+  }
+  
+  .simple-counter {
+    padding: 4px 8px;
+    font-size: 12px;
+    min-width: 50px;
+  }
+}
+
+@media (max-width: 480px) {
+  .search-input-wrapper {
+    max-width: 100%;
+  }
+  
+  .classifier-search-input {
+    font-size: 14px;
+    padding: 10px 45px 10px 12px;
+  }
+  
+  .search-button {
+    width: 32px;
+    height: 32px;
+  }
+  
+  .classifier-simple-counters {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+  }
+  
+  .simple-counter {
+    font-size: 11px;
+    padding: 3px 6px;
+  }
+}
