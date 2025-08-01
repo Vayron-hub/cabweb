@@ -1,105 +1,5 @@
 <div class="dashboard-container">
-  <!-- Header Verde -->
-  <div class="dashboard-header">
-    <div class="header-content">
-      <div class="header-left">
-        <div class="logo-container">
-          <img src="" alt="Logo" class="logo" />
-        </div>
-      </div>
-      
-      <div class="header-center">
-        <div class="location-selector-container">
-          <i class="pi pi-map-marker location-icon"></i>
-          <select 
-            [(ngModel)]="selectedLocation" 
-            (change)="onLocationChange()" 
-            class="location-dropdown"
-            [disabled]="isLoadingZonas">
-            <option value="" disabled *ngIf="isLoadingZonas">Cargando zonas...</option>
-            <option *ngFor="let location of locations" [value]="location">{{location}}</option>
-          </select>
-          <i class="pi pi-spin pi-spinner" *ngIf="isLoadingZonas" style="margin-left: 8px; color: #666;"></i>
-        </div>
-      </div>
-      
-      <div class="header-right">
-        <button class="header-btn help-btn">
-          <i class="pi pi-question-circle"></i>
-        </button>
-        <div class="user-menu-container">
-          <button 
-            class="header-btn user-btn"
-            (click)="toggleUserMenu()"
-            [class.active]="userMenuOpen">
-            <i class="pi pi-user"></i>
-          </button>
-          
-          <!-- Mini menú de usuario -->
-          <div class="user-dropdown" *ngIf="userMenuOpen">
-            <div class="user-info-header">
-              <div class="user-avatar-large">
-                <i class="pi pi-user"></i>
-              </div>
-              <div class="user-details-header">
-                <span class="user-name-header">{{currentUser.nombre}}</span>
-                <span class="user-role-header">{{currentUser.rol}}</span>
-              </div>
-            </div>
-            
-            <div class="menu-divider"></div>
-            
-            <div class="menu-options">
-              <button 
-                class="menu-option"
-                (click)="viewMyAccount()">
-                <i class="pi pi-user-edit"></i>
-                <span>Ver mi cuenta</span>
-              </button>
-              <button 
-                class="menu-option logout"
-                (click)="logout()">
-                <i class="pi pi-sign-out"></i>
-                <span>Cerrar sesión</span>
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Barra de Navegación -->
-  <div class="nav-bar">
-    <button 
-      class="nav-item" 
-      [class.active]="activeTab === 'dashboard'"
-      (click)="setActiveTab('dashboard')">
-      <i class="pi pi-chart-bar"></i>
-      <span>Dashboard</span>
-    </button>
-    <button 
-      class="nav-item" 
-      [class.active]="activeTab === 'estadisticas'"
-      (click)="setActiveTab('estadisticas')">
-      <i class="pi pi-chart-line"></i>
-      <span>Estadísticas</span>
-    </button>
-    <button 
-      class="nav-item" 
-      [class.active]="activeTab === 'usuarios'"
-      (click)="setActiveTab('usuarios')">
-      <i class="pi pi-users"></i>
-      <span>Usuarios</span>
-    </button>
-    <button 
-      class="nav-item" 
-      [class.active]="activeTab === 'clasificadores'"
-      (click)="setActiveTab('clasificadores')">
-      <i class="pi pi-filter"></i>
-      <span>Clasificadores</span>
-    </button>
-  </div>
+  
 
   <!-- Contenido del Dashboard -->
   <div class="dashboard-content" *ngIf="activeTab === 'dashboard'">
@@ -146,41 +46,60 @@
         </div>
       </div>
 
-      <!-- Panel Central - Gráfico de Barras -->
+      <!-- Panel Central - Comparativa Global de Zonas -->
       <div class="chart-panel">
+        <div class="chart-header-small">
+          <h4>Comparativa de Zonas</h4>
+          <p>Top zonas por detecciones</p>
+        </div>
         <div class="bar-chart">
-          <div class="bar" [style.height.%]="75"></div>
-          <div class="bar" [style.height.%]="45"></div>
-          <div class="bar" [style.height.%]="60"></div>
-          <div class="bar" [style.height.%]="85"></div>
+          <div class="bar" [style.height.%]="datosDashboardCentral[0] || 0" [title]="'Detecciones en ' + (zonasDeteccionesHoy[0] || 'N/A')"></div>
+          <div class="bar" [style.height.%]="datosDashboardCentral[1] || 0" [title]="'Detecciones en ' + (zonasDeteccionesHoy[1] || 'N/A')"></div>
+          <div class="bar" [style.height.%]="datosDashboardCentral[2] || 0" [title]="'Detecciones en ' + (zonasDeteccionesHoy[2] || 'N/A')"></div>
+          <div class="bar" [style.height.%]="datosDashboardCentral[3] || 0" [title]="'Detecciones en ' + (zonasDeteccionesHoy[3] || 'N/A')"></div>
+        </div>
+        <div class="bar-labels">
+          <span>{{(zonasDeteccionesHoy[0] || 'N/A').substring(0,8)}}</span>
+          <span>{{(zonasDeteccionesHoy[1] || 'N/A').substring(0,8)}}</span>
+          <span>{{(zonasDeteccionesHoy[2] || 'N/A').substring(0,8)}}</span>
+          <span>{{(zonasDeteccionesHoy[3] || 'N/A').substring(0,8)}}</span>
         </div>
       </div>
 
       <!-- Panel Derecho - Gráficos Circulares -->
       <div class="pie-charts-panel">
         <div class="pie-chart-row">
-          <div class="pie-chart">
+          <!-- Gráfico de Valorizable (Azul) -->
+          <div class="pie-chart" title="Residuos Valorizables: {{porcentajeValorizable || 0}}%">
             <svg viewBox="0 0 42 42" class="donut">
               <circle cx="21" cy="21" r="15.915" fill="transparent" stroke="#e6e6e6" stroke-width="3"></circle>
-              <circle cx="21" cy="21" r="15.915" fill="transparent" stroke="#4a7c59" stroke-width="3" 
-                      stroke-dasharray="60 40" stroke-dashoffset="25"></circle>
+              <circle cx="21" cy="21" r="15.915" fill="transparent" stroke="#2196F3" stroke-width="3" 
+                      [attr.stroke-dasharray]="(porcentajeValorizable || 0) + ' ' + (100 - (porcentajeValorizable || 0))" stroke-dashoffset="25"></circle>
+              <text x="21" y="24" text-anchor="middle" font-size="8" font-weight="bold" fill="#2196F3">{{porcentajeValorizable || 0}}%</text>
             </svg>
+            <div class="chart-label">Valorizable</div>
           </div>
-          <div class="pie-chart">
+          <!-- Gráfico de Orgánica (Verde) -->
+          <div class="pie-chart" title="Residuos Orgánicos: {{porcentajeOrganica || 0}}%">
             <svg viewBox="0 0 42 42" class="donut">
               <circle cx="21" cy="21" r="15.915" fill="transparent" stroke="#e6e6e6" stroke-width="3"></circle>
-              <circle cx="21" cy="21" r="15.915" fill="transparent" stroke="#4a7c59" stroke-width="3" 
-                      stroke-dasharray="40 60" stroke-dashoffset="25"></circle>
+              <circle cx="21" cy="21" r="15.915" fill="transparent" stroke="#4CAF50" stroke-width="3" 
+                      [attr.stroke-dasharray]="(porcentajeOrganica || 0) + ' ' + (100 - (porcentajeOrganica || 0))" stroke-dashoffset="25"></circle>
+              <text x="21" y="24" text-anchor="middle" font-size="8" font-weight="bold" fill="#4CAF50">{{porcentajeOrganica || 0}}%</text>
             </svg>
+            <div class="chart-label">Orgánica</div>
           </div>
         </div>
         <div class="pie-chart-single">
-          <div class="pie-chart">
+          <!-- Gráfico de No Valorizable (Gris) -->
+          <div class="pie-chart" title="Residuos No Valorizables: {{porcentajeNoValorizable || 0}}%">
             <svg viewBox="0 0 42 42" class="donut">
               <circle cx="21" cy="21" r="15.915" fill="transparent" stroke="#e6e6e6" stroke-width="3"></circle>
-              <circle cx="21" cy="21" r="15.915" fill="transparent" stroke="#4a7c59" stroke-width="3" 
-                      stroke-dasharray="70 30" stroke-dashoffset="25"></circle>
+              <circle cx="21" cy="21" r="15.915" fill="transparent" stroke="#757575" stroke-width="3" 
+                      [attr.stroke-dasharray]="(porcentajeNoValorizable || 0) + ' ' + (100 - (porcentajeNoValorizable || 0))" stroke-dashoffset="25"></circle>
+              <text x="21" y="24" text-anchor="middle" font-size="8" font-weight="bold" fill="#757575">{{porcentajeNoValorizable || 0}}%</text>
             </svg>
+            <div class="chart-label">No Valorizable</div>
           </div>
         </div>
       </div>
@@ -190,7 +109,7 @@
     <!-- Sección Últimas Detecciones -->
     <div class="recent-detections">
       <div class="recent-detections-header">
-        <h2>Últimas detecciones</h2>
+        <h2>Últimas detecciones<span *ngIf="selectedLocation"> - {{selectedLocation}}</span></h2>
         <button 
           class="refresh-btn-small"
           (click)="loadUltimasDetecciones()"
@@ -203,29 +122,25 @@
       <div class="detections-list" *ngIf="!isLoadingDetecciones">
         <div class="detection-card" *ngFor="let detection of ultimasDetecciones; trackBy: trackDetectionById">
           <div class="detection-icon-wrapper">
-            <div class="detection-icon" [style.background-color]="getDetectionTypeColor(detection.tipoResiduo)">
-              <i class="pi" [ngClass]="getDetectionTypeIcon(detection.tipoResiduo)"></i>
+            <div class="detection-icon" [style.background-color]="getDetectionTypeColor(detection.tipo || detection.tipoResiduo)">
+              <i class="pi" [ngClass]="getDetectionTypeIcon(detection.tipo || detection.tipoResiduo)"></i>
             </div>
           </div>
           
           <div class="detection-content">
             <div class="detection-main-info">
-              <div class="detection-type-label">{{detection.tipoResiduo}}</div>
-              <div class="detection-time">{{formatDetectionTime(detection.fecha)}}</div>
+              <div class="detection-type-label">{{detection.tipo || detection.tipoResiduo || 'Sin tipo'}}</div>
+              <div class="detection-time">{{formatDetectionTime(detection.fechaHora || detection.fecha)}}</div>
             </div>
             
             <div class="detection-secondary-info">
               <div class="detection-location">
                 <i class="pi pi-map-marker"></i>
-                <span>{{detection.clasificador}} - {{detection.zona}}</span>
-              </div>
-              <div class="detection-confidence">
-                <i class="pi pi-percentage"></i>
-                <span>{{detection.confianza}}% confianza</span>
+                <span>{{(detection.clasificador || 'Sin clasificador')}}</span>
               </div>
             </div>
             
-            <div class="detection-status-wrapper">
+            <div class="detection-status-wrapper" *ngIf="detection.estado">
               <span class="status-badge" [ngClass]="detection.estado.toLowerCase()">
                 <i class="pi" [ngClass]="detection.estado === 'Confirmada' ? 'pi-check' : 'pi-clock'"></i>
                 {{detection.estado}}
@@ -281,125 +196,270 @@
       </div>
     </div>
 
-    <!-- Grid de Estadísticas -->
-    <div class="statistics-grid">
+    <!-- Panel de KPIs -->
+    <div class="kpis-panel">
+      <div class="kpi-card" *ngIf="estadisticasGenerales">
+        <div class="kpi-icon total">
+          <i class="pi pi-chart-line"></i>
+        </div>
+        <div class="kpi-content">
+          <span class="kpi-number">{{estadisticasGenerales.totalDetecciones}}</span>
+          <span class="kpi-label">Total Detecciones</span>
+        </div>
+      </div>
       
-      <!-- Módulo de Detecciones -->
-      <div class="stat-module">
-        <div class="module-header">
-          <h3>Módulo</h3>
-          <p>Detecciones por hora</p>
+      <div class="kpi-card" *ngIf="estadisticasGenerales">
+        <div class="kpi-icon efficiency">
+          <i class="pi pi-check-circle"></i>
         </div>
-        <div class="module-chart">
-          <div class="bar-chart-container">
-            <div class="chart-bar" [style.height.%]="deteccionesPorHora[0]">
-              <div class="bar-value">{{deteccionesPorHora[0]}}</div>
+        <div class="kpi-content">
+          <span class="kpi-number">{{getEfficiencyPercentage()}}%</span>
+          <span class="kpi-label">Eficiencia</span>
+        </div>
+      </div>
+      
+      <div class="kpi-card">
+        <div class="kpi-icon active">
+          <i class="pi pi-desktop"></i>
+        </div>
+        <div class="kpi-content">
+          <span class="kpi-number">{{getActiveClassifiersCount()}}</span>
+          <span class="kpi-label">Clasificadores Activos</span>
+        </div>
+      </div>
+      
+      <div class="kpi-card">
+        <div class="kpi-icon zones">
+          <i class="pi pi-map"></i>
+        </div>
+        <div class="kpi-content">
+          <span class="kpi-number">{{getActiveZonesCount()}}</span>
+          <span class="kpi-label">Zonas Activas</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Grid de Gráficas -->
+    <div class="charts-grid">
+      
+      <!-- 1. Gráfica de Composición de Residuos (Doughnut) -->
+      <div class="chart-container large">
+        <div class="chart-header">
+          <h3>Distribución por Tipo de Residuo</h3>
+          <p>Composición actual de detecciones</p>
+        </div>
+        <div class="chart-content">
+          <div class="composition-chart" *ngIf="estadisticasTipos.length > 0">
+            <div class="doughnut-chart">
+              <svg viewBox="0 0 120 120" class="composition-svg">
+                <!-- Background circle -->
+                <circle cx="60" cy="60" r="40" fill="transparent" stroke="#f0f0f0" stroke-width="8"></circle>
+                
+                <!-- Dynamic segments based on estadisticasTipos -->
+                <circle 
+                  *ngFor="let tipo of getTopTipos(); let i = index"
+                  cx="60" cy="60" r="40" 
+                  fill="transparent" 
+                  [attr.stroke]="getTipoColor(tipo.tipo)"
+                  stroke-width="8"
+                  [attr.stroke-dasharray]="tipo.porcentaje + ' ' + (100 - tipo.porcentaje)"
+                  [attr.stroke-dashoffset]="getStrokeDashOffset(i)"
+                  class="chart-segment">
+                </circle>
+                
+                <!-- Center text -->
+                <text x="60" y="55" text-anchor="middle" font-size="14" font-weight="bold" fill="#333">
+                  {{getTotalDetections()}}
+                </text>
+                <text x="60" y="70" text-anchor="middle" font-size="10" fill="#666">
+                  Total
+                </text>
+              </svg>
             </div>
-            <div class="chart-bar" [style.height.%]="deteccionesPorHora[1]">
-              <div class="bar-value">{{deteccionesPorHora[1]}}</div>
-            </div>
-            <div class="chart-bar" [style.height.%]="deteccionesPorHora[2]">
-              <div class="bar-value">{{deteccionesPorHora[2]}}</div>
-            </div>
-            <div class="chart-bar" [style.height.%]="deteccionesPorHora[3]">
-              <div class="bar-value">{{deteccionesPorHora[3]}}</div>
+            
+            <!-- Legend -->
+            <div class="chart-legend">
+              <div class="legend-item" *ngFor="let tipo of getTopTipos()">
+                <div class="legend-color" [style.background-color]="getTipoColor(tipo.tipo)"></div>
+                <span class="legend-label">{{tipo.tipo}}</span>
+                <span class="legend-value">{{tipo.porcentaje}}%</span>
+              </div>
             </div>
           </div>
-          <div class="chart-labels">
-            <span>6AM</span>
-            <span>12PM</span>
-            <span>6PM</span>
-            <span>12AM</span>
+          
+          <!-- Loading state -->
+          <div class="chart-loading" *ngIf="isLoadingStats">
+            <i class="pi pi-spin pi-spinner"></i>
+            <p>Cargando datos...</p>
           </div>
         </div>
       </div>
 
-      <!-- Módulo de Clasificación -->
-      <div class="stat-module">
-        <div class="module-header">
-          <h3>Módulo</h3>
-          <p>Clasificaciones exitosas</p>
+      <!-- 2. Patrones de Actividad por Horarios (Heatmap) -->
+      <div class="chart-container medium">
+        <div class="chart-header">
+          <h3>Patrones de Actividad</h3>
+          <p>Detecciones por hora del día</p>
         </div>
-        <div class="module-chart">
-          <div class="bar-chart-container">
-            <div class="chart-bar" [style.height.%]="clasificacionesExitosas[0]">
-              <div class="bar-value">{{clasificacionesExitosas[0]}}</div>
+        <div class="chart-content">
+          <div class="heatmap-chart" *ngIf="estadisticasHorarios.length > 0">
+            <div class="heatmap-grid">
+              <div 
+                class="heatmap-cell"
+                *ngFor="let horario of estadisticasHorarios"
+                [attr.title]="horario.hora + ':00 - ' + horario.cantidad + ' detecciones'"
+                [style.background-color]="getHeatmapColor(horario.cantidad, getMaxCantidad())">
+                <span class="cell-hour">{{horario.hora}}</span>
+                <span class="cell-count">{{horario.cantidad}}</span>
+              </div>
             </div>
-            <div class="chart-bar" [style.height.%]="clasificacionesExitosas[1]">
-              <div class="bar-value">{{clasificacionesExitosas[1]}}</div>
+            
+            <!-- Time labels -->
+            <div class="heatmap-labels">
+              <span>00</span>
+              <span>06</span>
+              <span>12</span>
+              <span>18</span>
+              <span>23</span>
             </div>
-            <div class="chart-bar" [style.height.%]="clasificacionesExitosas[2]">
-              <div class="bar-value">{{clasificacionesExitosas[2]}}</div>
-            </div>
-            <div class="chart-bar" [style.height.%]="clasificacionesExitosas[3]">
-              <div class="bar-value">{{clasificacionesExitosas[3]}}</div>
-            </div>
-          </div>
-          <div class="chart-labels">
-            <span>Lun</span>
-            <span>Mar</span>
-            <span>Mié</span>
-            <span>Jue</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- Módulo de Transporte -->
-      <div class="stat-module">
-        <div class="module-header">
-          <h3>Módulo</h3>
-          <p>Flujo de transporte</p>
-        </div>
-        <div class="module-chart">
-          <div class="bar-chart-container">
-            <div class="chart-bar" [style.height.%]="flujoTransporte[0]">
-              <div class="bar-value">{{flujoTransporte[0]}}</div>
-            </div>
-            <div class="chart-bar" [style.height.%]="flujoTransporte[1]">
-              <div class="bar-value">{{flujoTransporte[1]}}</div>
-            </div>
-            <div class="chart-bar" [style.height.%]="flujoTransporte[2]">
-              <div class="bar-value">{{flujoTransporte[2]}}</div>
-            </div>
-            <div class="chart-bar" [style.height.%]="flujoTransporte[3]">
-              <div class="bar-value">{{flujoTransporte[3]}}</div>
-            </div>
-          </div>
-          <div class="chart-labels">
-            <span>Bus</span>
-            <span>Auto</span>
-            <span>Moto</span>
-            <span>Bike</span>
           </div>
         </div>
       </div>
 
-      <!-- Módulo de Usuarios -->
-      <div class="stat-module">
-        <div class="module-header">
-          <h3>Módulo</h3>
-          <p>Actividad de usuarios</p>
+      <!-- 3. Top Clasificadores Más Activos (Barras Horizontales) -->
+      <div class="chart-container medium">
+        <div class="chart-header">
+          <h3>Clasificadores Más Activos</h3>
+          <p>Top 5 por número de detecciones</p>
         </div>
-        <div class="module-chart">
-          <div class="bar-chart-container">
-            <div class="chart-bar" [style.height.%]="actividadUsuarios[0]">
-              <div class="bar-value">{{actividadUsuarios[0]}}</div>
-            </div>
-            <div class="chart-bar" [style.height.%]="actividadUsuarios[1]">
-              <div class="bar-value">{{actividadUsuarios[1]}}</div>
-            </div>
-            <div class="chart-bar" [style.height.%]="actividadUsuarios[2]">
-              <div class="bar-value">{{actividadUsuarios[2]}}</div>
-            </div>
-            <div class="chart-bar" [style.height.%]="actividadUsuarios[3]">
-              <div class="bar-value">{{actividadUsuarios[3]}}</div>
+        <div class="chart-content">
+          <div class="horizontal-bar-chart" *ngIf="estadisticasZonas.length > 0">
+            <div 
+              class="bar-item"
+              *ngFor="let zona of getTopZonas(); let i = index">
+              <div class="bar-info">
+                <span class="bar-label">{{zona.nombre}}</span>
+                <span class="bar-value">{{zona.totalDetecciones}}</span>
+              </div>
+              <div class="bar-container">
+                <div 
+                  class="bar-fill"
+                  [style.width.%]="getBarPercentage(zona.totalDetecciones, getMaxZonaDetections())"
+                  [style.background]="'linear-gradient(90deg, #4a7c59 0%, #6bb86b ' + (i * 20) + '%)'"
+                  [attr.title]="zona.nombre + ': ' + zona.totalDetecciones + ' detecciones'">
+                </div>
+              </div>
             </div>
           </div>
-          <div class="chart-labels">
-            <span>Admin</span>
-            <span>Op</span>
-            <span>View</span>
-            <span>Guest</span>
+        </div>
+      </div>
+
+      <!-- 4. Actividad por Zonas (Barras Agrupadas) -->
+      <div class="chart-container large">
+        <div class="chart-header">
+          <h3>Detecciones por Zona</h3>
+          <p>Distribución de tipos de residuo por zona</p>
+        </div>
+        <div class="chart-content">
+          <div class="grouped-bar-chart" *ngIf="estadisticasZonas.length > 0">
+            <div class="chart-bars">
+              <div 
+                class="bar-group"
+                *ngFor="let zona of estadisticasZonas.slice(0, 5)">
+                <div class="group-label">{{zona.nombre.substring(0, 8)}}</div>
+                <div class="bars-container">
+                  <!-- Barra para cada tipo de residuo -->
+                  <div 
+                    class="grouped-bar valorizable"
+                    [style.height.%]="getZonaTypePercentage(zona, 'valorizable')"
+                    [attr.title]="'Valorizable: ' + getZonaTypeCount(zona, 'valorizable')">
+                  </div>
+                  <div 
+                    class="grouped-bar organico"
+                    [style.height.%]="getZonaTypePercentage(zona, 'organico')"
+                    [attr.title]="'Orgánico: ' + getZonaTypeCount(zona, 'organico')">
+                  </div>
+                  <div 
+                    class="grouped-bar no-valorizable"
+                    [style.height.%]="getZonaTypePercentage(zona, 'noValorizable')"
+                    [attr.title]="'No Valorizable: ' + getZonaTypeCount(zona, 'noValorizable')">
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Legend for grouped bars -->
+            <div class="grouped-legend">
+              <div class="legend-item">
+                <div class="legend-color valorizable"></div>
+                <span>Valorizable</span>
+              </div>
+              <div class="legend-item">
+                <div class="legend-color organico"></div>
+                <span>Orgánico</span>
+              </div>
+              <div class="legend-item">
+                <div class="legend-color no-valorizable"></div>
+                <span>No Valorizable</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 5. Tendencia Temporal (Gráfica de Líneas) -->
+      <div class="chart-container full-width">
+        <div class="chart-header">
+          <h3>Tendencia de Detecciones</h3>
+          <p>Evolución en los últimos días</p>
+        </div>
+        <div class="chart-content">
+          <div class="line-chart" *ngIf="estadisticasGenerales">
+            <div class="chart-area">
+              <svg viewBox="0 0 600 200" class="line-svg">
+                <!-- Grid lines -->
+                <defs>
+                  <pattern id="grid" width="60" height="40" patternUnits="userSpaceOnUse">
+                    <path d="M 60 0 L 0 0 0 40" fill="none" stroke="#f0f0f0" stroke-width="1"/>
+                  </pattern>
+                </defs>
+                <rect width="600" height="200" fill="url(#grid)" />
+                
+                <!-- Simple trend line based on available data -->
+                <polyline
+                  [attr.points]="getSimpleTrendPoints()"
+                  fill="none"
+                  stroke="#4a7c59"
+                  stroke-width="3"
+                  stroke-linecap="round"
+                  stroke-linejoin="round">
+                </polyline>
+                
+                <!-- Data points -->
+                <circle
+                  *ngFor="let point of getSimpleDataPoints(); let i = index"
+                  [attr.cx]="point.x"
+                  [attr.cy]="point.y"
+                  r="4"
+                  fill="#4a7c59"
+                  [attr.title]="point.label + ': ' + point.value">
+                </circle>
+                
+                <!-- Area fill -->
+                <polygon
+                  [attr.points]="getSimpleTrendAreaPoints()"
+                  fill="rgba(74, 124, 89, 0.1)">
+                </polygon>
+              </svg>
+            </div>
+            
+            <!-- X-axis labels -->
+            <div class="line-labels">
+              <span>Total</span>
+              <span>Hoy</span>
+              <span>Este Mes</span>
+              <span>Usuarios</span>
+            </div>
           </div>
         </div>
       </div>
@@ -540,16 +600,16 @@
                 </div>
               </div>
             </td>
-            <td class="user-email">{{user.email}}</td>
+            <td class="user-email">{{user.correo || user.email}}</td>
             <td>
               <span class="role-badge" [ngClass]="getRoleClass(user.rol)">
                 {{user.rol}}
               </span>
             </td>
             <td>
-              <span class="status-badge" [ngClass]="getStatusClass(user.estado)">
-                <i class="pi" [ngClass]="getStatusIcon(user.estado)"></i>
-                {{user.estado}}
+              <span class="status-badge" [ngClass]="getStatusClass(user.activo)">
+                <i class="pi" [ngClass]="getStatusIcon(user.activo)"></i>
+                {{getStatusText(user.activo)}}
               </span>
             </td>
             <td class="last-access">{{formatDate(user.ultimoAcceso)}}</td>
@@ -572,8 +632,8 @@
                 class="action-btn toggle"
                 (click)="toggleUserStatus(user)"
                 [disabled]="!canEditUser()"
-                [title]="user.estado === 'Activo' ? 'Desactivar usuario' : 'Activar usuario'">
-                <i class="pi" [ngClass]="user.estado === 'Activo' ? 'pi-eye-slash' : 'pi-eye'"></i>
+                [title]="user.activo ? 'Desactivar usuario' : 'Activar usuario'">
+                <i class="pi" [ngClass]="user.activo ? 'pi-eye-slash' : 'pi-eye'"></i>
               </button>
             </td>
           </tr>
@@ -735,7 +795,7 @@
             
             <div class="info-group">
               <label>Último Acceso</label>
-              <span>{{formatAccountDate(currentUser.ultimoAcceso)}}</span>
+              <span>{{formatDate(currentUser.ultimoAcceso)}}</span>
             </div>
             
             <div class="info-group">

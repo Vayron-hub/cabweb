@@ -3,7 +3,7 @@ import { Landing } from './components/landing/landing';
 import { Login } from './components/login/login';
 import { Dashboard } from './components/dashboard/dashboard';
 import { AdminLayoutComponent } from './components/admin-layout/admin-layout';
-import { DashboardHomeComponent } from './components/dashboard-home/dashboard-home';
+import { AdminDashboardComponent } from './components/admin-dashboard/admin-dashboard';
 import { AuthGuard } from './guards/auth.guard';
 
 export const routes: Routes = [
@@ -28,7 +28,7 @@ export const routes: Routes = [
     canActivate: [AuthGuard],
     children: [
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
-      { path: 'dashboard', component: DashboardHomeComponent },
+      { path: 'dashboard', component: AdminDashboardComponent },
       {
         path: 'estadisticas',
         loadComponent: () => import('./components/estadisticas/estadisticas.js').then(m => m.EstadisticasComponent)

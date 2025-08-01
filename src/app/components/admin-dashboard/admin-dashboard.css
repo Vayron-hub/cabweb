@@ -450,15 +450,36 @@
   padding: 20px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.1);
   display: flex;
-  align-items: end;
-  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* Header pequeño para panel central */
+.chart-header-small {
+  text-align: center;
+  margin-bottom: 15px;
+}
+
+.chart-header-small h4 {
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+  margin: 0 0 5px 0;
+}
+
+.chart-header-small p {
+  font-size: 12px;
+  color: #666;
+  margin: 0;
 }
 
 .bar-chart {
   display: flex;
   align-items: end;
   gap: 20px;
-  height: 200px;
+  height: 150px;
+  margin-bottom: 10px;
 }
 
 .bar {
@@ -466,6 +487,21 @@
   background: #4a7c59;
   border-radius: 4px 4px 0 0;
   min-height: 20px;
+}
+
+.bar-labels {
+  display: flex;
+  gap: 20px;
+  font-size: 11px;
+  color: #666;
+  text-align: center;
+}
+
+.bar-labels span {
+  width: 40px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 /* Panel de Gráficos Circulares */
@@ -1544,6 +1580,59 @@
   padding: 2px 6px;
   border-radius: 4px;
   box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.chart-labels {
+  display: flex;
+  justify-content: space-around;
+  margin-top: 12px;
+  padding: 0 15px;
+}
+
+.chart-labels span {
+  font-size: 11px;
+  color: #666;
+  font-weight: 500;
+  text-align: center;
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Etiquetas para el gráfico de barras central */
+.bar-labels {
+  display: flex;
+  justify-content: space-around;
+  margin-top: 10px;
+  padding: 0 10px;
+}
+
+.bar-labels span {
+  font-size: 11px;
+  color: #777;
+  font-weight: 500;
+  text-align: center;
+  max-width: 60px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Etiquetas para gráficos circulares */
+.chart-label {
+  position: absolute;
+  bottom: -25px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 10px;
+  color: #666;
+  font-weight: 600;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.pie-chart {
+  position: relative;
 }
 
 .chart-labels {

@@ -502,6 +502,35 @@ export class BackendService {
       .pipe(catchError(this.handleError));
   }
 
+  // === ENDPOINTS ESPECÍFICOS DE ESTADÍSTICAS POR ZONA ===
+  
+  getEstadisticasZonaPorId(zonaId: string | number): Observable<EstadisticasGenerales> {
+    console.log('🔗 BackendService - getEstadisticasZonaPorId llamado con ID:', zonaId);
+    const url = `${this.apiUrl}/detecciones/estadisticas/zona/${zonaId}`;
+    console.log('🔗 URL construida para estadísticas de zona:', url);
+    
+    return this.http.get<EstadisticasGenerales>(url)
+      .pipe(catchError(this.handleError));
+  }
+
+  getEstadisticasTiposPorZona(zonaId: string | number): Observable<EstadisticasTipos[]> {
+    console.log('🔗 BackendService - getEstadisticasTiposPorZona llamado con ID:', zonaId);
+    const url = `${this.apiUrl}/detecciones/estadisticas/tipos/zona/${zonaId}`;
+    console.log('🔗 URL construida para tipos por zona:', url);
+    
+    return this.http.get<EstadisticasTipos[]>(url)
+      .pipe(catchError(this.handleError));
+  }
+
+  getEstadisticasHorariosPorZona(zonaId: string | number): Observable<EstadisticasHorarios[]> {
+    console.log('🔗 BackendService - getEstadisticasHorariosPorZona llamado con ID:', zonaId);
+    const url = `${this.apiUrl}/detecciones/estadisticas/horarios/zona/${zonaId}`;
+    console.log('🔗 URL construida para horarios por zona:', url);
+    
+    return this.http.get<EstadisticasHorarios[]>(url)
+      .pipe(catchError(this.handleError));
+  }
+
   // === MÉTODOS DE UTILIDAD ===
   
   // Método para verificar roles (si tu backend lo soporta)
