@@ -20,10 +20,9 @@
 
     <div class="main-dashboard-grid">
       
-      <!-- Panel Izquierdo - TOP 3 Clasificadores Globales -->
       <div class="classifiers-panel">
         <div class="panel-header">
-          <h2>🏆 TOP 3 Clasificadores Más Activos</h2>
+          <h2>TOP 3 Clasificadores Más Activos</h2>
           <small>Del sistema completo</small>
         </div>
         <div class="classifier-item" *ngFor="let classifier of getCurrentClassifiers()">
@@ -32,7 +31,7 @@
           </div>
           <div class="classifier-info">
             <h3>{{classifier.name}}</h3>
-            <small class="zone-info">📍 {{classifier.zona}}</small>
+            <small class="zone-info"> {{classifier.zona}}</small>
             <div class="total-detections">
               <span class="detection-count">{{classifier.totalDetecciones}}</span>
               <small>detecciones totales</small>
@@ -44,7 +43,7 @@
       <!-- Panel Central - Comparativa Entre Zonas -->
       <div class="chart-panel">
         <div class="panel-header">
-          <h2>📊 Comparativa Entre Zonas</h2>
+          <h2>Comparativa Entre Zonas</h2>
           <small>Detecciones por zona del sistema</small>
         </div>
         <div class="chart-content">
@@ -77,10 +76,9 @@
         </div>
       </div>
 
-      <!-- Panel Derecho - Distribución Global de Tipos -->
       <div class="pie-charts-panel">
         <div class="panel-header">
-          <h2>🌍 Distribución Global</h2>
+          <h2>Distribución Global</h2>
           <small>Tipos más populares del sistema</small>
         </div>
         <div class="pie-chart-row">
@@ -276,7 +274,6 @@
         </div>
       </div>
 
-      <!-- Módulo de Transporte -->
       <div class="stat-module">
         <div class="module-header">
           <h3>Módulo</h3>
@@ -306,7 +303,6 @@
         </div>
       </div>
 
-      <!-- Módulo de Usuarios -->
       <div class="stat-module">
         <div class="module-header">
           <h3>Módulo</h3>
@@ -576,7 +572,6 @@
       </div>
     </div>
 
-    <!-- Lista de clasificadores simple -->
     <div class="classifiers-simple-section">
       <div class="classifiers-header-simple">
         <h2>
