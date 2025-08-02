@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpErrorResponse } from '@angular/common/http';
-import { Observable, throwError, BehaviorSubject } from 'rxjs';
+import { Observable, throwError, BehaviorSubject, forkJoin } from 'rxjs';
 import { catchError, map, tap } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
 
@@ -101,10 +101,13 @@ export interface EstadisticasGenerales {
 }
 
 export interface EstadisticasZonas {
-  zonaId: string | number;
+  id: number;
   nombre: string;
+  totalClasificadores: number;
   totalDetecciones: number;
-  porcentaje: number;
+  deteccionesHoy: number;
+  ultimaActividad: string | null;
+  tipoMasComun: string | null;
 }
 
 export interface EstadisticasTipos {
@@ -349,27 +352,27 @@ export class BackendService {
   // === ENDPOINTS ESPECÍFICOS DEL DASHBOARD ===
   
   getDashboardData(): Observable<DashboardData> {
-    return this.http.get<DashboardData>(`${this.apiUrl}/reportes/dashboard`)
+    return this.http.get<DashboardData>(`${this.apiUrl}/dashboard`)
       .pipe(catchError(this.handleError));
   }
 
   getEstadisticasGenerales(): Observable<EstadisticasGenerales> {
-    return this.http.get<EstadisticasGenerales>(`${this.apiUrl}/reportes/estadisticas/generales`)
+    return this.http.get<EstadisticasGenerales>(`${this.apiUrl}/estadisticas/generales`)
       .pipe(catchError(this.handleError));
   }
 
   getEstadisticasZonas(): Observable<EstadisticasZonas[]> {
-    return this.http.get<EstadisticasZonas[]>(`${this.apiUrl}/reportes/estadisticas/zonas`)
+    return this.http.get<EstadisticasZonas[]>(`${this.apiUrl}/zonas/estadisticas`)
       .pipe(catchError(this.handleError));
   }
 
   getEstadisticasTipos(): Observable<EstadisticasTipos[]> {
-    return this.http.get<EstadisticasTipos[]>(`${this.apiUrl}/reportes/estadisticas/tipos`)
+    return this.http.get<EstadisticasTipos[]>(`${this.apiUrl}/estadisticas/tipos`)
       .pipe(catchError(this.handleError));
   }
 
   getEstadisticasHorarios(): Observable<EstadisticasHorarios[]> {
-    return this.http.get<EstadisticasHorarios[]>(`${this.apiUrl}/reportes/estadisticas/horarios`)
+    return this.http.get<EstadisticasHorarios[]>(`${this.apiUrl}/estadisticas/horarios`)
       .pipe(catchError(this.handleError));
   }
 
@@ -390,7 +393,7 @@ export class BackendService {
   }
 
   getDeteccionesRecientes(limite: number = 10): Observable<Deteccion[]> {
-    return this.http.get<Deteccion[]>(`${this.apiUrl}/detecciones/recientes?limite=${limite}`)
+    return this.http.get<Deteccion[]>(`${this.apiUrl}/detecciones/recientes?limit=${limite}`)
       .pipe(catchError(this.handleError));
   }
 
@@ -499,35 +502,6 @@ export class BackendService {
 
   deleteCampana(id: string | number): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/contenido/campanas/${id}`)
-      .pipe(catchError(this.handleError));
-  }
-
-  // === ENDPOINTS ESPECÍFICOS DE ESTADÍSTICAS POR ZONA ===
-  
-  getEstadisticasZonaPorId(zonaId: string | number): Observable<EstadisticasGenerales> {
-    console.log('🔗 BackendService - getEstadisticasZonaPorId llamado con ID:', zonaId);
-    const url = `${this.apiUrl}/detecciones/estadisticas/zona/${zonaId}`;
-    console.log('🔗 URL construida para estadísticas de zona:', url);
-    
-    return this.http.get<EstadisticasGenerales>(url)
-      .pipe(catchError(this.handleError));
-  }
-
-  getEstadisticasTiposPorZona(zonaId: string | number): Observable<EstadisticasTipos[]> {
-    console.log('🔗 BackendService - getEstadisticasTiposPorZona llamado con ID:', zonaId);
-    const url = `${this.apiUrl}/detecciones/estadisticas/tipos/zona/${zonaId}`;
-    console.log('🔗 URL construida para tipos por zona:', url);
-    
-    return this.http.get<EstadisticasTipos[]>(url)
-      .pipe(catchError(this.handleError));
-  }
-
-  getEstadisticasHorariosPorZona(zonaId: string | number): Observable<EstadisticasHorarios[]> {
-    console.log('🔗 BackendService - getEstadisticasHorariosPorZona llamado con ID:', zonaId);
-    const url = `${this.apiUrl}/detecciones/estadisticas/horarios/zona/${zonaId}`;
-    console.log('🔗 URL construida para horarios por zona:', url);
-    
-    return this.http.get<EstadisticasHorarios[]>(url)
       .pipe(catchError(this.handleError));
   }
 

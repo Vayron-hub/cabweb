@@ -6,6 +6,12 @@
   </div>
   <div class="statistics-actions">
     <button 
+      class="btn-primary"
+      (click)="exportStatisticsData()">
+      <i class="pi pi-download"></i>
+      Exportar
+    </button>
+    <button 
       class="btn-secondary"
       (click)="refreshStatistics()"
       [disabled]="isLoadingStats">
@@ -15,187 +21,125 @@
   </div>
 </div>
 
-<!-- Panel de KPIs -->
-<div class="kpis-panel">
-  <div class="kpi-card" *ngIf="estadisticasGenerales">
-    <div class="kpi-icon total">
-      <i class="pi pi-chart-line"></i>
-    </div>
-    <div class="kpi-content">
-      <span class="kpi-number">{{estadisticasGenerales.totalDetecciones}}</span>
-      <span class="kpi-label">Total Detecciones</span>
-    </div>
-  </div>
+<!-- Grid de Estadísticas -->
+<div class="statistics-grid">
   
-  <div class="kpi-card">
-    <div class="kpi-icon active">
-      <i class="pi pi-desktop"></i>
+  <!-- Módulo de Detecciones -->
+  <div class="stat-module">
+    <div class="module-header">
+      <h3>Módulo</h3>
+      <p>Detecciones por hora</p>
     </div>
-    <div class="kpi-content">
-      <span class="kpi-number">{{getActiveClassifiersCount()}}</span>
-      <span class="kpi-label">Clasificadores Activos</span>
-    </div>
-  </div>
-  
-  <div class="kpi-card">
-    <div class="kpi-icon zones">
-      <i class="pi pi-map"></i>
-    </div>
-    <div class="kpi-content">
-      <span class="kpi-number">{{getActiveZonesCount()}}</span>
-      <span class="kpi-label">Zonas Activas</span>
-    </div>
-  </div>
-</div>
-
-
-<!-- Grid de Gráficas Avanzadas -->
-<div class="charts-grid">
-  
-  <!-- 1. Gráfica de Composición de Residuos (Doughnut) -->
-  <div class="chart-container large">
-    <div class="chart-header">
-      <h3>Distribución por Tipo de Residuo</h3>
-      <p>Composición actual de detecciones</p>
-    </div>
-    <div class="chart-content">
-      <div class="composition-chart" *ngIf="estadisticasTipos.length > 0">
-        <div class="doughnut-chart">
-          <svg viewBox="0 0 120 120" class="composition-svg">
-            <!-- Background circle -->
-            <circle cx="60" cy="60" r="40" fill="transparent" stroke="#f0f0f0" stroke-width="8"></circle>
-            
-            <!-- Dynamic segments based on estadisticasTipos -->
-            <circle 
-              *ngFor="let tipo of getTopTipos(); let i = index"
-              cx="60" cy="60" r="40" 
-              fill="transparent" 
-              [attr.stroke]="getTipoColor(tipo.tipo)"
-              stroke-width="8"
-              [attr.stroke-dasharray]="tipo.porcentaje + ' ' + (100 - tipo.porcentaje)"
-              [attr.stroke-dashoffset]="getStrokeDashOffset(i)"
-              class="chart-segment">
-            </circle>
-            
-            <!-- Center text -->
-            <text x="60" y="55" text-anchor="middle" font-size="14" font-weight="bold" fill="#333">
-              {{getTotalDetections()}}
-            </text>
-            <text x="60" y="70" text-anchor="middle" font-size="10" fill="#666">
-              Total
-            </text>
-          </svg>
+    <div class="module-chart">
+      <div class="bar-chart-container">
+        <div class="chart-bar" [style.height.%]="deteccionesPorHora[0]">
+          <div class="bar-value">{{deteccionesPorHora[0]}}</div>
         </div>
-        
-        <!-- Legend -->
-        <div class="chart-legend">
-          <div class="legend-item" *ngFor="let tipo of getTopTipos()">
-            <div class="legend-color" [style.background-color]="getTipoColor(tipo.tipo)"></div>
-            <span class="legend-label">{{tipo.tipo}}</span>
-            <span class="legend-value">{{tipo.porcentaje}}%</span>
-          </div>
+        <div class="chart-bar" [style.height.%]="deteccionesPorHora[1]">
+          <div class="bar-value">{{deteccionesPorHora[1]}}</div>
+        </div>
+        <div class="chart-bar" [style.height.%]="deteccionesPorHora[2]">
+          <div class="bar-value">{{deteccionesPorHora[2]}}</div>
+        </div>
+        <div class="chart-bar" [style.height.%]="deteccionesPorHora[3]">
+          <div class="bar-value">{{deteccionesPorHora[3]}}</div>
         </div>
       </div>
-      
-      <!-- Loading state -->
-      <div class="chart-loading" *ngIf="isLoadingStats">
-        <i class="pi pi-spin pi-spinner"></i>
-        <p>Cargando datos...</p>
+      <div class="chart-labels">
+        <span>6AM</span>
+        <span>12PM</span>
+        <span>6PM</span>
+        <span>12AM</span>
       </div>
     </div>
   </div>
 
-  <!-- 2. Top Clasificadores Más Activos (Barras Horizontales) -->
-  <div class="chart-container medium">
-    <div class="chart-header">
-      <h3>Clasificadores Más Activos</h3>
-      <p>Top 5 por número de detecciones</p>
+  <!-- Módulo de Clasificación -->
+  <div class="stat-module">
+    <div class="module-header">
+      <h3>Módulo</h3>
+      <p>Clasificaciones exitosas</p>
     </div>
-    <div class="chart-content">
-      <div class="horizontal-bar-chart" *ngIf="estadisticasZonas.length > 0">
-        <div 
-          class="bar-item"
-          *ngFor="let zona of getTopZonas(); let i = index">
-          <div class="bar-info">
-            <span class="bar-label">{{zona.nombre}}</span>
-            <span class="bar-value">{{zona.totalDetecciones}}</span>
-          </div>
-          <div class="bar-container">
-            <div 
-              class="bar-fill"
-              [style.width.%]="getBarPercentage(zona.totalDetecciones, getMaxZonaDetections())"
-              [style.background]="'linear-gradient(90deg, #4a7c59 0%, #6bb86b ' + (i * 20) + '%)'"
-              [attr.title]="zona.nombre + ': ' + zona.totalDetecciones + ' detecciones'">
-            </div>
-          </div>
+    <div class="module-chart">
+      <div class="bar-chart-container">
+        <div class="chart-bar" [style.height.%]="clasificacionesExitosas[0]">
+          <div class="bar-value">{{clasificacionesExitosas[0]}}</div>
         </div>
+        <div class="chart-bar" [style.height.%]="clasificacionesExitosas[1]">
+          <div class="bar-value">{{clasificacionesExitosas[1]}}</div>
+        </div>
+        <div class="chart-bar" [style.height.%]="clasificacionesExitosas[2]">
+          <div class="bar-value">{{clasificacionesExitosas[2]}}</div>
+        </div>
+        <div class="chart-bar" [style.height.%]="clasificacionesExitosas[3]">
+          <div class="bar-value">{{clasificacionesExitosas[3]}}</div>
+        </div>
+      </div>
+      <div class="chart-labels">
+        <span>Lun</span>
+        <span>Mar</span>
+        <span>Mié</span>
+        <span>Jue</span>
       </div>
     </div>
   </div>
 
-  <!-- 3. Tendencia Temporal (Gráfica de Líneas) -->
-  <div class="chart-container full-width">
-    <div class="chart-header">
-      <h3>Tendencia de Detecciones</h3>
-      <p>Evolución en los últimos días</p>
+  <!-- Módulo de Transporte -->
+  <div class="stat-module">
+    <div class="module-header">
+      <h3>Módulo</h3>
+      <p>Flujo de transporte</p>
     </div>
-    <div class="chart-content">
-      <div class="line-chart" *ngIf="estadisticasGenerales">
-        <div class="chart-area">
-          <svg viewBox="0 0 600 200" class="line-svg">
-            <!-- Grid lines -->
-            <defs>
-              <pattern id="grid" width="60" height="40" patternUnits="userSpaceOnUse">
-                <path d="M 60 0 L 0 0 0 40" fill="none" stroke="#f0f0f0" stroke-width="1"/>
-              </pattern>
-            </defs>
-            <rect width="600" height="200" fill="url(#grid)" />
-            
-            <!-- Simple trend line based on available data -->
-            <polyline
-              [attr.points]="getSimpleTrendPoints()"
-              fill="none"
-              stroke="#4a7c59"
-              stroke-width="3"
-              stroke-linecap="round"
-              stroke-linejoin="round">
-            </polyline>
-            
-            <!-- Data points -->
-            <circle
-              *ngFor="let point of getSimpleDataPoints(); let i = index"
-              [attr.cx]="point.x"
-              [attr.cy]="point.y"
-              r="4"
-              fill="#4a7c59"
-              [attr.title]="point.label + ': ' + point.value">
-            </circle>
-            
-            <!-- Area fill -->
-            <polygon
-              [attr.points]="getSimpleTrendAreaPoints()"
-              fill="rgba(74, 124, 89, 0.1)">
-            </polygon>
-          </svg>
+    <div class="module-chart">
+      <div class="bar-chart-container">
+        <div class="chart-bar" [style.height.%]="flujoTransporte[0]">
+          <div class="bar-value">{{flujoTransporte[0]}}</div>
         </div>
-        
-        <!-- Trend indicators -->
-        <div class="trend-indicators">
-          <div class="trend-item">
-            <span class="trend-label">Promedio</span>
-            <span class="trend-value">{{getAverageDetections()}}</span>
-          </div>
-          <div class="trend-item">
-            <span class="trend-label">Máximo</span>
-            <span class="trend-value">{{getMaxDetections()}}</span>
-          </div>
-          <div class="trend-item">
-            <span class="trend-label">Tendencia</span>
-            <span class="trend-value" [class.positive]="getTrendDirection() > 0" [class.negative]="getTrendDirection() < 0">
-              {{getTrendDirection() > 0 ? '↗' : getTrendDirection() < 0 ? '↘' : '→'}}
-            </span>
-          </div>
+        <div class="chart-bar" [style.height.%]="flujoTransporte[1]">
+          <div class="bar-value">{{flujoTransporte[1]}}</div>
         </div>
+        <div class="chart-bar" [style.height.%]="flujoTransporte[2]">
+          <div class="bar-value">{{flujoTransporte[2]}}</div>
+        </div>
+        <div class="chart-bar" [style.height.%]="flujoTransporte[3]">
+          <div class="bar-value">{{flujoTransporte[3]}}</div>
+        </div>
+      </div>
+      <div class="chart-labels">
+        <span>Bus</span>
+        <span>Auto</span>
+        <span>Moto</span>
+        <span>Bike</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Módulo de Usuarios -->
+  <div class="stat-module">
+    <div class="module-header">
+      <h3>Módulo</h3>
+      <p>Actividad de usuarios</p>
+    </div>
+    <div class="module-chart">
+      <div class="bar-chart-container">
+        <div class="chart-bar" [style.height.%]="actividadUsuarios[0]">
+          <div class="bar-value">{{actividadUsuarios[0]}}</div>
+        </div>
+        <div class="chart-bar" [style.height.%]="actividadUsuarios[1]">
+          <div class="bar-value">{{actividadUsuarios[1]}}</div>
+        </div>
+        <div class="chart-bar" [style.height.%]="actividadUsuarios[2]">
+          <div class="bar-value">{{actividadUsuarios[2]}}</div>
+        </div>
+        <div class="chart-bar" [style.height.%]="actividadUsuarios[3]">
+          <div class="bar-value">{{actividadUsuarios[3]}}</div>
+        </div>
+      </div>
+      <div class="chart-labels">
+        <span>Admin</span>
+        <span>Op</span>
+        <span>View</span>
+        <span>Guest</span>
       </div>
     </div>
   </div>

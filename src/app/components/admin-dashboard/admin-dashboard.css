@@ -350,6 +350,26 @@
   box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
 
+/* Headers de los paneles */
+.panel-header {
+  margin-bottom: 15px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid #f0f0f0;
+}
+
+.panel-header h2 {
+  margin: 0 0 5px 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+}
+
+.panel-header small {
+  color: #666;
+  font-size: 12px;
+  font-weight: normal;
+}
+
 .classifier-item {
   display: flex;
   align-items: center;
@@ -360,6 +380,14 @@
 
 .classifier-item:last-child {
   border-bottom: none;
+}
+
+.zone-info {
+  display: block;
+  color: #666;
+  font-size: 11px;
+  margin-top: 2px;
+  font-style: italic;
 }
 
 .classifier-icon {
@@ -403,6 +431,27 @@
 .classifier-counters {
   display: flex;
   gap: 15px;
+}
+
+/* Diseño simple para total de detecciones */
+.total-detections {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  margin-top: 8px;
+}
+
+.detection-count {
+  font-size: 24px;
+  font-weight: 700;
+  color: #6B7280;
+  line-height: 1;
+}
+
+.total-detections small {
+  font-size: 12px;
+  color: #9CA3AF;
+  margin-top: 2px;
 }
 
 .counter {
@@ -451,57 +500,83 @@
   box-shadow: 0 2px 8px rgba(0,0,0,0.1);
   display: flex;
   flex-direction: column;
-  align-items: center;
   justify-content: space-between;
 }
 
-/* Header pequeño para panel central */
-.chart-header-small {
-  text-align: center;
-  margin-bottom: 15px;
+.chart-panel .panel-header {
+  margin-bottom: 20px;
 }
 
-.chart-header-small h4 {
-  font-size: 14px;
-  font-weight: 600;
-  color: #333;
-  margin: 0 0 5px 0;
-}
-
-.chart-header-small p {
-  font-size: 12px;
-  color: #666;
-  margin: 0;
-}
-
-.bar-chart {
+.chart-content {
   display: flex;
-  align-items: end;
-  gap: 20px;
-  height: 150px;
-  margin-bottom: 10px;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  padding: 20px 0;
+  height: 280px;
+}
+
+.bar-chart-simple {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 30px;
+  height: 200px;
+  width: 100%;
+}
+
+.bar-column {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 100%;
 }
 
 .bar {
-  width: 40px;
-  background: #4a7c59;
-  border-radius: 4px 4px 0 0;
-  min-height: 20px;
+  width: 50px;
+  background: linear-gradient(45deg, #4a7c59, #5a8c69);
+  border-radius: 8px 8px 0 0;
+  min-height: 10px;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(74, 124, 89, 0.3);
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  position: relative;
 }
 
-.bar-labels {
-  display: flex;
-  gap: 20px;
+.bar:hover {
+  background: linear-gradient(45deg, #5a8c69, #6a9c79);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(74, 124, 89, 0.4);
+}
+
+.bar:after {
+  content: attr(data-value) '%';
+  position: absolute;
+  top: -25px;
+  left: 50%;
+  transform: translateX(-50%);
   font-size: 11px;
-  color: #666;
-  text-align: center;
+  font-weight: bold;
+  color: #4a7c59;
+  white-space: nowrap;
 }
 
-.bar-labels span {
-  width: 40px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+.bar-label {
+  font-size: 12px;
+  color: #555;
+  font-weight: 600;
+  text-align: center;
+  margin-top: 8px;
+  max-width: 70px;
+  line-height: 1.2;
+  cursor: help;
+  transition: color 0.2s ease;
+  word-wrap: break-word;
+}
+
+.bar-label:hover {
+  color: #4a7c59;
+  font-weight: 700;
 }
 
 /* Panel de Gráficos Circulares */
@@ -554,6 +629,15 @@
   font-weight: 600;
   color: #333;
   margin: 0;
+}
+
+.zone-highlight {
+  color: #4a7c59;
+  font-weight: 700;
+  background: linear-gradient(135deg, #4a7c59, #5a8c69);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 .refresh-btn-small {
@@ -669,6 +753,18 @@
 .detection-confidence i {
   color: #4a7c59;
   font-size: 12px;
+}
+
+.zone-separator {
+  color: #ccc;
+  margin: 0 6px;
+  font-weight: bold;
+}
+
+.zone-info {
+  color: #888;
+  font-size: 13px;
+  font-style: italic;
 }
 
 .detection-status-wrapper {
@@ -1596,24 +1692,6 @@
   text-align: center;
   flex: 1;
   white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-/* Etiquetas para el gráfico de barras central */
-.bar-labels {
-  display: flex;
-  justify-content: space-around;
-  margin-top: 10px;
-  padding: 0 10px;
-}
-
-.bar-labels span {
-  font-size: 11px;
-  color: #777;
-  font-weight: 500;
-  text-align: center;
-  max-width: 60px;
   overflow: hidden;
   text-overflow: ellipsis;
 }
