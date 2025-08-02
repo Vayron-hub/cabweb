@@ -357,7 +357,7 @@ export class BackendService {
   }
 
   getEstadisticasGenerales(): Observable<EstadisticasGenerales> {
-    return this.http.get<EstadisticasGenerales>(`${this.apiUrl}/estadisticas/generales`)
+    return this.http.get<EstadisticasGenerales>(`${this.apiUrl}/detecciones/estadisticas`)
       .pipe(catchError(this.handleError));
   }
 
@@ -367,12 +367,12 @@ export class BackendService {
   }
 
   getEstadisticasTipos(): Observable<EstadisticasTipos[]> {
-    return this.http.get<EstadisticasTipos[]>(`${this.apiUrl}/estadisticas/tipos`)
+    return this.http.get<EstadisticasTipos[]>(`${this.apiUrl}/detecciones/estadisticas/tipos-populares`)
       .pipe(catchError(this.handleError));
   }
 
   getEstadisticasHorarios(): Observable<EstadisticasHorarios[]> {
-    return this.http.get<EstadisticasHorarios[]>(`${this.apiUrl}/estadisticas/horarios`)
+    return this.http.get<EstadisticasHorarios[]>(`${this.apiUrl}/detecciones/estadisticas/horarios-recurrentes`)
       .pipe(catchError(this.handleError));
   }
 
