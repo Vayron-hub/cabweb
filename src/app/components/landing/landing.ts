@@ -22,6 +22,9 @@ export class Landing {
     if (cardType === 'login') {
       // Si es el botón de login, ir al login
       this.router.navigate(['/login']);
+    } else if (cardType === 'cotizacion') {
+      // Si es el botón de cotización, ir a la página de cotización
+      this.router.navigate(['/cotizacion']);
     } else {
       // Para cualquier otra tarjeta, ir directamente al admin dashboard
       if (this.authService.isLoggedIn()) {
