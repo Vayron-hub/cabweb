@@ -146,6 +146,7 @@
 .role-checkboxes {
   display: flex;
   gap: 20px;
+  background-color: white;
 }
 
 .checkbox-item {
@@ -154,6 +155,7 @@
   gap: 8px;
   cursor: pointer;
   font-size: 14px;
+  background-color: white;
 }
 
 .checkbox-item input[type="checkbox"] {

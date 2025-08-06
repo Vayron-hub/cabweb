@@ -39,10 +39,10 @@
         placeholder="Buscar usuarios por nombre o correo..."
         [(ngModel)]="searchTerm"
         (input)="filterUsers()"
-        class="search-input">
+        class="search-input background-input">
     </div>
   </div>
-  <div class="role-filters">
+  <!-- <div class="role-filters">
     <label class="filter-label">Filtrar por rol:</label>
     <div class="role-checkboxes">
       <label class="checkbox-item" *ngFor="let role of roleOptions">
@@ -55,7 +55,7 @@
         {{role.label}}
       </label>
     </div>
-  </div>
+  </div> -->
 </div>
 
 <!-- Estadísticas de usuarios -->
@@ -98,7 +98,8 @@
           <input 
             type="checkbox" 
             (change)="selectAllUsers($event)"
-            [checked]="allUsersSelected()">
+            [checked]="allUsersSelected()"
+            >
         </th>
         <th>Usuario</th>
         <th>Email</th>
@@ -115,7 +116,8 @@
             type="checkbox" 
             [value]="user.id"
             (change)="toggleUserSelection(user.id, $event)"
-            [checked]="selectedUsers.includes(user.id)">
+            [checked]="selectedUsers.includes(user.id)"
+            >
         </td>
         <td>
           <div class="user-info">
