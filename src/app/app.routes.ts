@@ -10,6 +10,10 @@ export const routes: Routes = [
   { path: '', component: Landing },
   { path: 'login', component: Login },
   { path: 'login/:type', component: Login },
+  {
+    path: 'cotizacion',
+    loadComponent: () => import('./components/cotizacion/cotizacion.component').then(m => m.CotizacionComponent)
+  },
   { 
     // Redirigir dashboard viejo al nuevo admin layout
     path: 'dashboard', 

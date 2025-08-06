@@ -1,0 +1,259 @@
+<!-- Header -->
+<div class="header-green p-4 text-center mb-8">
+  <h1 class="text-4xl font-bold mb-2">Configurador CAB</h1>
+  <p class="text-lg opacity-90">Personaliza tu sistema de gestión ambiental</p>
+</div>
+
+<div class="container mx-auto px-4 pb-8">
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+    
+    <!-- Panel de Configuración -->
+    <div class="lg:col-span-2 space-y-6">
+      
+      <!-- ESP32 con Cámara -->
+      <div class="bg-white rounded-xl shadow-lg p-6">
+        <div class="flex items-center mb-4">
+          <i class="pi pi-microchip text-2xl text-blue-600 mr-3"></i>
+          <h3 class="text-xl font-bold text-gray-800">ESP32 con Cámara</h3>
+        </div>
+        <p class="text-gray-600 mb-4">Controlador principal con capacidades de procesamiento de imagen</p>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div 
+            class="border-2 rounded-lg p-4 cursor-pointer transition-all"
+            [class.border-blue-500]="selectedComponents.esp32 === 'basic'"
+            [class.bg-blue-50]="selectedComponents.esp32 === 'basic'"
+            (click)="selectComponent('esp32', 'basic')">
+            <h4 class="font-semibold text-gray-800">Básico</h4>
+            <p class="text-sm text-gray-600 mb-2">ESP32-CAM estándar</p>
+            <span class="text-lg font-bold text-green-600">${{prices.esp32.basic | currency:'USD':'symbol':'1.0-0'}}</span>
+          </div>
+          <div 
+            class="border-2 rounded-lg p-4 cursor-pointer transition-all"
+            [class.border-blue-500]="selectedComponents.esp32 === 'advanced'"
+            [class.bg-blue-50]="selectedComponents.esp32 === 'advanced'"
+            (click)="selectComponent('esp32', 'advanced')">
+            <h4 class="font-semibold text-gray-800">Avanzado</h4>
+            <p class="text-sm text-gray-600 mb-2">ESP32-S3 con mayor capacidad</p>
+            <span class="text-lg font-bold text-green-600">${{prices.esp32.advanced | currency:'USD':'symbol':'1.0-0'}}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Servomotores -->
+      <div class="bg-white rounded-xl shadow-lg p-6">
+        <div class="flex items-center mb-4">
+          <i class="pi pi-cog text-2xl text-orange-600 mr-3"></i>
+          <h3 class="text-xl font-bold text-gray-800">Servomotores</h3>
+        </div>
+        <p class="text-gray-600 mb-4">Sistema de movimiento para clasificación automática</p>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div 
+            class="border-2 rounded-lg p-4 cursor-pointer transition-all"
+            [class.border-orange-500]="selectedComponents.servos === 'standard'"
+            [class.bg-orange-50]="selectedComponents.servos === 'standard'"
+            (click)="selectComponent('servos', 'standard')">
+            <h4 class="font-semibold text-gray-800">Estándar</h4>
+            <p class="text-sm text-gray-600 mb-2">3 servos SG90 (torque básico)</p>
+            <span class="text-lg font-bold text-green-600">${{prices.servos.standard | currency:'USD':'symbol':'1.0-0'}}</span>
+          </div>
+          <div 
+            class="border-2 rounded-lg p-4 cursor-pointer transition-all"
+            [class.border-orange-500]="selectedComponents.servos === 'premium'"
+            [class.bg-orange-50]="selectedComponents.servos === 'premium'"
+            (click)="selectComponent('servos', 'premium')">
+            <h4 class="font-semibold text-gray-800">Premium</h4>
+            <p class="text-sm text-gray-600 mb-2">3 servos MG996R (alto torque)</p>
+            <span class="text-lg font-bold text-green-600">${{prices.servos.premium | currency:'USD':'symbol':'1.0-0'}}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Placa Arduino -->
+      <div class="bg-white rounded-xl shadow-lg p-6">
+        <div class="flex items-center mb-4">
+          <i class="pi pi-tablet text-2xl text-green-600 mr-3"></i>
+          <h3 class="text-xl font-bold text-gray-800">Placa de Control</h3>
+        </div>
+        <p class="text-gray-600 mb-4">Controlador secundario para servomotores</p>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div 
+            class="border-2 rounded-lg p-4 cursor-pointer transition-all"
+            [class.border-green-500]="selectedComponents.arduino === 'uno'"
+            [class.bg-green-50]="selectedComponents.arduino === 'uno'"
+            (click)="selectComponent('arduino', 'uno')">
+            <h4 class="font-semibold text-gray-800">Arduino Uno</h4>
+            <p class="text-sm text-gray-600 mb-2">Placa estándar</p>
+            <span class="text-lg font-bold text-green-600">${{prices.arduino.uno | currency:'USD':'symbol':'1.0-0'}}</span>
+          </div>
+          <div 
+            class="border-2 rounded-lg p-4 cursor-pointer transition-all"
+            [class.border-green-500]="selectedComponents.arduino === 'nano'"
+            [class.bg-green-50]="selectedComponents.arduino === 'nano'"
+            (click)="selectComponent('arduino', 'nano')">
+            <h4 class="font-semibold text-gray-800">Arduino Nano</h4>
+            <p class="text-sm text-gray-600 mb-2">Versión compacta</p>
+            <span class="text-lg font-bold text-green-600">${{prices.arduino.nano | currency:'USD':'symbol':'1.0-0'}}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Cámara Adicional -->
+      <div class="bg-white rounded-xl shadow-lg p-6">
+        <div class="flex items-center mb-4">
+          <i class="pi pi-camera text-2xl text-purple-600 mr-3"></i>
+          <h3 class="text-xl font-bold text-gray-800">Cámara para Servos</h3>
+        </div>
+        <p class="text-gray-600 mb-4">Monitoreo adicional del sistema de clasificación</p>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div 
+            class="border-2 rounded-lg p-4 cursor-pointer transition-all"
+            [class.border-purple-500]="selectedComponents.camera === 'basic'"
+            [class.bg-purple-50]="selectedComponents.camera === 'basic'"
+            (click)="selectComponent('camera', 'basic')">
+            <h4 class="font-semibold text-gray-800">Básica</h4>
+            <p class="text-sm text-gray-600 mb-2">Cámara USB 720p</p>
+            <span class="text-lg font-bold text-green-600">${{prices.camera.basic | currency:'USD':'symbol':'1.0-0'}}</span>
+          </div>
+          <div 
+            class="border-2 rounded-lg p-4 cursor-pointer transition-all"
+            [class.border-purple-500]="selectedComponents.camera === 'hd'"
+            [class.bg-purple-50]="selectedComponents.camera === 'hd'"
+            (click)="selectComponent('camera', 'hd')">
+            <h4 class="font-semibold text-gray-800">HD</h4>
+            <p class="text-sm text-gray-600 mb-2">Cámara USB 1080p</p>
+            <span class="text-lg font-bold text-green-600">${{prices.camera.hd | currency:'USD':'symbol':'1.0-0'}}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Apps -->
+      <div class="bg-white rounded-xl shadow-lg p-6">
+        <div class="flex items-center mb-4">
+          <i class="pi pi-mobile text-2xl text-indigo-600 mr-3"></i>
+          <h3 class="text-xl font-bold text-gray-800">Desarrollo de Software</h3>
+        </div>
+        <p class="text-gray-600 mb-4">Aplicaciones móvil y web para el control del sistema</p>
+        <div class="space-y-3">
+          <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+            <div class="flex items-center">
+              <p-checkbox 
+                [(ngModel)]="selectedComponents.mobileApp" 
+                [binary]="true"
+                (onChange)="updateTotal()">
+              </p-checkbox>
+              <span class="ml-3 font-medium text-gray-800">App Móvil</span>
+            </div>
+            <span class="text-lg font-bold text-green-600">${{prices.apps.mobile | currency:'USD':'symbol':'1.0-0'}}</span>
+          </div>
+          <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+            <div class="flex items-center">
+              <p-checkbox 
+                [(ngModel)]="selectedComponents.webApp" 
+                [binary]="true"
+                (onChange)="updateTotal()">
+              </p-checkbox>
+              <span class="ml-3 font-medium text-gray-800">App Web</span>
+            </div>
+            <span class="text-lg font-bold text-green-600">${{prices.apps.web | currency:'USD':'symbol':'1.0-0'}}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Panel de Resumen -->
+    <div class="lg:col-span-1">
+      <div class="bg-white rounded-xl shadow-lg p-6 sticky top-4">
+        <h3 class="text-xl font-bold text-gray-800 mb-6">Resumen de Cotización</h3>
+        
+        <div class="space-y-3 mb-6">
+          <div *ngIf="selectedComponents.esp32" class="flex justify-between items-center">
+            <span class="text-gray-600">ESP32 {{selectedComponents.esp32}}</span>
+            <span class="font-medium">${{getCurrentPrice('esp32') | currency:'USD':'symbol':'1.0-0'}}</span>
+          </div>
+          <div *ngIf="selectedComponents.servos" class="flex justify-between items-center">
+            <span class="text-gray-600">Servos {{selectedComponents.servos}}</span>
+            <span class="font-medium">${{getCurrentPrice('servos') | currency:'USD':'symbol':'1.0-0'}}</span>
+          </div>
+          <div *ngIf="selectedComponents.arduino" class="flex justify-between items-center">
+            <span class="text-gray-600">Arduino {{selectedComponents.arduino}}</span>
+            <span class="font-medium">${{getCurrentPrice('arduino') | currency:'USD':'symbol':'1.0-0'}}</span>
+          </div>
+          <div *ngIf="selectedComponents.camera" class="flex justify-between items-center">
+            <span class="text-gray-600">Cámara {{selectedComponents.camera}}</span>
+            <span class="font-medium">${{getCurrentPrice('camera') | currency:'USD':'symbol':'1.0-0'}}</span>
+          </div>
+          <div *ngIf="selectedComponents.mobileApp" class="flex justify-between items-center">
+            <span class="text-gray-600">App Móvil</span>
+            <span class="font-medium">${{prices.apps.mobile | currency:'USD':'symbol':'1.0-0'}}</span>
+          </div>
+          <div *ngIf="selectedComponents.webApp" class="flex justify-between items-center">
+            <span class="text-gray-600">App Web</span>
+            <span class="font-medium">${{prices.apps.web | currency:'USD':'symbol':'1.0-0'}}</span>
+          </div>
+        </div>
+
+        <hr class="my-4">
+        
+        <div class="flex justify-between items-center mb-6">
+          <span class="text-xl font-bold text-gray-800">Total</span>
+          <span class="text-2xl font-bold text-green-600">${{totalPrice | currency:'USD':'symbol':'1.0-0'}}</span>
+        </div>
+
+        <!-- Formulario de Envío -->
+        <div class="space-y-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Nombre</label>
+            <input 
+              type="text" 
+              [(ngModel)]="customerInfo.name"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+              placeholder="Tu nombre completo">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+            <input 
+              type="email" 
+              [(ngModel)]="customerInfo.email"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+              placeholder="tu@email.com">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Teléfono</label>
+            <input 
+              type="tel" 
+              [(ngModel)]="customerInfo.phone"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+              placeholder="(+52) 000 000 0000">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Mensaje</label>
+            <textarea 
+              [(ngModel)]="customerInfo.message"
+              rows="3"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+              placeholder="Comentarios adicionales...">
+            </textarea>
+          </div>
+        </div>
+
+        <button 
+          class="w-full mt-6 bg-green-600 text-white font-medium py-3 px-4 rounded-lg hover:bg-green-700 transition-colors"
+          [disabled]="!isFormValid() || totalPrice === 0"
+          (click)="sendQuote()">
+          <i class="pi pi-send mr-2"></i>
+          Enviar Cotización
+        </button>
+
+        <button 
+          class="w-full mt-3 border border-gray-300 text-gray-600 font-medium py-2 px-4 rounded-lg hover:bg-gray-50 transition-colors"
+          (click)="goBack()">
+          <i class="pi pi-arrow-left mr-2"></i>
+          Regresar
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Toast para notificaciones -->
+<p-toast></p-toast>
