@@ -34,6 +34,11 @@
   animation: pulse 2s infinite;
 }
 
+.logo-container {
+  display: flex;
+  align-items: center;
+}
+
 .logo-circle i {
   font-size: 2.5rem;
   margin-bottom: 4px;

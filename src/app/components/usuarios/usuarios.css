@@ -12,6 +12,10 @@
   box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
 
+.background-input {
+  background: white;
+}
+
 .users-title h2 {
   margin: 0 0 5px 0;
   font-size: 24px;
@@ -62,7 +66,7 @@
 }
 
 .btn-success {
-  background: #28a745;
+  background: #4a7c59;
   color: white;
 }
 

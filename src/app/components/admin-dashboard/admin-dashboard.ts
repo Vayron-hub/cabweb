@@ -26,16 +26,16 @@ export interface ClasificadorGlobal {
   styleUrl: './admin-dashboard.css'
 })
 export class AdminDashboardComponent implements OnInit, OnDestroy {
-  
+
   Math = Math;
-  
+
   selectedLocation = '';
   selectedZonaId: string | number = '';
   locations: string[] = [];
   zonas: Zona[] = [];
   clasificadores: Clasificador[] = [];
   isLoadingZonas = false;
-  
+
   currentUser: User = {
     id: 1,
     nombre: 'root',
@@ -50,17 +50,17 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
   };
   userMenuOpen = false;
   showAccountModal = false;
-  
+
   activeTab = 'dashboard';
-  
+
   ultimasDetecciones: any[] = [];
   isLoadingDetecciones = false;
-  
+
   clasificadoresPorZona: any[] = [];
   topClasificadoresGlobales: any[] = [];
   isLoadingClasificadores = false;
   classifierSearchTerm = '';
-  
+
   allUsers: User[] = [];
   filteredUsers: User[] = [];
   isLoadingUsers = false;
@@ -72,7 +72,7 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
     { label: 'Usuario', value: 'usuario' },
     { label: 'Operador', value: 'operador' }
   ];
-  
+
   // ESTADÍSTICAS REALES DEL BACKEND
   isLoadingStats = false;
   estadisticasGenerales: EstadisticasGenerales | null = null;
@@ -80,26 +80,26 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
   estadisticasZonas: EstadisticasZonas[] = [];
   estadisticasTipos: EstadisticasTipos[] = [];
   estadisticasHorarios: EstadisticasHorarios[] = []; // Para el heatmap
-  
+
   // ESTADÍSTICAS GLOBALES ADICIONALES
   usuariosMasActivos: UsuarioActivo[] = [];
   totalDetecciones: number = 0;
   totalUsuarios: number = 0;
   totalZonas: number = 0;
-  
+
   // GRÁFICAS CON DATOS REALES
   datosDeteccionesPorHora: number[] = [0, 0, 0, 0];
   datosClasificacionesExitosas: number[] = [0, 0, 0, 0];
   datosFlujoTransporte: number[] = [0, 0, 0, 0];
   datosActividadUsuarios: number[] = [0, 0, 0, 0];
-  
+
   datosDashboardCentral: number[] = [];
   zonasDeteccionesHoy: string[] = [];
-  
+
   porcentajeValorizable: number = 0;
   porcentajeOrganica: number = 0;
   porcentajeNoValorizable: number = 0;
-  
+
   private zonaSubscription: Subscription = new Subscription();
 
   constructor(
@@ -114,21 +114,21 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     console.log('🚀 ADMIN-DASHBOARD - Iniciando dashboard con datos REALES del sistema');
-    
+
     // SUSCRIBIRSE AL ZONA SERVICE PARA ESCUCHAR CAMBIOS DESDE LA NAVBAR
     this.zonaSubscription = this.zonaService.selectedZona$.subscribe(zonaInfo => {
       console.log('🔄 ZONA SERVICE - Cambio detectado:', zonaInfo);
-      
+
       if (zonaInfo && zonaInfo.nombre) {
         console.log('✅ Actualizando zona seleccionada desde navbar:', zonaInfo.nombre);
         this.selectedLocation = zonaInfo.nombre;
         this.selectedZonaId = zonaInfo.id;
-        
+
         // Recargar detecciones con la nueva zona
         this.loadUltimasDetecciones();
       }
     });
-    
+
     this.loadInitialData();
   }
 
@@ -138,22 +138,22 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
 
   loadInitialData() {
     console.log('🚀 Cargando datos GLOBALES del dashboard administrativo...');
-    
+
     // 1. Cargar usuarios del sistema
     this.loadUsers();
-    
+
     // 2. Cargar estadísticas GENERALES del sistema completo
     this.loadGlobalStatistics();
-    
+
     // 3. Cargar TOP 3 clasificadores más activos de TODO el sistema
     this.loadTopClasificadoresGlobales();
-    
+
     // 4. Cargar tipos más populares a nivel GLOBAL
     this.loadGlobalTypePercentages();
-    
+
     // 5. Comparativa entre TODAS las zonas
     this.loadGlobalZoneComparison();
-    
+
     // 6. Las detecciones se cargarán cuando se seleccione una zona desde el ZonaService
     console.log('⏳ Esperando selección de zona desde navbar...');
   }
@@ -165,7 +165,7 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
 
   loadUsers() {
     this.isLoadingUsers = true;
-    
+
     this.backendService.getUsuarios().subscribe({
       next: (usuarios: User[]) => {
         console.log('👥 Usuarios del backend:', usuarios);
@@ -192,7 +192,7 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
   }
 
   filterUsers() {
-    this.filteredUsers = this.allUsers.filter(user => 
+    this.filteredUsers = this.allUsers.filter(user =>
       user.nombre.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
       (user.correo && user.correo.toLowerCase().includes(this.searchTerm.toLowerCase())) ||
       (user.email && user.email.toLowerCase().includes(this.searchTerm.toLowerCase()))
@@ -211,7 +211,7 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
     console.log('Cambiando estado de usuario:', user);
     // Cambiar el estado boolean activo
     const newStatus = !user.activo;
-    
+
     // Aquí podrías hacer una llamada al backend para actualizar el estado
     this.backendService.updateUsuario(user.id, { ...user, activo: newStatus }).subscribe({
       next: (updatedUser: User) => {
@@ -329,12 +329,12 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
   loadTopClasificadoresGlobales() {
     console.log('🔄 Cargando TOP 3 clasificadores más activos desde https://localhost:7286/api/clasificadores/estadisticas...');
     this.isLoadingClasificadores = true;
-    
+
     this.backendService.getEstadisticasClasificadores().subscribe({
       next: (clasificadores: any[]) => {
         console.log('📊 Clasificadores del backend obtenidos:', clasificadores);
-        
-        if (clasificadores && Array.isArray(clasificadores) && clasificadores.length > 0) {          
+
+        if (clasificadores && Array.isArray(clasificadores) && clasificadores.length > 0) {
           // Procesar y ordenar por totalDetecciones - TOP 3 (solo zona, nombre y total)
           this.topClasificadoresGlobales = clasificadores
             .map((cls: any) => ({
@@ -345,13 +345,13 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
             }))
             .sort((a: any, b: any) => b.totalDetecciones - a.totalDetecciones)
             .slice(0, 3); // TOP 3 clasificadores más activos
-            
+
           console.log('🏆 TOP 3 clasificadores globales del sistema:', this.topClasificadoresGlobales);
         } else {
           console.warn('⚠️ No se encontraron clasificadores válidos');
           this.topClasificadoresGlobales = [];
         }
-        
+
         this.isLoadingClasificadores = false;
         this.cdr.detectChanges();
       },
@@ -383,17 +383,17 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
   }
 
   // === MÉTODOS DE DETECCIONES ===
-  
+
   loadUltimasDetecciones() {
     // No cargar detecciones si no hay zona seleccionada
     if (!this.selectedLocation) {
       console.log('⚠️ No hay zona seleccionada, esperando carga de zonas...');
       return;
     }
-    
+
     this.isLoadingDetecciones = true;
     console.log('🔄 Cargando últimas detecciones recientes del endpoint /api/detecciones/recientes para zona:', this.selectedLocation);
-    
+
     // Cargar detecciones, clasificadores y zonas en paralelo
     forkJoin({
       detecciones: this.backendService.getDeteccionesRecientes(20), // Pedimos más para filtrar por zona
@@ -402,31 +402,31 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
     }).subscribe({
       next: (data) => {
         console.log('📊 Datos obtenidos del backend:', data);
-        
+
         // Almacenar clasificadores y zonas para uso posterior
         this.clasificadores = data.clasificadores;
         this.zonas = data.zonas;
-        
+
         if (data.detecciones && data.detecciones.length > 0) {
           // Crear un mapa de clasificadores por ID para búsqueda rápida
           const clasificadoresMap = new Map();
           data.clasificadores.forEach(clasificador => {
             clasificadoresMap.set(clasificador.id, clasificador);
           });
-          
+
           // Procesar detecciones para agregar información de clasificador y zona
           const deteccionesConInfo = data.detecciones.map(deteccion => {
             const clasificador = clasificadoresMap.get(deteccion.clasificadorId);
             // Los clasificadores ya vienen con la zona anidada: clasificador.zona.nombre
             const zonaNombre = clasificador?.zona?.nombre || 'Sin zona';
-            
+
             const deteccionProcesada = {
               ...deteccion,
               clasificadorNombre: clasificador ? clasificador.nombre : `Clasificador ${deteccion.clasificadorId}`,
               zonaNombre: zonaNombre,
               zona: zonaNombre // Para compatibilidad con el filtro existente
             };
-            
+
             // DEBUG: Log detallado de cada detección
             console.log(`🔍 Detección ${deteccion.id}:`, {
               clasificadorId: deteccion.clasificadorId,
@@ -434,10 +434,10 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
               zonaNombre: deteccionProcesada.zonaNombre,
               tipo: deteccion.tipo
             });
-            
+
             return deteccionProcesada;
           });
-          
+
           console.log('🔍 DEBUG - Zona seleccionada:', this.selectedLocation);
           console.log('🔍 DEBUG - Detecciones con info completa:', deteccionesConInfo.map(d => ({
             id: d.id,
@@ -446,24 +446,24 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
             zonaNombre: d.zonaNombre,
             tipo: d.tipo
           })));
-          
+
           // Mostrar resumen de zonas encontradas
           const zonasEncontradas = [...new Set(deteccionesConInfo.map(d => d.zonaNombre))];
           console.log('🏢 Zonas encontradas en las detecciones:', zonasEncontradas);
-          
+
           // Filtrar por zona seleccionada
           const deteccionesFiltradas = deteccionesConInfo.filter(deteccion => {
             // Normalizar los nombres para comparación (quitar espacios y convertir a minúsculas)
             const zonaNormalizada = (deteccion.zonaNombre || '').trim().toLowerCase();
             const selectedNormalizada = (this.selectedLocation || '').trim().toLowerCase();
-            
+
             const coincide = zonaNormalizada === selectedNormalizada;
             console.log(`🎯 Filtro - Detección ${deteccion.id}: "${deteccion.zonaNombre}" (norm: "${zonaNormalizada}") === "${this.selectedLocation}" (norm: "${selectedNormalizada}") = ${coincide}`);
             return coincide;
           });
-          
+
           console.log(`🎯 Detecciones filtradas para zona "${this.selectedLocation}":`, deteccionesFiltradas.length);
-          
+
           // Ordenar por fecha (más recientes primero) y tomar las últimas 10
           this.ultimasDetecciones = deteccionesFiltradas
             .sort((a, b) => {
@@ -478,14 +478,14 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
               clasificador: deteccion.clasificadorNombre,
               estado: 'Confirmada' // Las detecciones recientes están confirmadas
             }));
-            
+
           console.log('✅ Últimas detecciones procesadas para zona:', this.ultimasDetecciones.length);
           console.log('📋 Detecciones con información completa:', this.ultimasDetecciones);
         } else {
           console.warn('⚠️ No se encontraron detecciones recientes');
           this.ultimasDetecciones = [];
         }
-        
+
         this.isLoadingDetecciones = false;
         this.cdr.detectChanges();
       },
@@ -504,22 +504,19 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
 
   getDetectionTypeColor(tipo: string): string {
     const tipoLower = tipo?.toLowerCase() || '';
-    
+
     // Orgánico - Verde
     if (tipoLower.includes('orgánico') || tipoLower.includes('organico')) {
       return '#4CAF50'; // Verde para orgánico
-    } 
+    }
     // Valorizable/Reciclable - Azul
-    else if (tipoLower.includes('valorizable') || tipoLower.includes('reciclable') || 
-             tipoLower.includes('plastico') || tipoLower.includes('vidrio') || 
-             tipoLower.includes('papel') || tipoLower.includes('metal')) {
+    else if (tipoLower ==='valorizable') {
       return '#2196F3'; // Azul para valorizable/reciclable
-    } 
+    }
     // No Valorizable - Naranja/Rojo
-    else if (tipoLower.includes('no valorizable') || tipoLower.includes('general') || 
-             tipoLower.includes('no reciclable')) {
+    else if (tipoLower==='no valorizable') {
       return '#FF9800'; // Naranja para no valorizable
-    } 
+    }
     // Otros tipos - Gris
     else {
       return '#9E9E9E'; // Gris para otros tipos
@@ -528,22 +525,20 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
 
   getDetectionTypeIcon(tipo: string): string {
     const tipoLower = tipo?.toLowerCase() || '';
-    
+
+    console.log('Tipo de detección:', tipoLower);
     // Orgánico - Ícono de hoja
-    if (tipoLower.includes('orgánico') || tipoLower.includes('organico')) {
-      return 'pi-leaf'; // Hoja para orgánico
-    } 
+    if (tipoLower === 'organico') {
+      return 'pi-heart'; // Hoja para orgánico
+    }
     // Valorizable/Reciclable - Ícono de reciclaje
-    else if (tipoLower.includes('valorizable') || tipoLower.includes('reciclable') || 
-             tipoLower.includes('plastico') || tipoLower.includes('vidrio') || 
-             tipoLower.includes('papel') || tipoLower.includes('metal')) {
+    else if (tipoLower === 'valorizable') {
       return 'pi-refresh'; // Ícono de reciclaje para valorizable
-    } 
+    }
     // No Valorizable - Ícono de advertencia
-    else if (tipoLower.includes('no valorizable') || tipoLower.includes('general') || 
-             tipoLower.includes('no reciclable')) {
+    else if (tipoLower === 'no valorizable') {
       return 'pi-exclamation-triangle'; // Triángulo de advertencia para no valorizable
-    } 
+    }
     // Otros tipos - Ícono genérico
     else {
       return 'pi-circle'; // Círculo para otros tipos
@@ -572,7 +567,7 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
   private loadGlobalStatistics() {
     console.log('🌍 Cargando estadísticas GLOBALES del sistema completo...');
     this.isLoadingStats = true;
-    
+
     // Cargar estadísticas generales del sistema
     this.backendService.getEstadisticasGenerales().subscribe({
       next: (estadisticas: EstadisticasGenerales) => {
@@ -581,7 +576,7 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
         this.totalDetecciones = estadisticas.totalDetecciones || 0;
         this.totalUsuarios = estadisticas.totalUsuarios || 0;
         this.totalZonas = estadisticas.totalZonas || 0;
-        
+
         this.isLoadingStats = false;
         this.cdr.detectChanges();
       },
@@ -596,15 +591,15 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
   // *** MÉTODO PARA CARGAR COMPARATIVA ENTRE TODAS LAS ZONAS ***
   private loadGlobalZoneComparison() {
     console.log('🗺️ Cargando comparativa entre TODAS las zonas del sistema...');
-    
+
     this.backendService.getEstadisticasZonas().subscribe({
       next: (zonas: EstadisticasZonas[]) => {
         console.log('📊 Estadísticas de todas las zonas:', zonas);
         this.estadisticasZonas = zonas;
-        
+
         // Actualizar datos para el gráfico de barras (comparativa entre zonas)
         this.updateZoneComparisonChart(zonas);
-        
+
         this.cdr.detectChanges();
       },
       error: (error: any) => {
@@ -619,33 +614,33 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
   // *** ACTUALIZAR GRÁFICO DE COMPARATIVA ENTRE ZONAS ***
   private updateZoneComparisonChart(zonas: EstadisticasZonas[]) {
     console.log('📊 Actualizando gráfico de comparativa entre zonas:', zonas);
-    
+
     if (zonas && zonas.length > 0) {
       // Filtrar solo las zonas que tienen detecciones
       const zonasConDetecciones = zonas.filter(zona => zona.totalDetecciones > 0);
-      
+
       if (zonasConDetecciones.length === 0) {
         console.warn('⚠️ No hay zonas con detecciones');
         this.datosDashboardCentral = [];
         this.zonasDeteccionesHoy = [];
         return;
       }
-      
+
       // Ordenar zonas por número de detecciones (mayor a menor)
       const zonasOrdenadas = zonasConDetecciones.sort((a, b) => b.totalDetecciones - a.totalDetecciones);
-      
+
       // Encontrar el máximo para calcular porcentajes relativos
       const maxDetecciones = zonasOrdenadas[0].totalDetecciones;
-      
+
       // Extraer datos para el gráfico de barras (porcentajes relativos para la altura)
       this.datosDashboardCentral = zonasOrdenadas.slice(0, 4).map(zona => {
         return maxDetecciones > 0 ? Math.round((zona.totalDetecciones / maxDetecciones) * 100) : 0;
       });
-      
-      this.zonasDeteccionesHoy = zonasOrdenadas.slice(0, 4).map(zona => 
+
+      this.zonasDeteccionesHoy = zonasOrdenadas.slice(0, 4).map(zona =>
         zona.nombre
       );
-      
+
       console.log('✅ Gráfico de comparativa de zonas actualizado');
       console.log('📊 Datos del gráfico (porcentajes):', this.datosDashboardCentral);
       console.log('🏷️ Labels del gráfico:', this.zonasDeteccionesHoy);
@@ -654,7 +649,7 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
         detecciones: z.totalDetecciones,
         porcentaje: Math.round((z.totalDetecciones / maxDetecciones) * 100)
       })));
-      
+
       // DEBUG: Verificar que los datos lleguen al template
       setTimeout(() => {
         console.log('🎯 VERIFICACIÓN FINAL - Datos en las variables del componente:');
@@ -672,7 +667,7 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
   private loadRealStatistics() {
     this.isLoadingStats = true;
     console.log('🔄 Cargando estadísticas REALES desde https://localhost:7286/api...');
-    
+
     // 1. Cargar estadísticas generales
     this.backendService.getEstadisticasGenerales().subscribe({
       next: (generales: EstadisticasGenerales) => {
@@ -728,7 +723,7 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
 
     // 5. Cargar usuarios para actividad
     this.loadUserStatistics();
-    
+
     setTimeout(() => {
       this.isLoadingStats = false;
       this.cdr.detectChanges();
@@ -739,61 +734,61 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
   // *** CARGAR PORCENTAJES GLOBALES DE TIPOS DE RESIDUO ***
   private loadGlobalTypePercentages() {
     console.log('🌍 Cargando porcentajes globales de tipos de residuo...');
-    
+
     this.backendService.getDetecciones().subscribe({
       next: (detecciones: any[]) => {
         console.log('📊 Detecciones globales obtenidas:', detecciones);
-        
+
         if (detecciones && detecciones.length > 0) {
           // Contar tipos de residuo a nivel global
-          const tiposCounts: {[key: string]: number} = {};
-          
+          const tiposCounts: { [key: string]: number } = {};
+
           detecciones.forEach(deteccion => {
             const tipo = (deteccion.tipo || deteccion.tipoResiduo || 'Sin tipo').toLowerCase();
             tiposCounts[tipo] = (tiposCounts[tipo] || 0) + 1;
           });
-          
+
           console.log('📈 Conteo de tipos:', tiposCounts);
-          
+
           const total = detecciones.length;
-          
+
           // Mapear tipos conocidos
           let reciclableCount = 0;
           let organicoCount = 0;
-          let generalCount = 0;
+          let novalCount = 0;
           
           Object.keys(tiposCounts).forEach(tipo => {
             const count = tiposCounts[tipo];
-            if (tipo.includes('reciclable') || tipo.includes('valorizable') || tipo.includes('plastico') || tipo.includes('vidrio') || tipo.includes('papel')) {
+            if (tipo === 'Valorizable' || tipo === 'valorizable') {
               reciclableCount += count;
-            } else if (tipo.includes('organico') || tipo.includes('orgánico') || tipo.includes('compost')) {
+            } else if (tipo.includes('organico') || tipo.includes('orgánico') || tipo.includes('Organico')) {
               organicoCount += count;
-            } else {
-              generalCount += count;
+            }else if (tipo ==='no valorizable') {
+              novalCount += count;
             }
           });
-          
+
           // Calcular porcentajes
           this.porcentajeValorizable = total > 0 ? Math.round((reciclableCount / total) * 100) : 0;
           this.porcentajeOrganica = total > 0 ? Math.round((organicoCount / total) * 100) : 0;
-          this.porcentajeNoValorizable = total > 0 ? Math.round((generalCount / total) * 100) : 0;
-          
+          this.porcentajeNoValorizable = total > 0 ? Math.round((novalCount / total) * 100) : 0;
+
           // Ajustar para que sume 100%
           const suma = this.porcentajeValorizable + this.porcentajeOrganica + this.porcentajeNoValorizable;
           if (suma < 100 && total > 0) {
             this.porcentajeNoValorizable += (100 - suma);
           }
-          
+
           console.log('🎯 Porcentajes globales calculados:');
           console.log(`  📦 Reciclable/Valorizable: ${this.porcentajeValorizable}% (${reciclableCount} detecciones)`);
           console.log(`  🌱 Orgánico: ${this.porcentajeOrganica}% (${organicoCount} detecciones)`);
-          console.log(`  🗑️ General/No Valorizable: ${this.porcentajeNoValorizable}% (${generalCount} detecciones)`);
-          
+          console.log(`  🗑️ General/No Valorizable: ${this.porcentajeNoValorizable}% (${novalCount} detecciones)`);
+
         } else {
           console.warn('⚠️ No se encontraron detecciones para calcular porcentajes');
           // No usar datos falsos por defecto
         }
-        
+
         this.cdr.detectChanges();
       },
       error: (error: any) => {
@@ -807,45 +802,45 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
   // *** ACTUALIZAR GRÁFICOS CON ESTADÍSTICAS DE TIPOS ***
   private updateTypeCharts(tipos: EstadisticasTipos[]) {
     console.log('📊 Actualizando gráficos de tipos con datos del backend:', tipos);
-    
+
     if (tipos && tipos.length > 0) {
       // Calcular el total de detecciones por tipo
       const total = tipos.reduce((sum, tipo) => sum + (tipo.cantidad || 0), 0);
-      
+
       // Buscar tipos específicos y calcular porcentajes
       let valorizableCount = 0;
       let organicoCount = 0;
       let noValorizableCount = 0;
-      
+
       tipos.forEach(tipo => {
         const nombreTipo = (tipo.tipo || '').toLowerCase();
         const cantidad = tipo.cantidad || 0;
-        
-        if (nombreTipo.includes('valorizable') || nombreTipo.includes('reciclable') || nombreTipo.includes('plastico')) {
+
+        if (nombreTipo.includes('valorizable') || nombreTipo.includes('Valorizable') || nombreTipo.includes('plastico')) {
           valorizableCount += cantidad;
-        } else if (nombreTipo.includes('organico') || nombreTipo.includes('orgánico')) {
+        } else if (nombreTipo.includes('organico') || nombreTipo.includes('orgánico') || nombreTipo.includes('Organico')) {
           organicoCount += cantidad;
-        } else {
+        } else if(nombreTipo.includes('no valorizable') || nombreTipo.includes('No Valorizable') || nombreTipo.includes('no Valorizable')) {
           noValorizableCount += cantidad;
         }
       });
-      
+
       // Calcular porcentajes
       this.porcentajeValorizable = total > 0 ? Math.round((valorizableCount / total) * 100) : 0;
       this.porcentajeOrganica = total > 0 ? Math.round((organicoCount / total) * 100) : 0;
       this.porcentajeNoValorizable = total > 0 ? Math.round((noValorizableCount / total) * 100) : 0;
-      
+
       // Asegurar que sume 100%
       const suma = this.porcentajeValorizable + this.porcentajeOrganica + this.porcentajeNoValorizable;
       if (suma < 100 && total > 0) {
         this.porcentajeNoValorizable += (100 - suma);
       }
-      
+
       console.log('✅ Gráficos de tipos actualizados desde backend:');
       console.log(`  📦 Valorizable: ${this.porcentajeValorizable}% (${valorizableCount} detecciones)`);
       console.log(`  🌱 Orgánico: ${this.porcentajeOrganica}% (${organicoCount} detecciones)`);
       console.log(`  🗑️ No Valorizable: ${this.porcentajeNoValorizable}% (${noValorizableCount} detecciones)`);
-      
+
     } else {
       console.warn('⚠️ No hay datos de tipos del backend, manteniendo método alternativo');
       // Mantener el método de fallback que ya funciona
@@ -854,7 +849,7 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
   }
 
   // === MÉTODOS DE MENÚ DE USUARIO ===
-  
+
   toggleUserMenu() {
     this.userMenuOpen = !this.userMenuOpen;
   }
@@ -907,78 +902,78 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
 
   private updateChartsFromGeneralStats(generales: EstadisticasGenerales) {
     console.log('📊 Actualizando gráficos principales con estadísticas generales:', generales);
-    
+
     // Actualizar totales principales
     this.totalDetecciones = generales.totalDetecciones || 0;
     this.totalUsuarios = generales.totalUsuarios || 0;
     this.totalZonas = generales.totalZonas || 0;
-    
+
     console.log('✅ Gráficos principales actualizados con estadísticas generales');
     this.cdr.detectChanges();
   }
 
   private updateHourlyChart(horarios: EstadisticasHorarios[]) {
     console.log('⏰ Actualizando gráfico de horas con:', horarios);
-    
+
     // Procesar datos horarios para el gráfico
     if (horarios && horarios.length > 0) {
       const horasData = new Array(24).fill(0);
-      
+
       horarios.forEach(hora => {
         const horaIndex = parseInt(hora.hora.toString());
         if (horaIndex >= 0 && horaIndex < 24) {
           horasData[horaIndex] = hora.cantidad || 0;
         }
       });
-      
+
       // Encontrar la hora pico
       const maxHora = Math.max(...horasData);
       const horaPico = horasData.indexOf(maxHora);
-      
+
       console.log(`📈 Hora pico: ${horaPico}:00 con ${maxHora} detecciones`);
-      
+
       // Actualizar variables para el template
       this.deteccionesPorHora = horarios;
     }
-    
+
     this.cdr.detectChanges();
   }
 
   private updateGlobalZoneCharts(zonas: EstadisticasZonas[]) {
     console.log('🗺️ Actualizando gráficos globales de zonas con:', zonas);
-    
+
     if (zonas && zonas.length > 0) {
       // Procesar estadísticas por zona
       this.estadisticasZonas = zonas;
-      
+
       // Encontrar zona más activa
-      const zonaMasActiva = zonas.reduce((max, zona) => 
+      const zonaMasActiva = zonas.reduce((max, zona) =>
         (zona.totalDetecciones || 0) > (max.totalDetecciones || 0) ? zona : max
       );
-      
+
       console.log('🏆 Zona más activa:', zonaMasActiva.nombre, 'con', zonaMasActiva.totalDetecciones, 'detecciones');
-      
+
     } else {
       console.warn('⚠️ No hay datos de zonas disponibles');
     }
-    
+
     this.cdr.detectChanges();
   }
 
   private loadUserStatistics() {
     console.log('👥 Cargando estadísticas de usuarios...');
-    
+
     // Obtener usuarios más activos usando el método existente
     this.backendService.getUsuarios().subscribe({
       next: (usuarios: User[]) => {
         console.log('✅ Usuarios obtenidos para estadísticas:', usuarios);
-        
+
         // Solo contar los usuarios reales del sistema
         this.usuariosMasActivos = usuarios.slice(0, 5).map(usuario => ({
           nombre: usuario.nombre || 'Usuario',
           detecciones: 0 // Sin simular datos falsos
         }));
-        
+
         this.cdr.detectChanges();
       },
       error: (error: any) => {
@@ -988,23 +983,23 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
     });
   }
 
-    // *** MÉTODOS AUXILIARES ***
+  // *** MÉTODOS AUXILIARES ***
 
   // Método para formatear nombres de zonas en las etiquetas del gráfico
   formatZoneLabel(zoneName: string | undefined): string {
     if (!zoneName || zoneName === 'N/A') return 'N/A';
-    
+
     // Eliminar prefijos comunes y acortar nombres largos
     let formatted = zoneName
       .replace('Edificio ', 'Ed. ')
       .replace('Zona ', '')
       .trim();
-    
+
     // Si sigue siendo muy largo, truncar
     if (formatted.length > 8) {
       formatted = formatted.substring(0, 8) + '...';
     }
-    
+
     return formatted;
   }
 
@@ -1012,16 +1007,16 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
   getZoneTitle(index: number): string {
     const zoneName = this.zonasDeteccionesHoy[index];
     const detections = this.estadisticasZonas.find(z => z.nombre === zoneName)?.totalDetecciones || 0;
-    
+
     if (!zoneName || zoneName === 'N/A') {
       return 'Sin datos';
     }
-    
+
     return `${zoneName}: ${detections} detecciones`;
   }
 
   // *** MÉTODO AUXILIAR PARA DEBUGGING ***
-  
+
   // Método público para cambiar zona desde la consola (debugging)
   cambiarZona(nombreZona: string) {
     console.log('🔧 DEBUG - Cambiando zona manualmente a:', nombreZona);
@@ -1033,7 +1028,7 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
       console.error('❌ Zona no encontrada. Zonas disponibles:', this.locations);
     }
   }
-  
+
   // Método para ver todas las detecciones sin filtro (debugging)
   verTodasLasDetecciones() {
     console.log('🔧 DEBUG - Cargando TODAS las detecciones sin filtro...');

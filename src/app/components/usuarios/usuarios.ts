@@ -10,6 +10,7 @@ import { Subscription } from 'rxjs';
 import { BackendService, Zona, User } from '../../services/backend.service';
 import { ZonaService, ZonaInfo } from '../../services/zona.service';
 import { AuthService } from '../../services/auth';
+import { DialogModule } from 'primeng/dialog';
 
 @Component({
   selector: 'app-usuarios',
@@ -21,7 +22,8 @@ import { AuthService } from '../../services/auth';
     TableModule,
     TagModule,
     InputTextModule,
-    CheckboxModule
+    CheckboxModule,
+    DialogModule
   ],
   templateUrl: './usuarios.html',
   styleUrl: './usuarios.css'
@@ -30,12 +32,12 @@ export class UsuariosComponent implements OnInit, OnDestroy {
   // Ubicación actual (sincronizada con ZonaService)
   selectedLocation = '';
   selectedZonaId: string | number = '';
-  
+
   // Datos de usuarios
   allUsers: User[] = [];
   filteredUsers: User[] = [];
   isLoadingUsers = false;
-  
+
   // Filtros y búsqueda
   searchTerm = '';
   selectedRoles: string[] = [];
@@ -44,10 +46,10 @@ export class UsuariosComponent implements OnInit, OnDestroy {
     { label: 'Usuario', value: 'usuario' },
     { label: 'Operador', value: 'operador' }
   ];
-  
+
   // Selección múltiple
   selectedUsers: (string | number)[] = [];
-  
+
   // Suscripciones
   private zonaSubscription: Subscription = new Subscription();
 
@@ -74,7 +76,7 @@ export class UsuariosComponent implements OnInit, OnDestroy {
     this.zonaSubscription = this.zonaService.selectedZona$.subscribe({
       next: (zonaInfo: ZonaInfo) => {
         console.log('🔄 Cambio de zona detectado en usuarios:', zonaInfo);
-        
+
         if (zonaInfo.id) {
           this.selectedLocation = zonaInfo.nombre;
           this.selectedZonaId = zonaInfo.id;
@@ -87,7 +89,7 @@ export class UsuariosComponent implements OnInit, OnDestroy {
   loadUsers() {
     console.log('🔍 CARGANDO USUARIOS DEL BACKEND...');
     this.isLoadingUsers = true;
-    
+
     this.backendService.getUsuarios().subscribe({
       next: (usuarios) => {
         console.log('✅ USUARIOS RECIBIDOS:', usuarios);
@@ -110,11 +112,11 @@ export class UsuariosComponent implements OnInit, OnDestroy {
   filterUsers() {
     this.filteredUsers = this.allUsers.filter(user => {
       const matchesSearch = user.nombre.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
-                           user.correo.toLowerCase().includes(this.searchTerm.toLowerCase());
-      
-      const matchesRole = this.selectedRoles.length === 0 || 
-                         this.selectedRoles.includes(user.rol || '');
-      
+        user.correo.toLowerCase().includes(this.searchTerm.toLowerCase());
+
+      const matchesRole = this.selectedRoles.length === 0 ||
+        this.selectedRoles.includes(user.rol || '');
+
       return matchesSearch && matchesRole;
     });
   }
@@ -177,7 +179,7 @@ export class UsuariosComponent implements OnInit, OnDestroy {
   deleteUser(user: User) {
     if (confirm(`¿Estás seguro de que deseas eliminar al usuario ${user.nombre}?`)) {
       console.log('🗑️ Eliminando usuario:', user.nombre);
-      
+
       this.backendService.deleteUsuario(user.id).subscribe({
         next: () => {
           console.log('✅ Usuario eliminado exitosamente');
@@ -195,15 +197,15 @@ export class UsuariosComponent implements OnInit, OnDestroy {
   toggleUserStatus(user: User) {
     const currentStatus = user.estado || 'Inactivo';
     const newStatus = currentStatus === 'Activo' ? 'Inactivo' : 'Activo';
-    
+
     console.log(`🔄 Cambiando estado de ${user.nombre} a ${newStatus}`);
-    
+
     // Actualizar el estado (asumiendo que el backend maneja 'activo' como boolean)
     const updateData = {
       ...user,
       activo: newStatus === 'Activo'
     };
-    
+
     this.backendService.updateUsuario(user.id, updateData).subscribe({
       next: (updatedUser) => {
         console.log('✅ Estado de usuario actualizado exitosamente');
@@ -227,9 +229,9 @@ export class UsuariosComponent implements OnInit, OnDestroy {
       alert('Por favor, selecciona usuarios para activar.');
       return;
     }
-    
+
     console.log('🔄 Activando usuarios seleccionados:', this.selectedUsers);
-    
+
     // Procesar cada usuario seleccionado
     const updatePromises = this.selectedUsers.map(userId => {
       const user = this.allUsers.find(u => u.id === userId);
@@ -239,7 +241,7 @@ export class UsuariosComponent implements OnInit, OnDestroy {
       }
       return null;
     }).filter(promise => promise !== null);
-    
+
     Promise.all(updatePromises).then(() => {
       console.log('✅ Usuarios activados exitosamente');
       this.selectedUsers = [];
@@ -255,9 +257,9 @@ export class UsuariosComponent implements OnInit, OnDestroy {
       alert('Por favor, selecciona usuarios para desactivar.');
       return;
     }
-    
+
     console.log('🔄 Desactivando usuarios seleccionados:', this.selectedUsers);
-    
+
     // Procesar cada usuario seleccionado
     const updatePromises = this.selectedUsers.map(userId => {
       const user = this.allUsers.find(u => u.id === userId);
@@ -267,7 +269,7 @@ export class UsuariosComponent implements OnInit, OnDestroy {
       }
       return null;
     }).filter(promise => promise !== null);
-    
+
     Promise.all(updatePromises).then(() => {
       console.log('✅ Usuarios desactivados exitosamente');
       this.selectedUsers = [];
@@ -283,15 +285,15 @@ export class UsuariosComponent implements OnInit, OnDestroy {
       alert('Por favor, selecciona usuarios para eliminar.');
       return;
     }
-    
+
     if (confirm(`¿Estás seguro de que deseas eliminar ${this.selectedUsers.length} usuarios?`)) {
       console.log('🗑️ Eliminando usuarios seleccionados:', this.selectedUsers);
-      
+
       // Procesar cada usuario seleccionado
-      const deletePromises = this.selectedUsers.map(userId => 
+      const deletePromises = this.selectedUsers.map(userId =>
         this.backendService.deleteUsuario(userId).toPromise()
       );
-      
+
       Promise.all(deletePromises).then(() => {
         console.log('✅ Usuarios eliminados exitosamente');
         this.selectedUsers = [];
@@ -305,12 +307,12 @@ export class UsuariosComponent implements OnInit, OnDestroy {
 
   exportUsersData() {
     console.log('📊 Exportando datos de usuarios...');
-    
+
     if (this.filteredUsers.length === 0) {
       alert('No hay usuarios para exportar.');
       return;
     }
-    
+
     // Crear datos CSV
     const csvHeaders = ['ID', 'Nombre', 'Correo', 'Rol', 'Estado', 'Fecha Creación', 'Último Acceso'];
     const csvData = this.filteredUsers.map(user => [
@@ -322,12 +324,12 @@ export class UsuariosComponent implements OnInit, OnDestroy {
       this.formatDate(user.fechaCreacion),
       this.formatDate(user.ultimoAcceso)
     ]);
-    
+
     // Convertir a CSV
     const csvContent = [csvHeaders, ...csvData]
       .map(row => row.map(field => `"${field}"`).join(','))
       .join('\n');
-    
+
     // Crear y descargar archivo
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement('a');
@@ -338,7 +340,7 @@ export class UsuariosComponent implements OnInit, OnDestroy {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
-    
+
     console.log('✅ Datos exportados exitosamente');
   }
 
@@ -384,5 +386,11 @@ export class UsuariosComponent implements OnInit, OnDestroy {
     const currentUser = this.authService.getCurrentUser();
     // No permitir eliminar el propio usuario
     return this.canEditUser() && currentUser?.id !== user.id;
+  }
+
+  visible: boolean = false;
+
+  showDialog() {
+    this.visible = true;
   }
 }

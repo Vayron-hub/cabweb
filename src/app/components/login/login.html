@@ -1,93 +1,69 @@
+<!-- Login Component basado en Pantalla 8 -->
 <div class="login-container">
-  <div class="login-background"></div>
-  
-  <div class="login-card-wrapper">
-    <div class="login-card">
+    
+  <!-- Formulario de login -->
+  <div class="login-form-section">
+    <div class="login-header">
+      <div class="circular-logo">
+        <div class="logo-circle logo-container">
+          <img src="assets/images/cab.png" alt="Logo" class="logo" />
+        </div>
+      </div>
+    </div>
+    <h2>Por favor ingresa tus credenciales</h2>
+    
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login-form">
       
-      <!-- Logo Section Simple -->
-      <div class="logo-section">
-        <img src="assets/images/cab.png" alt="CAB" class="logo-image" />
-        <p class="login-subtitle">Por favor ingresa tus credenciales.</p>
+      <!-- Campo Usuario -->
+      <div class="form-group">
+        <input 
+          type="text" 
+          formControlName="username"
+          placeholder="Usuario"
+          class="form-input"
+          [class.error]="loginForm.get('username')?.invalid && loginForm.get('username')?.touched">
       </div>
 
-      <!-- Formulario de Login Simple -->
-      <div class="form-section">
-        
-        <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login-form">
-          
-          <!-- Campo Usuario -->
-          <div class="input-group">
-            <input 
-              type="text"
-              id="username" 
-              formControlName="username"
-              placeholder="Usuario"
-              class="form-input"
-              [class.invalid]="loginForm.get('username')?.invalid && loginForm.get('username')?.touched"
-            />
-          </div>
-
-          <!-- Campo Contraseña -->
-          <div class="input-group">
-            <input 
-              [type]="showPassword ? 'text' : 'password'"
-              id="password" 
-              formControlName="password"
-              placeholder="Contraseña"
-              class="form-input"
-              [class.invalid]="loginForm.get('password')?.invalid && loginForm.get('password')?.touched"
-            />
-          </div>
-
-          <!-- Mensaje de Error -->
-          <div class="error-alert" *ngIf="errorMessage">
-            <p>{{errorMessage}}</p>
-          </div>
-
-          <!-- Mensaje de Loading -->
-          <div class="loading-message" *ngIf="isLoading">
-            <div class="loading-spinner"></div>
-            <span>Verificando credenciales...</span>
-          </div>
-
-          <!-- Botón de Ingresar -->
-          <button 
-            type="submit"
-            class="btn-login"
-            [disabled]="!loginForm.valid || isLoading">
-            <span *ngIf="!isLoading">INGRESAR</span>
-            <span *ngIf="isLoading">INGRESANDO...</span>
-          </button>
-
-        </form>
+      <!-- Campo Contraseña -->
+      <div class="form-group">
+        <input 
+          type="password" 
+          formControlName="password"
+          placeholder="Contraseña"
+          class="form-input"
+          [class.error]="loginForm.get('password')?.invalid && loginForm.get('password')?.touched">
       </div>
+
+      <!-- Mensaje de error -->
+      <div *ngIf="errorMessage" class="error-message">
+        <i class="pi pi-exclamation-circle"></i>
+        {{ errorMessage }}
+      </div>
+
+      <!-- Botón de login -->
+      <button 
+        type="submit" 
+        class="login-btn"
+        [disabled]="loginForm.invalid || isLoading">
+        <span *ngIf="!isLoading">Ingresar</span>
+        <span *ngIf="isLoading">
+          <i class="pi pi-spin pi-spinner"></i>
+          Ingresando...
+        </span>
+      </button>
+
+    </form>
+
+    <!-- Links adicionales -->
+    <div class="login-links">
+      <a href="#" class="forgot-link">¿Olvidaste tu contraseña?</a>
+      <div class="divider"></div>
+      <button class="back-btn" (click)="goBack()">
+        <i class="pi pi-arrow-left"></i>
+        Volver al inicio
+      </button>
     </div>
-  </div>
 
-  <!-- Modal de Ayuda (mantener por si se necesita) -->
-  <div class="modal-overlay" *ngIf="showHelpModal" (click)="closeHelpModal()">
-    <div class="help-modal" (click)="$event.stopPropagation()">
-      <div class="modal-header">
-        <h3>Ayuda de Acceso</h3>
-        <button class="close-btn" (click)="closeHelpModal()">
-          <i class="pi pi-times"></i>
-        </button>
-      </div>
-      <div class="modal-content">
-        <div class="help-section">
-          <h4>Credenciales del sistema:</h4>
-          <div class="credentials-list">
-            <div class="credential-item">
-              <strong>Administrador:</strong> admin&#64;utleon.edu.mx / password
-            </div>
-          </div>
-        </div>
-        <div class="help-section">
-          <h4>¿Necesitas ayuda?</h4>
-          <p>Si tienes problemas para acceder, contacta al administrador del sistema.</p>
-        </div>
-      </div>
-    </div>
   </div>
 
 </div>
