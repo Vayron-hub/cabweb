@@ -40,6 +40,19 @@ export class AdminLayoutComponent implements OnInit, OnDestroy {
       email: ''
     };
 
+
+  isChangingPassword: boolean = false;
+  isSavingPassword: boolean = false;
+  changePasswordData: {
+    currentPassword: string;
+    newPassword: string;
+    confirmPassword: string;
+  } = {
+      currentPassword: '',
+      newPassword: '',
+      confirmPassword: ''
+    };
+
   constructor(
     private backendService: BackendService,
     private zonaService: ZonaService,
@@ -152,9 +165,12 @@ export class AdminLayoutComponent implements OnInit, OnDestroy {
   // Método existente mejorado
   closeAccountModal() {
     this.showAccountModal = false;
-    // Si estaba editando, cancelar la edición
+    // Si estaba editando perfil o cambiando contraseña, cancelar
     if (this.isEditingProfile) {
       this.cancelEditingProfile();
+    }
+    if (this.isChangingPassword) {
+      this.cancelChangingPassword();
     }
   }
 
@@ -226,28 +242,28 @@ export class AdminLayoutComponent implements OnInit, OnDestroy {
   }
 
 
-canSaveProfile(): boolean {
-  // Validar datos
-  const hasValidData = this.editProfileData.nombre.trim() !== '' && 
-                      this.editProfileData.email.trim() !== '' &&
-                      this.isValidEmail(this.editProfileData.email);
-  
-  // Validar cambios
-  const hasChanges = this.editProfileData.nombre !== this.currentUser.nombre || 
-                    this.editProfileData.email !== this.currentUser.email;
-  
-  // Validar usuario - más explícito
-  const hasValidUser = this.currentUser?.id != null && this.currentUser.id !== '';
-  
-  console.log('🔍 Validación de guardado:', {
-    hasValidData,
-    hasChanges,
-    hasValidUser,
-    currentUserID: this.currentUser?.id
-  });
-  
-  return hasValidData && hasChanges && hasValidUser;
-}
+  canSaveProfile(): boolean {
+    // Validar datos
+    const hasValidData = this.editProfileData.nombre.trim() !== '' &&
+      this.editProfileData.email.trim() !== '' &&
+      this.isValidEmail(this.editProfileData.email);
+
+    // Validar cambios
+    const hasChanges = this.editProfileData.nombre !== this.currentUser.nombre ||
+      this.editProfileData.email !== this.currentUser.email;
+
+    // Validar usuario - más explícito
+    const hasValidUser = this.currentUser?.id != null && this.currentUser.id !== '';
+
+    console.log('🔍 Validación de guardado:', {
+      hasValidData,
+      hasChanges,
+      hasValidUser,
+      currentUserID: this.currentUser?.id
+    });
+
+    return hasValidData && hasChanges && hasValidUser;
+  }
 
   isValidEmail(email: string): boolean {
     if (!email) return false;
@@ -277,7 +293,7 @@ canSaveProfile(): boolean {
     this.backendService.updateUsuario(this.currentUser.id, updateData).subscribe({
       next: (response) => {
         console.log('✅ Perfil actualizado exitosamente:', response);
-        
+
         // Actualizar el usuario actual en memoria
         this.currentUser = {
           ...this.currentUser,
@@ -299,9 +315,9 @@ canSaveProfile(): boolean {
         console.error('❌ Error completo:', error);
         console.error('❌ Status:', error.status);
         console.error('❌ Message:', error.message);
-        
+
         this.isSavingProfile = false;
-        
+
         // Manejo específico de errores
         if (error.status === 400) {
           alert('Error: El email ya está registrado por otro usuario o los datos son inválidos.');
@@ -310,5 +326,148 @@ canSaveProfile(): boolean {
         }
       }
     });
+  }
+
+  // Agregar estos métodos después de saveProfileChanges():
+
+  startChangingPassword() {
+    this.isChangingPassword = true;
+    // Limpiar formulario
+    this.changePasswordData = {
+      currentPassword: '',
+      newPassword: '',
+      confirmPassword: ''
+    };
+  }
+
+  cancelChangingPassword() {
+    this.isChangingPassword = false;
+    // Limpiar datos
+    this.changePasswordData = {
+      currentPassword: '',
+      newPassword: '',
+      confirmPassword: ''
+    };
+  }
+
+  canSavePassword(): boolean {
+    const hasAllFields = this.changePasswordData.currentPassword.trim() !== '' &&
+                        this.changePasswordData.newPassword.trim() !== '' &&
+                        this.changePasswordData.confirmPassword.trim() !== '';
+    
+    const passwordsMatch = this.changePasswordData.newPassword === this.changePasswordData.confirmPassword;
+    
+    const isValidNewPassword = this.isStrongPassword(this.changePasswordData.newPassword);
+    
+    const isNotSamePassword = this.changePasswordData.currentPassword !== this.changePasswordData.newPassword;
+    
+    console.log('🔍 Validación de contraseña:', {
+      hasAllFields,
+      passwordsMatch,
+      isValidNewPassword,
+      isNotSamePassword
+    });
+    
+    return hasAllFields && passwordsMatch && isValidNewPassword && isNotSamePassword;
+  }
+
+  isStrongPassword(password: string): boolean {
+    if (password.length < 8) return false;
+    
+    // Al menos una mayúscula
+    if (!/[A-Z]/.test(password)) return false;
+    
+    // Al menos una minúscula  
+    if (!/[a-z]/.test(password)) return false;
+    
+    // Al menos un número
+    if (!/\d/.test(password)) return false;
+    
+    // Al menos un carácter especial
+    if (!/[!@#$%^&*(),.?":{}|<>]/.test(password)) return false;
+    
+    return true;
+  }
+
+  // Método para obtener mensaje de validación de contraseña
+  getPasswordValidationMessage(password: string): string {
+    if (password.length < 8) return 'Mínimo 8 caracteres';
+    if (!/[A-Z]/.test(password)) return 'Debe incluir al menos una mayúscula';
+    if (!/[a-z]/.test(password)) return 'Debe incluir al menos una minúscula';
+    if (!/\d/.test(password)) return 'Debe incluir al menos un número';
+    if (!/[!@#$%^&*(),.?":{}|<>]/.test(password)) return 'Debe incluir al menos un carácter especial';
+    return '';
+  }
+
+  // Reemplazar el método savePasswordChanges:
+  savePasswordChanges() {
+    if (!this.canSavePassword()) {
+      return;
+    }
+
+    this.isSavingPassword = true;
+
+    // Primero verificar la contraseña actual
+    console.log('🔍 Verificando contraseña actual...');
+    
+    this.backendService.verifyCurrentPassword(this.currentUser.id, this.changePasswordData.currentPassword).subscribe({
+      next: (verifyResponse) => {
+        if (!verifyResponse.isValid) {
+          console.error('❌ Contraseña actual incorrecta');
+          this.isSavingPassword = false;
+          alert('Error: La contraseña actual es incorrecta.');
+          return;
+        }
+
+        console.log('✅ Contraseña actual verificada, procediendo con el cambio...');
+        
+        // Si la contraseña actual es correcta, proceder con el cambio
+        const updateData = {
+          nombre: this.currentUser.nombre,
+          email: this.currentUser.email,
+          password: this.changePasswordData.newPassword
+        };
+
+        this.backendService.updateUsuario(this.currentUser.id, updateData).subscribe({
+          next: (response) => {
+            console.log('✅ Contraseña cambiada exitosamente:', response);
+            
+            this.isChangingPassword = false;
+            this.isSavingPassword = false;
+            this.cancelChangingPassword();
+            
+            alert('Contraseña cambiada exitosamente');
+          },
+          error: (error) => {
+            console.error('❌ Error al cambiar contraseña:', error);
+            this.isSavingPassword = false;
+            alert('Error al cambiar la contraseña. Por favor, inténtalo de nuevo.');
+          }
+        });
+      },
+      error: (error) => {
+        console.error('❌ Error al verificar contraseña actual:', error);
+        this.isSavingPassword = false;
+        
+        if (error.status === 403) {
+          alert('Error: No tienes permisos para cambiar esta contraseña.');
+        } else {
+          alert('Error al verificar la contraseña actual. Por favor, inténtalo de nuevo.');
+        }
+      }
+    });
+  }
+
+  // Alternativa: Un método que devuelve todas las validaciones
+
+  getPasswordValidation(password: string) {
+    return {
+      minLength: password.length >= 8,
+      hasUpper: /[A-Z]/.test(password),
+      hasLower: /[a-z]/.test(password),
+      hasNumber: /\d/.test(password),
+      hasSpecial: /[!@#$%^&*(),.?":{}|<>]/.test(password),
+      hasContent: password.length > 0
+    };
   }
 }

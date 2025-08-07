@@ -261,7 +261,8 @@ private transformUserToBackend(frontendUser: Partial<User>): any {
     backendData.Correo = frontendUser.correo;
   }
   
-  if (frontendUser.password) {
+  // Solo incluir password si se proporciona y no está vacío
+  if (frontendUser.password && frontendUser.password.trim() !== '') {
     backendData.Password = frontendUser.password;
   }
   
@@ -592,4 +593,14 @@ private transformUserToBackend(frontendUser: Partial<User>): any {
     return throwError(() => new Error(errorMessage));
   }
 
+  verifyCurrentPassword(id: string | number, currentPassword: string): Observable<{isValid: boolean}> {
+    const verifyData = {
+      Password: currentPassword
+    };
+    
+    console.log('🔍 Verificando contraseña actual para usuario ID:', id);
+    
+    return this.http.post<{isValid: boolean}>(`${this.apiUrl}/usuarios/${id}/verify-password`, verifyData)
+      .pipe(catchError(this.handleError));
+  }
 }

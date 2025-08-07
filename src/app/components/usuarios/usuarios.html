@@ -158,18 +158,6 @@
   </div>
   <div class="flex gap-2">
     <button 
-      class="bg-yellow-500 text-white border-0 px-3 py-2 rounded-lg text-sm font-medium cursor-pointer flex items-center gap-2 transition-all duration-200 hover:bg-yellow-600"
-      (click)="bulkDeactivateUsers()">
-      <i class="pi pi-eye-slash"></i>
-      Desactivar
-    </button>
-    <button 
-      class="bg-green-500 text-white border-0 px-3 py-2 rounded-lg text-sm font-medium cursor-pointer flex items-center gap-2 transition-all duration-200 hover:bg-green-600"
-      (click)="bulkActivateUsers()">
-      <i class="pi pi-eye"></i>
-      Activar
-    </button>
-    <button 
       class="bg-red-500 text-white border-0 px-3 py-2 rounded-lg text-sm font-medium cursor-pointer flex items-center gap-2 transition-all duration-200 hover:bg-red-600 disabled:opacity-50 disabled:cursor-not-allowed"
       (click)="bulkDeleteUsers()"
       [disabled]="!canDeleteUser()">
