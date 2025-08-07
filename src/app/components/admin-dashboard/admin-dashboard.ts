@@ -39,8 +39,8 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
     id: 1,
     nombre: 'root',
     correo: 'admin@utleon.edu.mx',
-    email: 'admin@utleon.edu.mx', 
-    password:'',// Compatibilidad
+    email: 'admin@utleon.edu.mx',
+    password: '',// Compatibilidad
     activo: true,
     enLinea: false,
     fechaCreacion: '2025-07-26',
@@ -107,19 +107,15 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
     private authService: AuthService,
     private cdr: ChangeDetectorRef
   ) {
-    console.log('🏗️ ADMIN-DASHBOARD - Constructor');
     // Solo inicializar variables básicas en el constructor
   }
 
   ngOnInit() {
-    console.log('🚀 ADMIN-DASHBOARD - Iniciando dashboard con datos REALES del sistema');
 
     // SUSCRIBIRSE AL ZONA SERVICE PARA ESCUCHAR CAMBIOS DESDE LA NAVBAR
     this.zonaSubscription = this.zonaService.selectedZona$.subscribe(zonaInfo => {
-      console.log('🔄 ZONA SERVICE - Cambio detectado:', zonaInfo);
 
       if (zonaInfo && zonaInfo.nombre) {
-        console.log('✅ Actualizando zona seleccionada desde navbar:', zonaInfo.nombre);
         this.selectedLocation = zonaInfo.nombre;
         this.selectedZonaId = zonaInfo.id;
 
@@ -136,7 +132,6 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
   }
 
   loadInitialData() {
-    console.log('🚀 Cargando datos GLOBALES del dashboard administrativo...');
 
     // 1. Cargar usuarios del sistema
     this.loadUsers();
@@ -154,7 +149,6 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
     this.loadGlobalZoneComparison();
 
     // 6. Las detecciones se cargarán cuando se seleccione una zona desde el ZonaService
-    console.log('⏳ Esperando selección de zona desde navbar...');
   }
 
   setActiveTab(tab: string) {
@@ -167,7 +161,6 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
 
     this.backendService.getUsuarios().subscribe({
       next: (usuarios: User[]) => {
-        console.log('👥 Usuarios del backend:', usuarios);
         // Mapear los datos del backend al formato del frontend
         this.allUsers = usuarios.map(user => ({
           ...user,
@@ -207,7 +200,6 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
   }
 
   toggleUserStatus(user: User) {
-    console.log('Cambiando estado de usuario:', user);
     // Cambiar el estado boolean activo
     const newStatus = !user.activo;
 
@@ -510,11 +502,11 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
       return '#4CAF50'; // Verde para orgánico
     }
     // Valorizable/Reciclable - Azul
-    else if (tipoLower ==='valorizable') {
+    else if (tipoLower === 'valorizable') {
       return '#2196F3'; // Azul para valorizable/reciclable
     }
     // No Valorizable - Naranja/Rojo
-    else if (tipoLower==='no valorizable') {
+    else if (tipoLower === 'no valorizable') {
       return '#FF9800'; // Naranja para no valorizable
     }
     // Otros tipos - Gris
@@ -756,14 +748,14 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
           let reciclableCount = 0;
           let organicoCount = 0;
           let novalCount = 0;
-          
+
           Object.keys(tiposCounts).forEach(tipo => {
             const count = tiposCounts[tipo];
             if (tipo === 'Valorizable' || tipo === 'valorizable') {
               reciclableCount += count;
             } else if (tipo.includes('organico') || tipo.includes('orgánico') || tipo.includes('Organico')) {
               organicoCount += count;
-            }else if (tipo ==='no valorizable') {
+            } else if (tipo === 'no valorizable') {
               novalCount += count;
             }
           });
@@ -820,7 +812,7 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
           valorizableCount += cantidad;
         } else if (nombreTipo.includes('organico') || nombreTipo.includes('orgánico') || nombreTipo.includes('Organico')) {
           organicoCount += cantidad;
-        } else if(nombreTipo.includes('no valorizable') || nombreTipo.includes('No Valorizable') || nombreTipo.includes('no Valorizable')) {
+        } else if (nombreTipo.includes('no valorizable') || nombreTipo.includes('No Valorizable') || nombreTipo.includes('no Valorizable')) {
           noValorizableCount += cantidad;
         }
       });
@@ -1063,5 +1055,29 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
         zonas: this.estadisticasZonas
       }
     };
+  }
+
+
+  getTopZoneCount(): number {
+    if (!this.estadisticasZonas || this.estadisticasZonas.length === 0) {
+      return 0;
+    }
+
+    // Encontrar la zona con más detecciones totales
+    const maxDetecciones = Math.max(...this.estadisticasZonas.map(zona => zona.totalDetecciones || 0));
+    return maxDetecciones;
+  }
+
+  getTopZoneName(): string {
+    if (!this.estadisticasZonas || this.estadisticasZonas.length === 0) {
+      return 'Sin datos';
+    }
+
+    // Encontrar la zona con más detecciones totales
+    const zonaConMasDetecciones = this.estadisticasZonas.reduce((max, zona) =>
+      (zona.totalDetecciones || 0) > (max.totalDetecciones || 0) ? zona : max
+    );
+
+    return this.formatZoneLabel(zonaConMasDetecciones.nombre);
   }
 }

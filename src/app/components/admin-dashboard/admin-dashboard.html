@@ -1,8 +1,6 @@
 <div class="space-y-8">
   <div class="space-y-8" *ngIf="activeTab === 'dashboard'">
-    <div
-      class="flex items-center justify-between p-6 bg-white rounded-xl shadow-sm"
-    >
+    <div class="flex items-center justify-between p-6 bg-white rounded-xl shadow-sm">
       <div>
         <h1 class="text-3xl font-bold text-gray-800 mb-2">
           ¡Buenos días Administrador!
@@ -23,26 +21,17 @@
           <small class="text-gray-600">Del sistema completo</small>
         </div>
         <div class="space-y-4">
-          <div
-            class="flex items-center gap-4 p-4 bg-gray-50 rounded-lg"
-            *ngFor="let classifier of getCurrentClassifiers()"
-          >
+          <div class="flex items-center gap-4 p-4 bg-gray-50 rounded-lg"
+            *ngFor="let classifier of getCurrentClassifiers()">
             <div class="w-12 h-12 flex items-center justify-center">
-              <img
-                src="assets/images/esp32cam.png"
-                alt="Classifier Icon"
-                class="w-full h-full object-contain"
-              />
+              <img src="assets/images/esp32cam.png" alt="Classifier Icon" class="w-full h-full object-contain" />
             </div>
             <div class="flex-1">
               <h3 class="font-medium text-gray-800">{{classifier.name}}</h3>
               <small class="text-gray-600 block mb-2">
-                {{classifier.zona}}</small
-              >
+                {{classifier.zona}}</small>
               <div class="flex items-baseline gap-2">
-                <span class="text-xl font-bold text-primary-600"
-                  >{{classifier.totalDetecciones}}</span
-                >
+                <span class="text-xl font-bold text-primary-600">{{classifier.totalDetecciones}}</span>
                 <small class="text-gray-500">detecciones totales</small>
               </div>
             </div>
@@ -60,40 +49,50 @@
         <div class="chart-content">
           <div class="flex items-end justify-center gap-6 h-32">
             <div class="flex flex-col items-center">
-              <div
-                class="w-12 bg-primary-500 rounded-t-md"
-                [style.height.%]="datosDashboardCentral[0] || 0"
-                [title]="getZoneTitle(0)"
-                [attr.data-value]="datosDashboardCentral[0] || 0"
-              ></div>
-              <span
-                class="text-xs text-gray-600 mt-2 text-center max-w-[60px] truncate"
-                >{{formatZoneLabel(zonasDeteccionesHoy[0])}}</span
-              >
+              <div class="w-12 bg-primary-500 rounded-t-md relative min-h-[8px]"
+                [style.height.%]="Math.max(datosDashboardCentral[0] || 0, 8)"
+                [attr.data-value]="datosDashboardCentral[0] || 0">
+                <div class="absolute -top-6 left-1/2 transform -translate-x-1/2 text-xs font-semibold text-gray-700">
+                  {{datosDashboardCentral[0] || 0}}
+                </div>
+              </div>
+              <span class="text-xs text-gray-600 mt-2 text-center max-w-[60px] truncate">
+                {{formatZoneLabel(zonasDeteccionesHoy[0]) || 'Zona 1'}}
+              </span>
             </div>
+
             <div class="flex flex-col items-center">
-              <div
-                class="w-12 bg-primary-600 rounded-t-md"
-                [style.height.%]="datosDashboardCentral[1] || 0"
-                [title]="getZoneTitle(1)"
-                [attr.data-value]="datosDashboardCentral[1] || 0"
-              ></div>
-              <span
-                class="text-xs text-gray-600 mt-2 text-center max-w-[60px] truncate"
-                >{{formatZoneLabel(zonasDeteccionesHoy[1])}}</span
-              >
+              <div class="w-12 bg-primary-600 rounded-t-md relative min-h-[8px]"
+                [style.height.%]="Math.max(datosDashboardCentral[1] || 0, 8)"
+                [attr.data-value]="datosDashboardCentral[1] || 0">
+                <div class="absolute -top-6 left-1/2 transform -translate-x-1/2 text-xs font-semibold text-gray-700">
+                  {{datosDashboardCentral[1] || 0}}
+                </div>
+              </div>
+              <span class="text-xs text-gray-600 mt-2 text-center max-w-[60px] truncate">
+                {{formatZoneLabel(zonasDeteccionesHoy[1]) || 'Zona 2'}}
+              </span>
             </div>
+
             <div class="flex flex-col items-center">
-              <div
-                class="w-12 bg-primary-700 rounded-t-md"
-                [style.height.%]="datosDashboardCentral[2] || 0"
-                [title]="getZoneTitle(2)"
-                [attr.data-value]="datosDashboardCentral[2] || 0"
-              ></div>
-              <span
-                class="text-xs text-gray-600 mt-2 text-center max-w-[60px] truncate"
-                >{{formatZoneLabel(zonasDeteccionesHoy[2])}}</span
-              >
+              <div class="w-12 bg-primary-700 rounded-t-md relative min-h-[8px]"
+                [style.height.%]="Math.max(datosDashboardCentral[2] || 0, 8)"
+                [attr.data-value]="datosDashboardCentral[2] || 0">
+                <div class="absolute -top-6 left-1/2 transform -translate-x-1/2 text-xs font-semibold text-gray-700">
+                  {{datosDashboardCentral[2] || 0}}
+                </div>
+              </div>
+              <span class="text-xs text-gray-600 mt-2 text-center max-w-[60px] truncate">
+                {{formatZoneLabel(zonasDeteccionesHoy[2]) || 'Zona 3'}}
+              </span>
+            </div>
+          </div>
+
+          <div class="text-center mt-4 p-3 bg-gray-50 rounded-lg">
+            <div class="text-xs text-gray-600 mb-1">Zona líder</div>
+            <div class="font-semibold text-primary-600">
+              {{getTopZoneName()}}
+              <span class="text-gray-700">- {{getTopZoneCount()}} detecciones</span>
             </div>
           </div>
         </div>
@@ -108,84 +107,30 @@
         </div>
         <div class="space-y-4">
           <div class="flex justify-center gap-4">
-            <div
-              class="text-center"
-              title="Residuos Valorizables: {{porcentajeValorizable || 0}}%"
-            >
+            <div class="text-center" title="Residuos Valorizables: {{porcentajeValorizable || 0}}%">
               <div class="w-16 h-16 mx-auto mb-2">
-                <svg
-                  viewBox="0 0 42 42"
-                  class="w-full h-full transform -rotate-90"
-                >
-                  <circle
-                    cx="21"
-                    cy="21"
-                    r="15.915"
-                    fill="transparent"
-                    stroke="#e6e6e6"
-                    stroke-width="3"
-                  ></circle>
-                  <circle
-                    cx="21"
-                    cy="21"
-                    r="15.915"
-                    fill="transparent"
-                    stroke="#2196F3"
-                    stroke-width="3"
+                <svg viewBox="0 0 42 42" class="w-full h-full transform -rotate-90">
+                  <circle cx="21" cy="21" r="15.915" fill="transparent" stroke="#e6e6e6" stroke-width="3"></circle>
+                  <circle cx="21" cy="21" r="15.915" fill="transparent" stroke="#2196F3" stroke-width="3"
                     [attr.stroke-dasharray]="(porcentajeValorizable || 0) + ' ' + (100 - (porcentajeValorizable || 0))"
-                    stroke-dashoffset="25"
-                  ></circle>
-                  <text
-                    x="21"
-                    y="24"
-                    text-anchor="middle"
-                    font-size="8"
-                    font-weight="bold"
-                    fill="#2196F3"
-                    class="transform rotate-90"
-                  >
+                    stroke-dashoffset="25"></circle>
+                  <text x="21" y="24" text-anchor="middle" font-size="8" font-weight="bold" fill="#2196F3"
+                    class="transform rotate-90">
                     {{porcentajeValorizable || 0}}%
                   </text>
                 </svg>
               </div>
               <div class="text-xs font-medium text-gray-700">Valorizable</div>
             </div>
-            <div
-              class="text-center"
-              title="Residuos Orgánicos: {{porcentajeOrganica || 0}}%"
-            >
+            <div class="text-center" title="Residuos Orgánicos: {{porcentajeOrganica || 0}}%">
               <div class="w-16 h-16 mx-auto mb-2">
-                <svg
-                  viewBox="0 0 42 42"
-                  class="w-full h-full transform -rotate-90"
-                >
-                  <circle
-                    cx="21"
-                    cy="21"
-                    r="15.915"
-                    fill="transparent"
-                    stroke="#e6e6e6"
-                    stroke-width="3"
-                  ></circle>
-                  <circle
-                    cx="21"
-                    cy="21"
-                    r="15.915"
-                    fill="transparent"
-                    stroke="#4CAF50"
-                    stroke-width="3"
+                <svg viewBox="0 0 42 42" class="w-full h-full transform -rotate-90">
+                  <circle cx="21" cy="21" r="15.915" fill="transparent" stroke="#e6e6e6" stroke-width="3"></circle>
+                  <circle cx="21" cy="21" r="15.915" fill="transparent" stroke="#4CAF50" stroke-width="3"
                     [attr.stroke-dasharray]="(porcentajeOrganica || 0) + ' ' + (100 - (porcentajeOrganica || 0))"
-                    stroke-dashoffset="25"
-                  ></circle>
-                  <text
-                    x="21"
-                    y="24"
-                    text-anchor="middle"
-                    font-size="8"
-                    font-weight="bold"
-                    fill="#4CAF50"
-                    class="transform rotate-90"
-                  >
+                    stroke-dashoffset="25"></circle>
+                  <text x="21" y="24" text-anchor="middle" font-size="8" font-weight="bold" fill="#4CAF50"
+                    class="transform rotate-90">
                     {{porcentajeOrganica || 0}}%
                   </text>
                 </svg>
@@ -194,42 +139,15 @@
             </div>
           </div>
           <div class="flex justify-center">
-            <div
-              class="text-center"
-              title="Residuos No Valorizables: {{porcentajeNoValorizable || 0}}%"
-            >
+            <div class="text-center" title="Residuos No Valorizables: {{porcentajeNoValorizable || 0}}%">
               <div class="w-20 h-20 mx-auto mb-2">
-                <svg
-                  viewBox="0 0 42 42"
-                  class="w-full h-full transform -rotate-90"
-                >
-                  <circle
-                    cx="21"
-                    cy="21"
-                    r="15.915"
-                    fill="transparent"
-                    stroke="#e6e6e6"
-                    stroke-width="3"
-                  ></circle>
-                  <circle
-                    cx="21"
-                    cy="21"
-                    r="15.915"
-                    fill="transparent"
-                    stroke="#757575"
-                    stroke-width="3"
+                <svg viewBox="0 0 42 42" class="w-full h-full transform -rotate-90">
+                  <circle cx="21" cy="21" r="15.915" fill="transparent" stroke="#e6e6e6" stroke-width="3"></circle>
+                  <circle cx="21" cy="21" r="15.915" fill="transparent" stroke="#757575" stroke-width="3"
                     [attr.stroke-dasharray]="(porcentajeNoValorizable || 0) + ' ' + (100 - (porcentajeNoValorizable || 0))"
-                    stroke-dashoffset="25"
-                  ></circle>
-                  <text
-                    x="21"
-                    y="24"
-                    text-anchor="middle"
-                    font-size="8"
-                    font-weight="bold"
-                    fill="#757575"
-                    class="transform rotate-90"
-                  >
+                    stroke-dashoffset="25"></circle>
+                  <text x="21" y="24" text-anchor="middle" font-size="8" font-weight="bold" fill="#757575"
+                    class="transform rotate-90">
                     {{porcentajeNoValorizable || 0}}%
                   </text>
                 </svg>
@@ -251,32 +169,19 @@
         </h2>
         <button
           class="w-8 h-8 flex items-center justify-center bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
-          (click)="loadUltimasDetecciones()"
-          [disabled]="isLoadingDetecciones"
-          title="Actualizar detecciones"
-        >
-          <i
-            class="pi text-sm"
-            [class.pi-refresh]="!isLoadingDetecciones"
-            [class.pi-spin]="isLoadingDetecciones"
-            [class.pi-spinner]="isLoadingDetecciones"
-          ></i>
+          (click)="loadUltimasDetecciones()" [disabled]="isLoadingDetecciones" title="Actualizar detecciones">
+          <i class="pi text-sm" [class.pi-refresh]="!isLoadingDetecciones" [class.pi-spin]="isLoadingDetecciones"
+            [class.pi-spinner]="isLoadingDetecciones"></i>
         </button>
       </div>
 
       <div class="space-y-4" *ngIf="!isLoadingDetecciones">
         <div
           class="flex items-start gap-4 p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors border border-gray-200"
-          *ngFor="let detection of ultimasDetecciones; trackBy: trackDetectionById"
-        >
-          <div
-            class="w-12 h-12 rounded-xl flex items-center justify-center text-white"
-            [style.background-color]="getDetectionTypeColor(detection.tipo || detection.tipoResiduo)"
-          >
-            <i
-              class="pi"
-              [ngClass]="getDetectionTypeIcon(detection.tipo || detection.tipoResiduo)"
-            ></i>
+          *ngFor="let detection of ultimasDetecciones; trackBy: trackDetectionById">
+          <div class="w-12 h-12 rounded-xl flex items-center justify-center text-white"
+            [style.background-color]="getDetectionTypeColor(detection.tipo || detection.tipoResiduo)">
+            <i class="pi" [ngClass]="getDetectionTypeIcon(detection.tipo || detection.tipoResiduo)"></i>
           </div>
 
           <div class="flex-1 min-w-0">
@@ -284,9 +189,7 @@
               <div class="font-medium text-gray-800 truncate">
                 {{detection.tipo || detection.tipoResiduo || 'Sin tipo'}}
               </div>
-              <div
-                class="text-sm text-gray-500 ml-2 px-2 py-1 bg-gray-200 rounded"
-              >
+              <div class="text-sm text-gray-500 ml-2 px-2 py-1 bg-gray-200 rounded">
                 {{formatDetectionTime(detection.fechaHora || detection.fecha)}}
               </div>
             </div>
@@ -294,25 +197,16 @@
             <div class="mb-3">
               <div class="flex items-center gap-2 text-sm text-gray-600">
                 <i class="pi pi-map-marker text-xs"></i>
-                <span class="truncate"
-                  >{{(detection.clasificador || 'Sin clasificador')}}</span
-                >
+                <span class="truncate">{{(detection.clasificador || 'Sin clasificador')}}</span>
                 <span *ngIf="detection.zona" class="text-gray-400">•</span>
-                <span *ngIf="detection.zona" class="text-gray-500 italic"
-                  >{{detection.zona}}</span
-                >
+                <span *ngIf="detection.zona" class="text-gray-500 italic">{{detection.zona}}</span>
               </div>
             </div>
 
             <div class="flex justify-end" *ngIf="detection.estado">
-              <span
-                class="px-2 py-1 text-xs rounded-full"
-                [ngClass]="detection.estado.toLowerCase() === 'confirmada' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'"
-              >
-                <i
-                  class="pi mr-1"
-                  [ngClass]="detection.estado === 'Confirmada' ? 'pi-check' : 'pi-clock'"
-                ></i>
+              <span class="px-2 py-1 text-xs rounded-full"
+                [ngClass]="detection.estado.toLowerCase() === 'confirmada' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'">
+                <i class="pi mr-1" [ngClass]="detection.estado === 'Confirmada' ? 'pi-check' : 'pi-clock'"></i>
                 {{detection.estado}}
               </span>
             </div>
@@ -320,9 +214,7 @@
         </div>
 
         <div class="text-center py-12" *ngIf="ultimasDetecciones.length === 0">
-          <div
-            class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4"
-          >
+          <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
             <i class="pi pi-info-circle text-gray-400 text-2xl"></i>
           </div>
           <div class="space-y-2">
@@ -337,10 +229,7 @@
         </div>
       </div>
 
-      <div
-        class="flex flex-col items-center justify-center py-12"
-        *ngIf="isLoadingDetecciones"
-      >
+      <div class="flex flex-col items-center justify-center py-12" *ngIf="isLoadingDetecciones">
         <i class="pi pi-spin pi-spinner text-2xl text-gray-400 mb-2"></i>
         <p class="text-gray-600">Cargando detecciones...</p>
       </div>
@@ -349,8 +238,7 @@
 
   <div class="space-y-8" *ngIf="activeTab === 'estadisticas'">
     <div
-      class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 p-6 bg-white rounded-xl shadow-sm"
-    >
+      class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 p-6 bg-white rounded-xl shadow-sm">
       <div class="statistics-title">
         <h2 class="text-2xl font-semibold text-gray-800 mb-1">Estadísticas</h2>
         <p class="text-sm text-gray-600">
@@ -360,22 +248,15 @@
       <div class="flex gap-3">
         <button
           class="flex items-center gap-2 px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-lg font-medium transition-colors"
-          (click)="exportStatisticsData()"
-        >
+          (click)="exportStatisticsData()">
           <i class="pi pi-download"></i>
           Exportar
         </button>
         <button
           class="flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 border border-gray-200 rounded-lg font-medium transition-colors"
-          (click)="refreshStatistics()"
-          [disabled]="isLoadingStats"
-        >
-          <i
-            class="pi"
-            [class.pi-refresh]="!isLoadingStats"
-            [class.pi-spin]="isLoadingStats"
-            [class.pi-spinner]="isLoadingStats"
-          ></i>
+          (click)="refreshStatistics()" [disabled]="isLoadingStats">
+          <i class="pi" [class.pi-refresh]="!isLoadingStats" [class.pi-spin]="isLoadingStats"
+            [class.pi-spinner]="isLoadingStats"></i>
           {{isLoadingStats ? 'Actualizando...' : 'Actualizar'}}
         </button>
       </div>
@@ -389,34 +270,26 @@
         </div>
         <div class="space-y-4">
           <div class="flex items-end justify-center gap-3 h-24">
-            <div
-              class="w-8 bg-primary-500 rounded-t-md flex flex-col items-center"
-              [style.height.%]="datosDeteccionesPorHora[0]"
-            >
+            <div class="w-8 bg-primary-500 rounded-t-md flex flex-col items-center"
+              [style.height.%]="datosDeteccionesPorHora[0]">
               <div class="text-xs font-bold text-white pt-2">
                 {{datosDeteccionesPorHora[0]}}
               </div>
             </div>
-            <div
-              class="w-8 bg-primary-600 rounded-t-md flex flex-col items-center"
-              [style.height.%]="datosDeteccionesPorHora[1]"
-            >
+            <div class="w-8 bg-primary-600 rounded-t-md flex flex-col items-center"
+              [style.height.%]="datosDeteccionesPorHora[1]">
               <div class="text-xs font-bold text-white pt-2">
                 {{datosDeteccionesPorHora[1]}}
               </div>
             </div>
-            <div
-              class="w-8 bg-primary-700 rounded-t-md flex flex-col items-center"
-              [style.height.%]="datosDeteccionesPorHora[2]"
-            >
+            <div class="w-8 bg-primary-700 rounded-t-md flex flex-col items-center"
+              [style.height.%]="datosDeteccionesPorHora[2]">
               <div class="text-xs font-bold text-white pt-2">
                 {{datosDeteccionesPorHora[2]}}
               </div>
             </div>
-            <div
-              class="w-8 bg-primary-800 rounded-t-md flex flex-col items-center"
-              [style.height.%]="datosDeteccionesPorHora[3]"
-            >
+            <div class="w-8 bg-primary-800 rounded-t-md flex flex-col items-center"
+              [style.height.%]="datosDeteccionesPorHora[3]">
               <div class="text-xs font-bold text-white pt-2">
                 {{datosDeteccionesPorHora[3]}}
               </div>
@@ -438,28 +311,16 @@
         </div>
         <div class="module-chart">
           <div class="bar-chart-container">
-            <div
-              class="chart-bar"
-              [style.height.%]="datosClasificacionesExitosas[0]"
-            >
+            <div class="chart-bar" [style.height.%]="datosClasificacionesExitosas[0]">
               <div class="bar-value">{{datosClasificacionesExitosas[0]}}</div>
             </div>
-            <div
-              class="chart-bar"
-              [style.height.%]="datosClasificacionesExitosas[1]"
-            >
+            <div class="chart-bar" [style.height.%]="datosClasificacionesExitosas[1]">
               <div class="bar-value">{{datosClasificacionesExitosas[1]}}</div>
             </div>
-            <div
-              class="chart-bar"
-              [style.height.%]="datosClasificacionesExitosas[2]"
-            >
+            <div class="chart-bar" [style.height.%]="datosClasificacionesExitosas[2]">
               <div class="bar-value">{{datosClasificacionesExitosas[2]}}</div>
             </div>
-            <div
-              class="chart-bar"
-              [style.height.%]="datosClasificacionesExitosas[3]"
-            >
+            <div class="chart-bar" [style.height.%]="datosClasificacionesExitosas[3]">
               <div class="bar-value">{{datosClasificacionesExitosas[3]}}</div>
             </div>
           </div>
@@ -544,18 +405,9 @@
           <i class="pi pi-download"></i>
           Exportar
         </button>
-        <button
-          class="btn-secondary"
-          (click)="loadUsers()"
-          [disabled]="isLoadingUsers"
-          title="Actualizar usuarios"
-        >
-          <i
-            class="pi"
-            [class.pi-refresh]="!isLoadingUsers"
-            [class.pi-spin]="isLoadingUsers"
-            [class.pi-spinner]="isLoadingUsers"
-          ></i>
+        <button class="btn-secondary" (click)="loadUsers()" [disabled]="isLoadingUsers" title="Actualizar usuarios">
+          <i class="pi" [class.pi-refresh]="!isLoadingUsers" [class.pi-spin]="isLoadingUsers"
+            [class.pi-spinner]="isLoadingUsers"></i>
           {{isLoadingUsers ? 'Actualizando...' : 'Actualizar'}}
         </button>
         <button class="btn-success" (click)="addNewUser()">
@@ -569,25 +421,16 @@
       <div class="search-bar">
         <div class="search-input-container">
           <i class="pi pi-search search-icon"></i>
-          <input
-            type="text"
-            placeholder="Buscar usuarios por nombre o correo..."
-            [(ngModel)]="searchTerm"
-            (input)="filterUsers()"
-            class="search-input"
-          />
+          <input type="text" placeholder="Buscar usuarios por nombre o correo..." [(ngModel)]="searchTerm"
+            (input)="filterUsers()" class="search-input" />
         </div>
       </div>
       <div class="role-filters">
         <label class="filter-label">Filtrar por rol:</label>
         <div class="role-checkboxes">
           <label class="checkbox-item" *ngFor="let role of roleOptions">
-            <input
-              type="checkbox"
-              [value]="role.value"
-              (change)="onRoleFilterChange($event)"
-              [checked]="selectedRoles.includes(role.value)"
-            />
+            <input type="checkbox" [value]="role.value" (change)="onRoleFilterChange($event)"
+              [checked]="selectedRoles.includes(role.value)" />
             <span class="checkmark"></span>
             {{role.label}}
           </label>
@@ -630,11 +473,7 @@
         <thead>
           <tr>
             <th>
-              <input
-                type="checkbox"
-                (change)="selectAllUsers($event)"
-                [checked]="allUsersSelected()"
-              />
+              <input type="checkbox" (change)="selectAllUsers($event)" [checked]="allUsersSelected()" />
             </th>
             <th>Usuario</th>
             <th>Email</th>
@@ -645,17 +484,11 @@
           </tr>
         </thead>
         <tbody>
-          <tr
-            *ngFor="let user of filteredUsers; trackBy: trackByUserId"
-            [class.selected]="selectedUsers.includes(user.id)"
-          >
+          <tr *ngFor="let user of filteredUsers; trackBy: trackByUserId"
+            [class.selected]="selectedUsers.includes(user.id)">
             <td>
-              <input
-                type="checkbox"
-                [value]="user.id"
-                (change)="toggleUserSelection(user.id, $event)"
-                [checked]="selectedUsers.includes(user.id)"
-              />
+              <input type="checkbox" [value]="user.id" (change)="toggleUserSelection(user.id, $event)"
+                [checked]="selectedUsers.includes(user.id)" />
             </td>
             <td>
               <div class="user-info">
@@ -673,40 +506,23 @@
               <span class="role-badge"> Admin </span>
             </td>
             <td>
-              <span
-                class="status-badge"
-                [ngClass]="getStatusClass(user.activo)"
-              >
+              <span class="status-badge" [ngClass]="getStatusClass(user.activo)">
                 <i class="pi" [ngClass]="getStatusIcon(user.activo)"></i>
                 {{getStatusText(user.activo)}}
               </span>
             </td>
             <td class="last-access">{{formatDate(user.ultimoAcceso)}}</td>
             <td class="actions">
-              <button
-                class="action-btn edit"
-                (click)="editUser(user)"
-                title="Editar usuario"
-              >
+              <button class="action-btn edit" (click)="editUser(user)" title="Editar usuario">
                 <i class="pi pi-pencil"></i>
               </button>
-              <button
-                class="action-btn delete"
-                (click)="deleteUser(user)"
-                [disabled]="!canDeleteUser()"
-                title="Eliminar usuario"
-              >
+              <button class="action-btn delete" (click)="deleteUser(user)" [disabled]="!canDeleteUser()"
+                title="Eliminar usuario">
                 <i class="pi pi-trash"></i>
               </button>
-              <button
-                class="action-btn toggle"
-                (click)="toggleUserStatus(user)"
-                [title]="user.estado === 'Activo' ? 'Desactivar usuario' : 'Activar usuario'"
-              >
-                <i
-                  class="pi"
-                  [ngClass]="user.estado === 'Activo' ? 'pi-eye-slash' : 'pi-eye'"
-                ></i>
+              <button class="action-btn toggle" (click)="toggleUserStatus(user)"
+                [title]="user.estado === 'Activo' ? 'Desactivar usuario' : 'Activar usuario'">
+                <i class="pi" [ngClass]="user.estado === 'Activo' ? 'pi-eye-slash' : 'pi-eye'"></i>
               </button>
             </td>
           </tr>
@@ -721,15 +537,8 @@
       </div>
     </div>
 
-    <div
-      class="loading-container"
-      *ngIf="isLoadingUsers"
-      style="text-align: center; padding: 40px"
-    >
-      <i
-        class="pi pi-spin pi-spinner"
-        style="font-size: 2rem; color: #4a7c59"
-      ></i>
+    <div class="loading-container" *ngIf="isLoadingUsers" style="text-align: center; padding: 40px">
+      <i class="pi pi-spin pi-spinner" style="font-size: 2rem; color: #4a7c59"></i>
       <p style="margin-top: 16px; color: #666">
         Cargando usuarios del sistema...
       </p>
@@ -748,11 +557,7 @@
           <i class="pi pi-eye"></i>
           Activar
         </button>
-        <button
-          class="btn-danger"
-          (click)="bulkDeleteUsers()"
-          [disabled]="!canDeleteUser()"
-        >
+        <button class="btn-danger" (click)="bulkDeleteUsers()" [disabled]="!canDeleteUser()">
           <i class="pi pi-trash"></i>
           Eliminar
         </button>
@@ -764,13 +569,8 @@
     <div class="classifiers-search-section">
       <h2>Filtro de búsqueda</h2>
       <div class="search-input-wrapper">
-        <input
-          type="text"
-          placeholder="Buscar clasificadores por nombre..."
-          [(ngModel)]="classifierSearchTerm"
-          (input)="filterClassifiers()"
-          class="classifier-search-input"
-        />
+        <input type="text" placeholder="Buscar clasificadores por nombre..." [(ngModel)]="classifierSearchTerm"
+          (input)="filterClassifiers()" class="classifier-search-input" />
         <button class="search-button">
           <i class="pi pi-search"></i>
         </button>
@@ -781,11 +581,8 @@
       <div class="classifiers-header-simple">
         <h2>
           Clasificadores {{getActiveCount()}} | {{getTotalCount()}}
-          <i
-            class="pi pi-spin pi-spinner"
-            *ngIf="isLoadingClasificadores"
-            style="margin-left: 8px; font-size: 14px; color: #666"
-          ></i>
+          <i class="pi pi-spin pi-spinner" *ngIf="isLoadingClasificadores"
+            style="margin-left: 8px; font-size: 14px; color: #666"></i>
         </h2>
         <button class="add-classifier-btn">
           <i class="pi pi-plus"></i>
@@ -793,34 +590,22 @@
       </div>
 
       <div class="classifiers-simple-list" *ngIf="!isLoadingClasificadores">
-        <div
-          class="classifier-simple-item"
-          *ngFor="let classifier of getCurrentClassifiers()"
-        >
+        <div class="classifier-simple-item" *ngFor="let classifier of getCurrentClassifiers()">
           <div class="classifier-device-icon">
             <div class="device-screen"></div>
           </div>
           <div class="classifier-simple-info">
             <h3>{{classifier.name}}</h3>
             <div class="classifier-simple-counters">
-              <span
-                class="simple-counter blue"
-                title="Detecciones de valorizable/reciclables"
-              >
+              <span class="simple-counter blue" title="Detecciones de valorizable/reciclables">
                 <i class="pi pi-trash"></i>
                 {{classifier.inactiveCount}}
               </span>
-              <span
-                class="simple-counter green"
-                title="Detecciones de residuos orgánicos"
-              >
+              <span class="simple-counter green" title="Detecciones de residuos orgánicos">
                 <i class="pi pi-trash"></i>
                 {{classifier.activeCount}}
               </span>
-              <span
-                class="simple-counter gray"
-                title="Detecciones de desechos generales"
-              >
+              <span class="simple-counter gray" title="Detecciones de desechos generales">
                 <i class="pi pi-trash"></i>
                 {{classifier.pendingCount}}
               </span>
@@ -829,23 +614,13 @@
         </div>
       </div>
 
-      <div
-        class="loading-container"
-        *ngIf="isLoadingClasificadores"
-        style="text-align: center; padding: 40px"
-      >
-        <i
-          class="pi pi-spin pi-spinner"
-          style="font-size: 2rem; color: #4a7c59"
-        ></i>
+      <div class="loading-container" *ngIf="isLoadingClasificadores" style="text-align: center; padding: 40px">
+        <i class="pi pi-spin pi-spinner" style="font-size: 2rem; color: #4a7c59"></i>
         <p style="margin-top: 16px; color: #666">Cargando clasificadores...</p>
       </div>
 
-      <div
-        class="no-data-container"
-        *ngIf="!isLoadingClasificadores && getCurrentClassifiers().length === 0"
-        style="text-align: center; padding: 40px"
-      >
+      <div class="no-data-container" *ngIf="!isLoadingClasificadores && getCurrentClassifiers().length === 0"
+        style="text-align: center; padding: 40px">
         <i class="pi pi-info-circle" style="font-size: 2rem; color: #999"></i>
         <p style="margin-top: 16px; color: #666">
           No hay clasificadores disponibles para esta zona
@@ -854,11 +629,7 @@
     </div>
   </div>
 
-  <div
-    class="modal-overlay"
-    *ngIf="showAccountModal"
-    (click)="closeAccountModal()"
-  >
+  <div class="modal-overlay" *ngIf="showAccountModal" (click)="closeAccountModal()">
     <div class="account-modal" (click)="$event.stopPropagation()">
       <div class="modal-header">
         <h2>Mi Cuenta</h2>
@@ -922,4 +693,5 @@
       </div>
     </div>
   </div>
+
 </div>
