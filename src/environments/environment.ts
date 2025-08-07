@@ -1,7 +1,7 @@
 export const environment = {
   production: false,
-  apiUrl: 'http://localhost:8080/api', // Tu backend en HTTPS
-  apiTimeout: 30000, // 30 segundos
+  apiUrl: 'https://localhost:8080/api', 
+  apiTimeout: 30000, 
   enableDevTools: true,
   version: '1.0.0'
 };
