@@ -559,4 +559,5 @@ export class BackendService {
     console.error('Error en BackendService:', errorMessage);
     return throwError(() => new Error(errorMessage));
   }
+
 }

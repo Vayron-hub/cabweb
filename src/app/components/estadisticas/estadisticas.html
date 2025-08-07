@@ -5,11 +5,9 @@
     <p>Análisis general de datos para {{selectedLocation}}</p>
   </div>
   <div class="statistics-actions">
-    <button 
-      class="btn-secondary"
-      (click)="refreshStatistics()"
-      [disabled]="isLoadingStats">
-      <i class="pi" [class.pi-refresh]="!isLoadingStats" [class.pi-spin]="isLoadingStats" [class.pi-spinner]="isLoadingStats"></i>
+    <button class="btn-secondary" (click)="refreshStatistics()" [disabled]="isLoadingStats">
+      <i class="pi" [class.pi-refresh]="!isLoadingStats" [class.pi-spin]="isLoadingStats"
+        [class.pi-spinner]="isLoadingStats"></i>
       {{isLoadingStats ? 'Actualizando...' : 'Actualizar'}}
     </button>
   </div>
@@ -26,7 +24,7 @@
       <span class="kpi-label">Total Detecciones</span>
     </div>
   </div>
-  
+
   <div class="kpi-card">
     <div class="kpi-icon active">
       <i class="pi pi-desktop"></i>
@@ -36,7 +34,7 @@
       <span class="kpi-label">Clasificadores Activos</span>
     </div>
   </div>
-  
+
   <div class="kpi-card">
     <div class="kpi-icon zones">
       <i class="pi pi-map"></i>
@@ -51,7 +49,7 @@
 
 <!-- Grid de Gráficas Avanzadas -->
 <div class="charts-grid">
-  
+
   <!-- 1. Gráfica de Composición de Residuos (Doughnut) -->
   <div class="chart-container large">
     <div class="chart-header">
@@ -61,22 +59,17 @@
     <div class="chart-content">
       <div class="composition-chart" *ngIf="estadisticasTipos.length > 0">
         <div class="doughnut-chart">
-          <svg viewBox="0 0 120 120" class="composition-svg">
+          <svg viewBox="0 0 120 120" class="composition-svg full-width">
             <!-- Background circle -->
             <circle cx="60" cy="60" r="40" fill="transparent" stroke="#f0f0f0" stroke-width="8"></circle>
-            
+
             <!-- Dynamic segments based on estadisticasTipos -->
-            <circle 
-              *ngFor="let tipo of getTopTipos(); let i = index"
-              cx="60" cy="60" r="40" 
-              fill="transparent" 
-              [attr.stroke]="getTipoColor(tipo.tipo)"
-              stroke-width="8"
+            <circle *ngFor="let tipo of getTopTipos(); let i = index" cx="60" cy="60" r="40" fill="transparent"
+              [attr.stroke]="getTipoColor(tipo.tipo)" stroke-width="8"
               [attr.stroke-dasharray]="tipo.porcentaje + ' ' + (100 - tipo.porcentaje)"
-              [attr.stroke-dashoffset]="getStrokeDashOffset(i)"
-              class="chart-segment">
+              [attr.stroke-dashoffset]="getStrokeDashOffset(i)" class="chart-segment">
             </circle>
-            
+
             <!-- Center text -->
             <text x="60" y="55" text-anchor="middle" font-size="14" font-weight="bold" fill="#333">
               {{getTotalDetections()}}
@@ -86,7 +79,7 @@
             </text>
           </svg>
         </div>
-        
+
         <!-- Legend -->
         <div class="chart-legend">
           <div class="legend-item" *ngFor="let tipo of getTopTipos()">
@@ -96,7 +89,7 @@
           </div>
         </div>
       </div>
-      
+
       <!-- Loading state -->
       <div class="chart-loading" *ngIf="isLoadingStats">
         <i class="pi pi-spin pi-spinner"></i>
@@ -105,80 +98,132 @@
     </div>
   </div>
 
-  <!-- 2. Top Clasificadores Más Activos (Barras Horizontales) -->
-  <div class="chart-container medium">
+
+  <!-- 2. Rendimiento de Clasificadores de la Zona -->
+  <div class="chart-container medium classifier-enhanced">
     <div class="chart-header">
-      <h3>Clasificadores Más Activos</h3>
-      <p>Top 5 por número de detecciones</p>
+      <h3>Rendimiento de Clasificadores</h3>
+      <p>{{selectedLocation}}</p>
+      <!-- Información del promedio mejorada -->
+      <div class="bg-green-50 border-l-4 border-green-400 p-4 mt-4 rounded" *ngIf="classifierPerformance.length > 0">
+        <p class="text-green-700 font-medium">
+          Promedio de la zona: <span class="font-bold">{{getAverageDetections()}} detecciones</span>
+        </p>
+      </div>
     </div>
-    <div class="chart-content">
-      <div class="horizontal-bar-chart" *ngIf="estadisticasZonas.length > 0">
-        <div 
-          class="bar-item"
-          *ngFor="let zona of getTopZonas(); let i = index">
-          <div class="bar-info">
-            <span class="bar-label">{{zona.nombre}}</span>
-            <span class="bar-value">{{zona.totalDetecciones}}</span>
-          </div>
-          <div class="bar-container">
-            <div 
-              class="bar-fill"
-              [style.width.%]="getBarPercentage(zona.totalDetecciones, getMaxZonaDetections())"
-              [style.background]="'linear-gradient(90deg, #4a7c59 0%, #6bb86b ' + (i * 20) + '%)'"
-              [attr.title]="zona.nombre + ': ' + zona.totalDetecciones + ' detecciones'">
+    <div class="chart-content" style="padding: 2rem;">
+      <div class="classifier-performance-chart" *ngIf="classifierPerformance.length > 0">
+        <div class="performance-item" *ngFor="let classifier of classifierPerformance; let i = index"
+          style="margin-bottom: 2rem;">
+
+          <!-- Información del clasificador con más espacio -->
+          <div class="performance-info">
+            <span class="classifier-name">{{classifier.nombre}}:</span>
+            <div class="flex items-center gap-3">
+              <span class="classifier-value ">
+                {{classifier.detecciones}}
+              </span>
             </div>
           </div>
         </div>
       </div>
+
+      <!-- Leyenda mejorada -->
+      <div class="mt-8 pt-6 border-t border-gray-200">
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        </div>
+      </div>
+
+      <div class="chart-loading" *ngIf="isLoadingStats">
+        <p>Cargando datos...</p>
+      </div>
     </div>
   </div>
 
-  <!-- 3. Tendencia Temporal (Gráfica de Líneas) -->
+
+  <!-- 2. Actividad por Horas en la Zona -->
   <div class="chart-container full-width">
     <div class="chart-header">
+      <h3>Actividad por Horas</h3>
+      <p>Patrones de detección en {{selectedLocation}}</p>
+    </div>
+    <div class="chart-content">
+      <!-- Contenedor con scroll horizontal -->
+      <div class="overflow-x-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100"
+        style="padding: 1rem; min-height: 250px;">
+
+        <!-- Grid scrolleable -->
+        <!-- Cambiar SOLO esta línea 187: -->
+<div style="display: grid; grid-template-columns: repeat(6, 1fr); gap: 0.75rem; width: 100%;">
+          <div *ngFor="let hour of hourlyActivity; let i = index"
+            class="text-center p-4 rounded-lg border-2 transition-all duration-300 hover:shadow-md"
+            [class]="hour.detections > 0 ? 'bg-blue-50 border-blue-200' : 'bg-gray-50 border-gray-200'"
+            style="min-width: 100px;">
+            <div class="font-bold text-lg mb-2" [class]="hour.detections > 0 ? 'text-blue-600' : 'text-gray-400'">
+              {{ hour.hour }}
+            </div>
+            <div class="text-3xl font-bold" [class]="hour.detections > 0 ? 'text-blue-800' : 'text-gray-500'">
+              {{ hour.detections }}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Leyenda mejorada -->
+      <div class="mt-6 p-4">
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+
+
+          <div *ngIf="getPeakHour()" class="bg-orange-100 px-4 py-2 rounded-lg">
+            <span class="text-orange-600 flex items-center gap-2">
+              🔥 Pico: {{ getPeakHour()?.hour }} ({{ getPeakHour()?.detecciones }} detecciones)
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div class="chart-loading" *ngIf="isLoadingStats">
+        <p>Cargando datos...</p>
+      </div>
+    </div>
+  </div>
+
+
+
+  <!-- 3. Tendencia Temporal (Gráfica de Líneas) -->
+  <div class="chart-container full-width">
+    <div class="chart-header full-width">
       <h3>Tendencia de Detecciones</h3>
       <p>Evolución en los últimos días</p>
     </div>
-    <div class="chart-content">
+    <div class="chart-content full-width">
       <div class="line-chart" *ngIf="estadisticasGenerales">
         <div class="chart-area">
           <svg viewBox="0 0 600 200" class="line-svg">
             <!-- Grid lines -->
             <defs>
               <pattern id="grid" width="60" height="40" patternUnits="userSpaceOnUse">
-                <path d="M 60 0 L 0 0 0 40" fill="none" stroke="#f0f0f0" stroke-width="1"/>
+                <path d="M 60 0 L 0 0 0 40" fill="none" stroke="#f0f0f0" stroke-width="1" />
               </pattern>
             </defs>
             <rect width="600" height="200" fill="url(#grid)" />
-            
+
             <!-- Simple trend line based on available data -->
-            <polyline
-              [attr.points]="getSimpleTrendPoints()"
-              fill="none"
-              stroke="#4a7c59"
-              stroke-width="3"
-              stroke-linecap="round"
-              stroke-linejoin="round">
+            <polyline [attr.points]="getSimpleTrendPoints()" fill="none" stroke="#4a7c59" stroke-width="3"
+              stroke-linecap="round" stroke-linejoin="round">
             </polyline>
-            
+
             <!-- Data points -->
-            <circle
-              *ngFor="let point of getSimpleDataPoints(); let i = index"
-              [attr.cx]="point.x"
-              [attr.cy]="point.y"
-              r="4"
-              fill="#4a7c59"
-              [attr.title]="point.label + ': ' + point.value">
+            <circle *ngFor="let point of getSimpleDataPoints(); let i = index" [attr.cx]="point.x" [attr.cy]="point.y"
+              r="4" fill="#4a7c59" [attr.title]="point.label + ': ' + point.value">
             </circle>
-            
+
             <!-- Area fill -->
-            <polygon
-              [attr.points]="getSimpleTrendAreaPoints()"
-              fill="rgba(74, 124, 89, 0.1)">
+            <polygon [attr.points]="getSimpleTrendAreaPoints()" fill="rgba(74, 124, 89, 0.1)">
             </polygon>
           </svg>
         </div>
-        
+
         <!-- Trend indicators -->
         <div class="trend-indicators">
           <div class="trend-item">
@@ -191,9 +236,9 @@
           </div>
           <div class="trend-item">
             <span class="trend-label">Tendencia</span>
-            <span class="trend-value" [class.positive]="getTrendDirection() > 0" [class.negative]="getTrendDirection() < 0">
-              {{getTrendDirection() > 0 ? '↗' : getTrendDirection() < 0 ? '↘' : '→'}}
-            </span>
+            <span class="trend-value" [class.positive]="getTrendDirection() > 0"
+              [class.negative]="getTrendDirection() < 0">
+              {{getTrendDirection() > 0 ? '↗' : getTrendDirection() < 0 ? '↘' : '→' }} </span>
           </div>
         </div>
       </div>

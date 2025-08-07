@@ -34,12 +34,12 @@
         </div>
         <div class="flex items-center gap-4 mb-8">
             <label for="latitud" class="font-semibold text-black w-24">Latitud</label>
-            <input pInputText id="latitud" type="number" class="background-input flex-auto" autocomplete="off"
+            <input pInputText id="latitud" type="number" min="-90" max="90" class="background-input flex-auto" autocomplete="off"
              [(ngModel)]="newClassifier.latitud"/>
         </div>
         <div class="flex text-black items-center gap-4 mb-8">
             <label for="longitud" class="font-semibold w-24">Longitud</label>
-            <input pInputText id="longitud" type="number" class="background-input flex-auto" autocomplete="off" 
+            <input pInputText id="longitud" type="number" min="-180" max="180" class="background-input flex-auto" autocomplete="off" 
             [(ngModel)]="newClassifier.longitud"/>
         </div>
         <div class="flex text-black items-center gap-4 mb-8">
