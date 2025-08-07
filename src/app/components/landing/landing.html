@@ -1,78 +1,188 @@
-<!-- Header -->
-<div class="header-green p-4 text-center">
-  <h1 class="text-4xl font-bold mb-2">CAB</h1>
-  <p class="text-lg opacity-90">Sistema de Gestión Ambiental</p>
-</div>
-
-<div class="container mx-auto px-4 py-8">
-  <div class="text-center mb-8">
-    <h2 class="text-3xl font-bold text-gray-800 mb-4">Información Pública</h2>
-    <p class="text-gray-600">Selecciona una categoría para ver información detallada</p>
-  </div>
-
-  <div class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
-    
-    <p-card class="card-hover cursor-pointer" (click)="onCardClick('zona')">
-      <div class="text-center p-4">
-        <div class="mb-4">
-          <i class="pi pi-map-marker text-6xl text-green-600"></i>
-        </div>
-        <h3 class="text-xl font-semibold text-gray-800 mb-2">Zona popular</h3>
-        <p class="text-gray-600 text-sm">Información sobre las zonas más populares para la gestión de residuos</p>
-        <div class="mt-4">
-          <i class="pi pi-arrow-right text-green-600"></i>
-        </div>
+<!-- Hero Section -->
+<div class="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100">
+  
+  <!-- Navigation -->
+  <nav class="px-6 py-4 md:px-12">
+    <div class="flex justify-between items-center">
+      <div class="text-2xl font-bold text-gray-900">CAB</div>
+      <div class="hidden md:flex space-x-8 text-sm text-gray-600">
+        <span>Sistema de Gestión Ambiental</span>
       </div>
-    </p-card>
+    </div>
+  </nav>
 
-    <p-card class="card-hover cursor-pointer" (click)="onCardClick('basura')">
-      <div class="text-center p-4">
-        <div class="mb-4">
-          <i class="pi pi-trash text-6xl text-green-600"></i>
-        </div>
-        <h3 class="text-xl font-semibold text-gray-800 mb-2">Basura popular</h3>
-        <p class="text-gray-600 text-sm">Estadísticas sobre los tipos de residuos más comunes en la región</p>
-        <div class="mt-4">
-          <i class="pi pi-arrow-right text-green-600"></i>
-        </div>
+  <!-- Hero Content -->
+  <div class="px-6 py-16 md:px-12 lg:px-24 xl:px-32">
+    <div class="max-w-6xl mx-auto">
+      
+      <!-- Main Headline -->
+      <div class="text-center mb-20">
+        <h1 class="text-5xl md:text-7xl lg:text-8xl font-bold text-gray-900 leading-none mb-8">
+          Transformando la
+          <span class="block text-transparent bg-clip-text bg-gradient-to-r from-emerald-600 to-teal-600">
+            gestión ambiental
+          </span>
+        </h1>
+        <p class="text-xl md:text-2xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+          Plataforma integral que combina tecnología avanzada, datos precisos y automatización 
+          inteligente para revolucionar la gestión de residuos urbanos.
+        </p>
       </div>
-    </p-card>
 
-    <p-card class="card-hover cursor-pointer" (click)="onCardClick('horario')">
-      <div class="text-center p-4">
-        <div class="mb-4">
-          <i class="pi pi-clock text-6xl text-green-600"></i>
-        </div>
-        <h3 class="text-xl font-semibold text-gray-800 mb-2">Horario popular</h3>
-        <p class="text-gray-600 text-sm">Horarios más frecuentes de recolección y gestión de residuos</p>
-        <div class="mt-4">
-          <i class="pi pi-arrow-right text-green-600"></i>
-        </div>
+      <!-- CTA Buttons -->
+      <div class="flex flex-col md:flex-row gap-4 justify-center items-center mb-32">
+        <p-button 
+          label="Solicitar Cotización" 
+          icon="pi pi-calculator" 
+          styleClass="p-button-lg p-button-success text-lg px-8 py-4"
+          (click)="onCardClick('cotizacion')">
+        </p-button>
+        <p-button 
+          label="Iniciar Sesión" 
+          icon="pi pi-sign-in" 
+          styleClass="p-button-lg p-button-outlined p-button-secondary text-lg px-8 py-4"
+          (click)="onCardClick('login')">
+        </p-button>
       </div>
-    </p-card>
 
-  </div>
-
-  <div class="text-center mt-12 mb-8">
-    <div class="bg-gradient-to-r from-green-50 to-blue-50 p-6 rounded-lg shadow-sm max-w-2xl mx-auto">
-      <h3 class="text-2xl font-bold text-gray-800 mb-3">¿Interesado en nuestro sistema?</h3>
-      <p class="text-gray-600 mb-4">Obtén una cotización personalizada para tu proyecto de gestión ambiental</p>
-      <p-button 
-        label="Solicitar Cotización" 
-        icon="pi pi-calculator" 
-        styleClass="p-button-success p-button-lg"
-        (click)="onCardClick('cotizacion')">
-      </p-button>
     </div>
   </div>
+</div>
 
-  <div class="text-center mt-12">
-    <p class="text-gray-600 mb-4">¿Necesitas acceder a más funciones administrativas?</p>
-    <p-button 
-      label="Iniciar Sesión" 
-      icon="pi pi-sign-in" 
-      styleClass="p-button-outlined p-button-secondary"
-      (click)="onCardClick('login')">
-    </p-button>
+<!-- Information Section -->
+<div class="bg-white py-24">
+  <div class="container mx-auto px-6 md:px-12 lg:px-24 xl:px-32">
+    
+    <!-- Section Header -->
+    <div class="text-center mb-20">
+      <h2 class="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+        Información en tiempo real
+      </h2>
+      <p class="text-xl text-gray-600 max-w-2xl mx-auto">
+        Accede a datos actualizados sobre gestión de residuos en tu región
+      </p>
+    </div>
+
+    <!-- Cards Grid -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-32">
+      
+      <!-- Zona Card -->
+      <div class="group cursor-pointer" (click)="onCardClick('zona')">
+        <div class="bg-white border border-gray-200 rounded-2xl p-8 h-full transition-all duration-300 hover:shadow-2xl hover:shadow-emerald-100 hover:-translate-y-2">
+          <div class="text-center">
+            <div class="mb-8">
+              <div class="w-20 h-20 mx-auto bg-gradient-to-br from-emerald-100 to-emerald-200 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                <i class="pi pi-map-marker text-3xl text-emerald-600"></i>
+              </div>
+            </div>
+            <h3 class="text-2xl font-bold text-gray-900 mb-4">Zona popular</h3>
+            <p class="text-gray-600 text-base leading-relaxed mb-8">
+              Información detallada sobre las zonas más populares para la gestión eficiente de residuos urbanos
+            </p>
+            <div class="inline-flex items-center text-emerald-600 font-medium group-hover:translate-x-2 transition-transform duration-300">
+              <span class="mr-2">Explorar datos</span>
+              <i class="pi pi-arrow-right"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Basura Card -->
+      <div class="group cursor-pointer" (click)="onCardClick('basura')">
+        <div class="bg-white border border-gray-200 rounded-2xl p-8 h-full transition-all duration-300 hover:shadow-2xl hover:shadow-teal-100 hover:-translate-y-2">
+          <div class="text-center">
+            <div class="mb-8">
+              <div class="w-20 h-20 mx-auto bg-gradient-to-br from-teal-100 to-teal-200 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                <i class="pi pi-trash text-3xl text-teal-600"></i>
+              </div>
+            </div>
+            <h3 class="text-2xl font-bold text-gray-900 mb-4">Basura popular</h3>
+            <p class="text-gray-600 text-base leading-relaxed mb-8">
+              Estadísticas completas sobre los tipos de residuos más comunes y patrones de generación
+            </p>
+            <div class="inline-flex items-center text-teal-600 font-medium group-hover:translate-x-2 transition-transform duration-300">
+              <span class="mr-2">Ver estadísticas</span>
+              <i class="pi pi-arrow-right"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Horario Card -->
+      <div class="group cursor-pointer" (click)="onCardClick('horario')">
+        <div class="bg-white border border-gray-200 rounded-2xl p-8 h-full transition-all duration-300 hover:shadow-2xl hover:shadow-blue-100 hover:-translate-y-2">
+          <div class="text-center">
+            <div class="mb-8">
+              <div class="w-20 h-20 mx-auto bg-gradient-to-br from-blue-100 to-blue-200 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                <i class="pi pi-clock text-3xl text-blue-600"></i>
+              </div>
+            </div>
+            <h3 class="text-2xl font-bold text-gray-900 mb-4">Horario popular</h3>
+            <p class="text-gray-600 text-base leading-relaxed mb-8">
+              Horarios optimizados de recolección y gestión basados en análisis de datos históricos
+            </p>
+            <div class="inline-flex items-center text-blue-600 font-medium group-hover:translate-x-2 transition-transform duration-300">
+              <span class="mr-2">Consultar horarios</span>
+              <i class="pi pi-arrow-right"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+</div>
+
+<!-- Call to Action Section -->
+<div class="bg-gradient-to-r from-emerald-50 via-white to-teal-50 py-24">
+  <div class="container mx-auto px-6 md:px-12 lg:px-24 xl:px-32">
+    <div class="text-center">
+      <h3 class="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+        ¿Listo para transformar tu gestión ambiental?
+      </h3>
+      <p class="text-xl text-gray-600 mb-12 max-w-3xl mx-auto leading-relaxed">
+        Únete a organizaciones que ya están revolucionando su enfoque hacia la sostenibilidad 
+        con nuestra plataforma integral de gestión ambiental
+      </p>
+      
+      <!-- CTA Button -->
+      <div class="mb-16">
+        <p-button 
+          label="Solicitar Cotización Personalizada" 
+          icon="pi pi-calculator" 
+          styleClass="p-button-success p-button-lg text-xl px-12 py-5"
+          (click)="onCardClick('cotizacion')">
+        </p-button>
+      </div>
+
+      <!-- Features Grid -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto">
+        <div class="text-center">
+          <div class="w-16 h-16 mx-auto bg-emerald-100 rounded-xl flex items-center justify-center mb-4">
+            <i class="pi pi-chart-line text-2xl text-emerald-600"></i>
+          </div>
+          <h4 class="text-lg font-semibold text-gray-900 mb-2">Análisis Inteligente</h4>
+          <p class="text-gray-600 text-sm">Datos en tiempo real para decisiones informadas</p>
+        </div>
+        
+        <div class="text-center">
+          <div class="w-16 h-16 mx-auto bg-teal-100 rounded-xl flex items-center justify-center mb-4">
+            <i class="pi pi-shield text-2xl text-teal-600"></i>
+          </div>
+          <h4 class="text-lg font-semibold text-gray-900 mb-2">Seguridad Garantizada</h4>
+          <p class="text-gray-600 text-sm">Protección de datos con estándares internacionales</p>
+        </div>
+        
+        <div class="text-center">
+          <div class="w-16 h-16 mx-auto bg-blue-100 rounded-xl flex items-center justify-center mb-4">
+            <i class="pi pi-cog text-2xl text-blue-600"></i>
+          </div>
+          <h4 class="text-lg font-semibold text-gray-900 mb-2">Fácil Integración</h4>
+          <p class="text-gray-600 text-sm">Implementación rápida sin interrupciones</p>
+        </div>
+      </div>
+
+    </div>
   </div>
 </div>

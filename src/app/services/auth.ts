@@ -63,11 +63,10 @@ export class AuthService {
       const user: User = {
         id: credential.user.id,
         nombre: credential.user.nombre,
+        password: '',
         correo: (credential.user as any).correo || (credential.user as any).email, // Convertir email a correo si es necesario
-        rol: credential.user.rol,
         estado: credential.user.estado,
         ultimoAcceso: new Date(),
-        zona: (credential.user as any).zona
       };
       
       // Simular el guardado de datos como lo haría el backend
@@ -126,29 +125,6 @@ export class AuthService {
     return userStr ? JSON.parse(userStr) : null;
   }
 
-  hasRole(role: string): boolean {
-    if (this.useBackend) {
-      return this.backendService.hasRole(role);
-    } else {
-      // Verificación de rol con datos simulados
-      const user = this.getCurrentUser();
-      return user ? user.rol === role : false;
-    }
-  }
-
-  isAdmin(): boolean {
-    return this.hasRole('administrador'); // Cambié de 'Administrador' a 'administrador' para que coincida con tu backend
-  }
-
-  canEditUsers(): boolean {
-    const user = this.getCurrentUser();
-    return user && user.rol ? ['administrador', 'Operador'].includes(user.rol) : false; // Añadí 'administrador' en minúscula
-  }
-
-  getUserZone(): string | null {
-    const user = this.getCurrentUser();
-    return user?.zona || null;
-  }
 
   // === MÉTODOS PARA EL COMPONENTE (mantener compatibilidad) ===
   
@@ -161,10 +137,10 @@ export class AuthService {
     } else {
       // Datos simulados para desarrollo
       return [
-        { id: 'ADM001', nombre: 'Juan Administrador', rol: 'administrador', correo: 'admin@cab.com', estado: 'Activo', ultimoAcceso: new Date() },
-        { id: 'USR001', nombre: 'José García', rol: 'usuario', correo: 'jose@cab.com', estado: 'Activo', ultimoAcceso: new Date() },
-        { id: 'USR002', nombre: 'María López', rol: 'usuario', correo: 'maria@cab.com', estado: 'Activo', ultimoAcceso: new Date() },
-        { id: 'PRV001', nombre: 'Usuario Privado', rol: 'usuario', correo: 'priv@cab.com', estado: 'Activo', ultimoAcceso: new Date() }
+        { id: 'ADM001', nombre: 'Juan Administrador', correo: 'admin@cab.com', password: '', estado: 'Activo', ultimoAcceso: new Date() },
+        { id: 'USR001', nombre: 'José García', correo: 'jose@cab.com', password: '', estado: 'Activo', ultimoAcceso: new Date() },
+        { id: 'USR002', nombre: 'María López', correo: 'maria@cab.com', password: '', estado: 'Activo', ultimoAcceso: new Date() },
+        { id: 'PRV001', nombre: 'Usuario Privado', correo: 'priv@cab.com', password: '', estado: 'Activo', ultimoAcceso: new Date() }
       ];
     }
   }

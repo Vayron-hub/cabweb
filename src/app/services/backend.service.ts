@@ -8,18 +8,23 @@ import { environment } from '../../environments/environment';
 export interface User {
   id: string | number;
   nombre: string;
-  correo: string; // Tu backend usa 'correo', no 'email'
+  correo: string;
+  password: string; // Tu backend usa 'correo', no 'email'
   fechaCreacion?: string;
   fechaUltimoAcceso?: string | null; // Puede ser null
   enLinea?: boolean; // Estado online/offline
   activo?: boolean; // Tu backend usa boolean, no string
-  rol?: string; // Tu backend puede no tener rol por ahora
-  zona?: string;
   
   // Propiedades calculadas para compatibilidad con el frontend
   email?: string; // Mapeado desde 'correo'
   estado?: string; // Mapeado desde 'activo'
   ultimoAcceso?: Date | string; // Mapeado desde 'fechaUltimoAcceso'
+}
+
+export interface newUser{
+  nombre: string;
+  correo: string;
+  password: string;
 }
 
 export interface LoginRequest {
@@ -380,7 +385,7 @@ export class BackendService {
   
   getDeteccionesPorZona(zonaId: string | number): Observable<Deteccion[]> {
     console.log('🔗 BackendService - getDeteccionesPorZona llamado con ID:', zonaId);
-    const url = `${this.apiUrl}/detecciones/por-zona/${zonaId}`;
+    const url = `${this.apiUrl}/detecciones/zona/${zonaId}`;
     console.log('🔗 URL construida para detecciones:', url);
     
     return this.http.get<Deteccion[]>(url)
@@ -407,7 +412,7 @@ export class BackendService {
   getClasificadoresPorZona(zonaId: string | number): Observable<Clasificador[]> {
     console.log('🔗 BackendService - getClasificadoresPorZona llamado con ID:', zonaId);
     console.log('🔗 Tipo de zonaId:', typeof zonaId);
-    const url = `${this.apiUrl}/clasificadores/por-zona/${zonaId}`;
+    const url = `${this.apiUrl}/clasificadores/zona/${zonaId}`;
     console.log('🔗 URL construida:', url);
     
     return this.http.get<Clasificador[]>(url)
@@ -433,6 +438,11 @@ export class BackendService {
   
   getUsuariosPorRol(rol: string): Observable<User[]> {
     return this.http.get<User[]>(`${this.apiUrl}/usuarios/rol/${rol}`)
+      .pipe(catchError(this.handleError));
+  }
+
+  postUsuarios(user: newUser): Observable<User[]> {
+    return this.http.post<User[]>(`${this.apiUrl}/usuarios`, user)
       .pipe(catchError(this.handleError));
   }
 
@@ -508,10 +518,6 @@ export class BackendService {
   // === MÉTODOS DE UTILIDAD ===
   
   // Método para verificar roles (si tu backend lo soporta)
-  hasRole(role: string): boolean {
-    const user = this.getCurrentUser();
-    return user ? user.rol === role : false;
-  }
 
   // === MÉTODO PARA VERIFICAR CONECTIVIDAD ===
   

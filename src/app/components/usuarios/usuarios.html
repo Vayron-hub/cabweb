@@ -1,5 +1,5 @@
 <!-- Header de Usuarios -->
-<div class="users-header">
+<div class="users-header" >
   <div class="users-title">
     <h2>Gestión de Usuarios</h2>
   </div>
@@ -9,22 +9,25 @@
       <i class="pi pi-plus"></i>
       Nuevo Usuario
     </button>
-    <p-dialog header="Edit Profile" [(visible)]="visible" [style]="{ width: '25rem', background: 'white' }" [modal]="true" [closable]="false">
+    <p-dialog header="Edit Profile" [(visible)]="visible" [style]="{ width: '25rem', background: 'white', color: 'black' }" [modal]="true" [closable]="false">
         <div class="flex items-center gap-4 mb-4">
             <label for="username" class="font-semibold text-black w-24">Username</label>
-            <input pInputText id="username"  class="background-input flex-auto" autocomplete="off" />
+            <input pInputText id="username"  class="background-input flex-auto" autocomplete="off" 
+            [(ngModel)]="newUser.nombre"/>
         </div>
         <div class="flex items-center gap-4 mb-8">
             <label for="email" class="font-semibold text-black w-24">Email</label>
-            <input pInputText id="email" class="background-input flex-auto" autocomplete="off" />
+            <input pInputText id="email" type="email" class="background-input flex-auto" autocomplete="off"
+             [(ngModel)]="newUser.correo"/>
         </div>
-        <div class="flex bg-white items-center gap-4 mb-8">
-            <label for="password" class="font-semibold text-black w-24">Password</label>
-            <input pInputText id="password" class="background-input flex-auto" autocomplete="off" />
+        <div class="flex text-black items-center gap-4 mb-8">
+            <label for="password" class="font-semibold w-24">Password</label>
+            <input pInputText id="password" type="password" class="background-input flex-auto" autocomplete="off" 
+            [(ngModel)]="newUser.password"/>
         </div>
         <div class="flex justify-end gap-2">
             <p-button label="Cancel" severity="secondary" (click)="visible = false" />
-            <p-button label="Save" (click)="visible = false" />
+            <p-button label="Save" (click)="postUser()" />
         </div>
     </p-dialog>
   </div>
@@ -42,20 +45,6 @@
         class="search-input background-input">
     </div>
   </div>
-  <!-- <div class="role-filters">
-    <label class="filter-label">Filtrar por rol:</label>
-    <div class="role-checkboxes">
-      <label class="checkbox-item" *ngFor="let role of roleOptions">
-        <input 
-          type="checkbox" 
-          [value]="role.value"
-          (change)="onRoleFilterChange($event)"
-          [checked]="selectedRoles.includes(role.value)">
-        <span class="checkmark"></span>
-        {{role.label}}
-      </label>
-    </div>
-  </div> -->
 </div>
 
 <!-- Estadísticas de usuarios -->
@@ -105,7 +94,6 @@
         <th>Email</th>
         <th>Rol</th>
         <th>Estado</th>
-        <th>Acciones</th>
       </tr>
     </thead>
     <tbody>
@@ -132,8 +120,8 @@
         </td>
         <td class="user-email">{{user.correo || 'Sin email'}}</td>
         <td>
-          <span class="role-badge" [ngClass]="getRoleClass(user.rol)">
-            {{user.rol || 'Sin rol'}}
+          <span class="role-badge">
+            Admin
           </span>
         </td>
         <td>
@@ -141,29 +129,6 @@
             <i class="pi" [ngClass]="getStatusIcon(user.estado)"></i>
             {{user.estado || 'Sin estado'}}
           </span>
-        </td>
-        <td class="actions">
-          <button 
-            class="action-btn edit"
-            (click)="editUser(user)"
-            [disabled]="!canEditUser()"
-            title="Editar usuario">
-            <i class="pi pi-pencil"></i>
-          </button>
-          <button 
-            class="action-btn delete"
-            (click)="deleteUser(user)"
-            [disabled]="!canDeleteUser(user)"
-            title="Eliminar usuario">
-            <i class="pi pi-trash"></i>
-          </button>
-          <button 
-            class="action-btn toggle"
-            (click)="toggleUserStatus(user)"
-            [disabled]="!canEditUser()"
-            [title]="(user.estado === 'Activo') ? 'Desactivar usuario' : 'Activar usuario'">
-            <i class="pi" [ngClass]="(user.estado === 'Activo') ? 'pi-eye-slash' : 'pi-eye'"></i>
-          </button>
         </td>
       </tr>
     </tbody>
@@ -191,22 +156,20 @@
   <div class="bulk-buttons">
     <button 
       class="btn-warning"
-      (click)="bulkDeactivateUsers()"
-      [disabled]="!canEditUser()">
+      (click)="bulkDeactivateUsers()">
       <i class="pi pi-eye-slash"></i>
       Desactivar
     </button>
     <button 
       class="btn-success"
-      (click)="bulkActivateUsers()"
-      [disabled]="!canEditUser()">
+      (click)="bulkActivateUsers()">
       <i class="pi pi-eye"></i>
       Activar
     </button>
     <button 
       class="btn-danger"
       (click)="bulkDeleteUsers()"
-      [disabled]="!canEditUser()">
+      [disabled]="!canDeleteUser()">
       <i class="pi pi-trash"></i>
       Eliminar
     </button>

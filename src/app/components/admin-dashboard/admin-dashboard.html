@@ -474,8 +474,8 @@
             </td>
             <td class="user-email">{{user.email}}</td>
             <td>
-              <span class="role-badge" [ngClass]="getRoleClass(user.rol)">
-                {{user.rol}}
+              <span class="role-badge">
+                Admin
               </span>
             </td>
             <td>
@@ -489,21 +489,19 @@
               <button 
                 class="action-btn edit"
                 (click)="editUser(user)"
-                [disabled]="!canEditUser()"
                 title="Editar usuario">
                 <i class="pi pi-pencil"></i>
               </button>
               <button 
                 class="action-btn delete"
                 (click)="deleteUser(user)"
-                [disabled]="!canDeleteUser(user)"
+                [disabled]="!canDeleteUser()"
                 title="Eliminar usuario">
                 <i class="pi pi-trash"></i>
               </button>
               <button 
                 class="action-btn toggle"
                 (click)="toggleUserStatus(user)"
-                [disabled]="!canEditUser()"
                 [title]="user.estado === 'Activo' ? 'Desactivar usuario' : 'Activar usuario'">
                 <i class="pi" [ngClass]="user.estado === 'Activo' ? 'pi-eye-slash' : 'pi-eye'"></i>
               </button>
@@ -534,22 +532,20 @@
       <div class="bulk-buttons">
         <button 
           class="btn-warning"
-          (click)="bulkDeactivateUsers()"
-          [disabled]="!canEditUser()">
+          (click)="bulkDeactivateUsers()">
           <i class="pi pi-eye-slash"></i>
           Desactivar
         </button>
         <button 
           class="btn-success"
-          (click)="bulkActivateUsers()"
-          [disabled]="!canEditUser()">
+          (click)="bulkActivateUsers()">
           <i class="pi pi-eye"></i>
           Activar
         </button>
         <button 
           class="btn-danger"
           (click)="bulkDeleteUsers()"
-          [disabled]="!canEditUser()">
+          [disabled]="!canDeleteUser()">
           <i class="pi pi-trash"></i>
           Eliminar
         </button>
@@ -652,7 +648,7 @@
             
             <div class="info-group">
               <label>Rol</label>
-              <span class="role-tag">{{currentUser.rol}}</span>
+              <span class="role-tag">Admin</span>
             </div>
             
             <div class="info-group">

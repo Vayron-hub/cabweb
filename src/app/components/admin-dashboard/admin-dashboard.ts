@@ -40,8 +40,8 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
     id: 1,
     nombre: 'root',
     correo: 'admin@utleon.edu.mx',
-    email: 'admin@utleon.edu.mx', // Compatibilidad
-    rol: 'Administrador',
+    email: 'admin@utleon.edu.mx', 
+    password:'',// Compatibilidad
     activo: true,
     enLinea: false,
     fechaCreacion: '2025-07-26',
@@ -176,7 +176,7 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
           email: user.email || user.correo,
           estado: user.activo ? 'Activo' : 'Inactivo', // Compatibilidad
           ultimoAcceso: user.ultimoAcceso || user.fechaUltimoAcceso || new Date(),
-          rol: user.rol || 'Usuario'
+          rol: 'Admin'
         }));
         this.filteredUsers = [...this.allUsers];
         this.isLoadingUsers = false;
@@ -306,12 +306,13 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
     return activo === true ? 'Activo' : 'Inactivo';
   }
 
-  canEditUser(): boolean {
-    return this.currentUser.rol === 'Administrador';
-  }
-
-  canDeleteUser(user: User): boolean {
-    return this.canEditUser() && this.currentUser.id !== user.id;
+  canDeleteUser(): boolean {
+    const currentUser = this.authService.getCurrentUser();
+    // No permitir eliminar el propio usuario
+    if (currentUser && this.selectedUsers.includes(currentUser.id)) {
+      return false;
+    }
+    return true
   }
 
   bulkActivateUsers() {

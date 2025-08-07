@@ -7,7 +7,7 @@ import { TagModule } from 'primeng/tag';
 import { InputTextModule } from 'primeng/inputtext';
 import { CheckboxModule } from 'primeng/checkbox';
 import { Subscription } from 'rxjs';
-import { BackendService, Zona, User } from '../../services/backend.service';
+import { BackendService, Zona, User, newUser } from '../../services/backend.service';
 import { ZonaService, ZonaInfo } from '../../services/zona.service';
 import { AuthService } from '../../services/auth';
 import { DialogModule } from 'primeng/dialog';
@@ -46,6 +46,12 @@ export class UsuariosComponent implements OnInit, OnDestroy {
     { label: 'Usuario', value: 'usuario' },
     { label: 'Operador', value: 'operador' }
   ];
+
+  newUser: newUser = {
+    nombre: '',
+    correo: '',
+    password: '',
+  };
 
   // Selección múltiple
   selectedUsers: (string | number)[] = [];
@@ -109,15 +115,51 @@ export class UsuariosComponent implements OnInit, OnDestroy {
     });
   }
 
+  postUser() {
+    if (!this.newUser.nombre || !this.newUser.correo || !this.newUser.password) {
+      alert('Por favor, completa todos los campos del formulario.');
+      return;
+    } else if (this.newUser.password.length < 8) {
+      alert('La contraseña debe tener al menos 8 caracteres.');
+      return;
+    } else if (!this.newUser.nombre.trim()) {
+      alert('El nombre no puede estar vacío.');
+      return;
+    } else if (!this.newUser.correo.trim()) {
+      alert('El correo no puede estar vacío.');
+      return;
+    } else if (!this.newUser.password.trim()) {
+      alert('La contraseña no puede estar vacía.');
+      return;
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(this.newUser.correo)) {
+      alert('Por favor, ingresa un correo electrónico válido.');
+      return;
+    } else if (this.allUsers.some(user => user.correo === this.newUser.correo)) {
+      alert('Ya existe un usuario con este correo electrónico.');
+      return;
+    } else {
+      console.log('📤 Enviando nuevo usuario al backend:', this.newUser)
+      this.backendService.postUsuarios(this.newUser).subscribe({
+        next: (response) => {
+          console.log('✅ Usuario creado exitosamente:', response)
+          this.loadUsers();
+          this.hideDialog();
+        },
+        error: (error) => {
+          console.error('Error al crear usuario:', error);
+          alert('Error al crear el usuario. Por favor, inténtalo de nuevo.');
+        }
+      });
+    }
+  }
+
   filterUsers() {
     this.filteredUsers = this.allUsers.filter(user => {
       const matchesSearch = user.nombre.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
         user.correo.toLowerCase().includes(this.searchTerm.toLowerCase());
 
-      const matchesRole = this.selectedRoles.length === 0 ||
-        this.selectedRoles.includes(user.rol || '');
 
-      return matchesSearch && matchesRole;
+      return matchesSearch;
     });
   }
 
@@ -319,7 +361,6 @@ export class UsuariosComponent implements OnInit, OnDestroy {
       user.id,
       user.nombre,
       user.correo,
-      user.rol || 'Usuario',
       user.estado || 'Inactivo',
       this.formatDate(user.fechaCreacion),
       this.formatDate(user.ultimoAcceso)
@@ -378,19 +419,27 @@ export class UsuariosComponent implements OnInit, OnDestroy {
     return user.id;
   }
 
-  canEditUser(): boolean {
-    return this.authService.canEditUsers();
-  }
 
-  canDeleteUser(user: User): boolean {
+  canDeleteUser(): boolean {
     const currentUser = this.authService.getCurrentUser();
     // No permitir eliminar el propio usuario
-    return this.canEditUser() && currentUser?.id !== user.id;
+    if (currentUser && this.selectedUsers.includes(currentUser.id)) {
+      return false;
+    }
+    return true
   }
 
   visible: boolean = false;
 
   showDialog() {
     this.visible = true;
+  }
+  hideDialog() {
+    this.newUser = {
+      nombre: '',
+      correo: '',
+      password: ''
+    };
+    this.visible = false;
   }
 }
