@@ -9,7 +9,7 @@
           Aquí tienes tu dashboard de visualización de tus datos.
         </p>
       </div>
-      <i class="pi pi-chart-bar text-primary-600 hidden md:block"></i>
+      <i class="pi pi-chart-bar text-primary-600 hidden md:block !text-6xl"></i>
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -107,11 +107,30 @@
         </div>
         <div class="space-y-4">
           <div class="flex justify-center gap-4">
-            <div class="text-center" title="Residuos Valorizables: {{porcentajeValorizable || 0}}%">
-              <div class="w-16 h-16 mx-auto mb-2">
-                <svg viewBox="0 0 42 42" class="w-full h-full transform -rotate-90">
-                  <circle cx="21" cy="21" r="15.915" fill="transparent" stroke="#e6e6e6" stroke-width="3"></circle>
-                  <circle cx="21" cy="21" r="15.915" fill="transparent" stroke="#2196F3" stroke-width="3"
+            <div
+              class="text-center"
+              title="Residuos Valorizables: {{porcentajeValorizable || 0}}%"
+            >
+              <div class="size-24 mx-auto mb-2">
+                <svg
+                  viewBox="0 0 42 42"
+                  class="w-full h-full transform -rotate-90"
+                >
+                  <circle
+                    cx="21"
+                    cy="21"
+                    r="15.915"
+                    fill="transparent"
+                    stroke="#e6e6e6"
+                    stroke-width="3"
+                  ></circle>
+                  <circle
+                    cx="21"
+                    cy="21"
+                    r="15.915"
+                    fill="transparent"
+                    stroke="#2196F3"
+                    stroke-width="3"
                     [attr.stroke-dasharray]="(porcentajeValorizable || 0) + ' ' + (100 - (porcentajeValorizable || 0))"
                     stroke-dashoffset="25"></circle>
                   <text x="21" y="24" text-anchor="middle" font-size="8" font-weight="bold" fill="#2196F3"
@@ -122,11 +141,30 @@
               </div>
               <div class="text-xs font-medium text-gray-700">Valorizable</div>
             </div>
-            <div class="text-center" title="Residuos Orgánicos: {{porcentajeOrganica || 0}}%">
-              <div class="w-16 h-16 mx-auto mb-2">
-                <svg viewBox="0 0 42 42" class="w-full h-full transform -rotate-90">
-                  <circle cx="21" cy="21" r="15.915" fill="transparent" stroke="#e6e6e6" stroke-width="3"></circle>
-                  <circle cx="21" cy="21" r="15.915" fill="transparent" stroke="#4CAF50" stroke-width="3"
+            <div
+              class="text-center"
+              title="Residuos Orgánicos: {{porcentajeOrganica || 0}}%"
+            >
+              <div class="size-24 mx-auto mb-2">
+                <svg
+                  viewBox="0 0 42 42"
+                  class="w-full h-full transform -rotate-90"
+                >
+                  <circle
+                    cx="21"
+                    cy="21"
+                    r="15.915"
+                    fill="transparent"
+                    stroke="#e6e6e6"
+                    stroke-width="3"
+                  ></circle>
+                  <circle
+                    cx="21"
+                    cy="21"
+                    r="15.915"
+                    fill="transparent"
+                    stroke="#4CAF50"
+                    stroke-width="3"
                     [attr.stroke-dasharray]="(porcentajeOrganica || 0) + ' ' + (100 - (porcentajeOrganica || 0))"
                     stroke-dashoffset="25"></circle>
                   <text x="21" y="24" text-anchor="middle" font-size="8" font-weight="bold" fill="#4CAF50"
@@ -139,11 +177,30 @@
             </div>
           </div>
           <div class="flex justify-center">
-            <div class="text-center" title="Residuos No Valorizables: {{porcentajeNoValorizable || 0}}%">
-              <div class="w-20 h-20 mx-auto mb-2">
-                <svg viewBox="0 0 42 42" class="w-full h-full transform -rotate-90">
-                  <circle cx="21" cy="21" r="15.915" fill="transparent" stroke="#e6e6e6" stroke-width="3"></circle>
-                  <circle cx="21" cy="21" r="15.915" fill="transparent" stroke="#757575" stroke-width="3"
+            <div
+              class="text-center"
+              title="Residuos No Valorizables: {{porcentajeNoValorizable || 0}}%"
+            >
+              <div class="size-24 mx-auto mb-2">
+                <svg
+                  viewBox="0 0 42 42"
+                  class="w-full h-full transform -rotate-90"
+                >
+                  <circle
+                    cx="21"
+                    cy="21"
+                    r="15.915"
+                    fill="transparent"
+                    stroke="#e6e6e6"
+                    stroke-width="3"
+                  ></circle>
+                  <circle
+                    cx="21"
+                    cy="21"
+                    r="15.915"
+                    fill="transparent"
+                    stroke="#757575"
+                    stroke-width="3"
                     [attr.stroke-dasharray]="(porcentajeNoValorizable || 0) + ' ' + (100 - (porcentajeNoValorizable || 0))"
                     stroke-dashoffset="25"></circle>
                   <text x="21" y="24" text-anchor="middle" font-size="8" font-weight="bold" fill="#757575"
@@ -176,18 +233,21 @@
       </div>
 
       <div class="space-y-4" *ngIf="!isLoadingDetecciones">
-        <div
-          class="flex items-start gap-4 p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors border border-gray-200"
-          *ngFor="let detection of ultimasDetecciones; trackBy: trackDetectionById">
-          <div class="w-12 h-12 rounded-xl flex items-center justify-center text-white"
-            [style.background-color]="getDetectionTypeColor(detection.tipo || detection.tipoResiduo)">
-            <i class="pi" [ngClass]="getDetectionTypeIcon(detection.tipo || detection.tipoResiduo)"></i>
+        <div class="flex items-start gap-4 p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors border border-gray-200"
+          *ngFor="let detection of ultimasDetecciones; trackBy: trackDetectionById"
+        >
+          <div
+            class="size-8 items-center justify-center text-white"
+          >
+            <img
+              src="{{getDetectionTypeImg(detection.tipo || detection.tipoResiduo)}}"
+            />
           </div>
 
           <div class="flex-1 min-w-0">
             <div class="flex items-start justify-between mb-2">
               <div class="font-medium text-gray-800 truncate">
-                {{detection.tipo || detection.tipoResiduo || 'Sin tipo'}}
+                {{getDetectionType(detection.tipo || detection.tipoResiduo)}}
               </div>
               <div class="text-sm text-gray-500 ml-2 px-2 py-1 bg-gray-200 rounded">
                 {{formatDetectionTime(detection.fechaHora || detection.fecha)}}

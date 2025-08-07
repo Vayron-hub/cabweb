@@ -356,6 +356,19 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
     });
   }
 
+  getDetectionType(tipo: string): string {
+    switch (tipo) {
+      case 'organico':
+        return 'Orgánico';
+      case 'valorizable':
+        return 'Valorizable';
+      case 'no_valorizable':
+        return 'No valorizable';
+      default:
+        return 'Otro';
+    }
+  }
+
   getCurrentClassifiers(): any[] {
     // Retorna los TOP 3 clasificadores más activos de TODO el sistema
     console.log('🔍 getCurrentClassifiers - TOP 3 clasificadores globales:', this.topClasificadoresGlobales);
@@ -515,21 +528,20 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
     }
   }
 
-  getDetectionTypeIcon(tipo: string): string {
+  getDetectionTypeImg(tipo: string): string {
     const tipoLower = tipo?.toLowerCase() || '';
 
-    console.log('Tipo de detección:', tipoLower);
     // Orgánico - Ícono de hoja
     if (tipoLower === 'organico') {
-      return 'pi-heart'; // Hoja para orgánico
+      return 'assets/images/organico.png'; // Hoja para orgánico
     }
     // Valorizable/Reciclable - Ícono de reciclaje
     else if (tipoLower === 'valorizable') {
-      return 'pi-refresh'; // Ícono de reciclaje para valorizable
+      return 'assets/images/valorizable.png'; // Ícono de reciclaje para valorizable
     }
     // No Valorizable - Ícono de advertencia
-    else if (tipoLower === 'no valorizable') {
-      return 'pi-exclamation-triangle'; // Triángulo de advertencia para no valorizable
+    else if (tipoLower === 'no_valorizable') {
+      return 'assets/images/no_valorizable.png'; // Ícono de advertencia para no valorizable
     }
     // Otros tipos - Ícono genérico
     else {

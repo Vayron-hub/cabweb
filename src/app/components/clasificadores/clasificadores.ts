@@ -262,6 +262,16 @@ export class ClasificadoresComponent implements OnInit, OnDestroy {
     return this.getCurrentClassifiers().length;
   }
 
+  getTotalDetectionsCount(): number {
+    const classifiers = this.getCurrentClassifiers();
+    return classifiers.reduce((sum: number, classifier: any) => {
+      const activeCount = classifier.activeCount || 0;
+      const inactiveCount = classifier.inactiveCount || 0;
+      const pendingCount = classifier.pendingCount || 0;
+      return sum + activeCount + inactiveCount + pendingCount;
+    }, 0);
+  }
+
   // Método para cambiar zona (si se implementa selector de zona)
   onLocationChange(newLocation: string) {
     this.selectedLocation = newLocation;
