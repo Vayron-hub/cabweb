@@ -155,18 +155,6 @@
   </div>
   <div class="bulk-buttons">
     <button 
-      class="btn-warning"
-      (click)="bulkDeactivateUsers()">
-      <i class="pi pi-eye-slash"></i>
-      Desactivar
-    </button>
-    <button 
-      class="btn-success"
-      (click)="bulkActivateUsers()">
-      <i class="pi pi-eye"></i>
-      Activar
-    </button>
-    <button 
       class="btn-danger"
       (click)="bulkDeleteUsers()"
       [disabled]="!canDeleteUser()">

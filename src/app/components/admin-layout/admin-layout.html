@@ -1,11 +1,6 @@
 <div class="admin-layout">
-  <app-navbar
-    [selectedLocation]="selectedLocation"
-    [locations]="locations"
-    [isLoadingZonas]="isLoadingZonas"
-    [currentUser]="currentUser"
-    (locationChange)="onLocationChange($event)"
-    (logout)="onLogout()"
+  <app-navbar [selectedLocation]="selectedLocation" [locations]="locations" [isLoadingZonas]="isLoadingZonas"
+    [currentUser]="currentUser" (locationChange)="onLocationChange($event)" (logout)="onLogout()"
     (viewMyAccount)="onViewMyAccount()">
   </app-navbar>
 
@@ -17,44 +12,45 @@
   <div class="modal-overlay" *ngIf="showAccountModal" (click)="closeAccountModal()">
     <div class="account-modal" (click)="$event.stopPropagation()">
       <div class="modal-header">
-        <h2>Mi Cuenta</h2>
+        <h2>{{ isEditingProfile ? 'Editar Perfil' : 'Mi Cuenta' }}</h2>
         <button class="close-btn" (click)="closeAccountModal()">
           <i class="pi pi-times"></i>
         </button>
       </div>
-      
+
       <div class="modal-content">
         <div class="account-info-section">
           <div class="account-avatar">
             <i class="pi pi-user"></i>
           </div>
-          
-          <div class="account-details">
+
+          <!-- Vista de solo lectura -->
+          <div class="account-details" *ngIf="!isEditingProfile">
             <div class="info-group">
               <label>Nombre Completo</label>
               <span>{{currentUser.nombre}}</span>
             </div>
-            
+
             <div class="info-group">
               <label>Rol</label>
               <span class="role-tag">Admin</span>
             </div>
-            
+
             <div class="info-group">
               <label>Email</label>
               <span>{{currentUser.email}}</span>
             </div>
-            
+
             <div class="info-group">
               <label>ID de Usuario</label>
               <span>{{currentUser.id}}</span>
             </div>
-            
+
             <div class="info-group">
               <label>Último Acceso</label>
               <span>{{formatAccountDate(currentUser.ultimoAcceso)}}</span>
             </div>
-            
+
             <div class="info-group">
               <label>Estado de Cuenta</label>
               <span class="status-active">
@@ -63,17 +59,71 @@
               </span>
             </div>
           </div>
+
+          <!-- Formulario de edición -->
+          <div class="account-edit-form" *ngIf="isEditingProfile">
+            <div class="form-group">
+              <label for="editNombre">Nombre * </label>
+              <strong>
+                <input pInputText type="text" id="editNombre" [(ngModel)]="editProfileData.nombre" class="form-input"
+                  placeholder="Ingresa tu nombre completo" [class.error]="!editProfileData.nombre">
+              </strong>
+            </div>
+
+            <div class="form-group">
+              <label for="editEmail">Email * </label>
+              <strong>
+                <input pInputText type="email" id="editEmail" [(ngModel)]="editProfileData.email"
+                  class="form-input text-black" placeholder="Ingresa tu email"
+                  [class.error]="!editProfileData.email || !isValidEmail(editProfileData.email)">
+                <small class="error-text" *ngIf="!isValidEmail(editProfileData.email) && editProfileData.email">
+                  Por favor ingresa un email válido
+                </small>
+              </strong>
+            </div>
+
+            <!-- Información que no se puede editar -->
+            <div class="readonly-info">
+              <div class="info-group">
+                <label>Rol</label>
+                <span class="role-tag">Admin</span>
+              </div>
+
+              <div class="info-group">
+                <label>ID de Usuario</label>
+                <span>{{currentUser.id}}</span>
+              </div>
+            </div>
+          </div>
         </div>
-        
+
+        <!-- Botones de acción -->
         <div class="account-actions">
-          <button class="btn-secondary">
-            <i class="pi pi-pencil"></i>
-            Editar Perfil
-          </button>
-          <button class="btn-warning">
-            <i class="pi pi-key"></i>
-            Cambiar Contraseña
-          </button>
+          <!-- Botones en modo vista -->
+          <div *ngIf="!isEditingProfile" class="view-actions">
+            <button class="btn-secondary" (click)="startEditingProfile()">
+              <i class="pi pi-pencil"></i>
+              Editar Perfil
+            </button>
+            <button class="btn-warning">
+              <i class="pi pi-key"></i>
+              Cambiar Contraseña
+            </button>
+          </div>
+
+          <!-- Botones en modo edición -->
+          <div *ngIf="isEditingProfile" class="edit-actions">
+            <button class="btn-secondary" (click)="cancelEditingProfile()">
+              <i class="pi pi-times"></i>
+              Cancelar
+            </button>
+            <button class="btn-primary" (click)="saveProfileChanges()"
+              [disabled]="!canSaveProfile() || isSavingProfile">
+              <i class="pi pi-spin pi-spinner" *ngIf="isSavingProfile"></i>
+              <i class="pi pi-check" *ngIf="!isSavingProfile"></i>
+              {{ isSavingProfile ? 'Guardando...' : 'Guardar Cambios' }}
+            </button>
+          </div>
         </div>
       </div>
     </div>

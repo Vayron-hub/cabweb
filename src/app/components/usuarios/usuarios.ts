@@ -11,6 +11,7 @@ import { BackendService, Zona, User, newUser } from '../../services/backend.serv
 import { ZonaService, ZonaInfo } from '../../services/zona.service';
 import { AuthService } from '../../services/auth';
 import { DialogModule } from 'primeng/dialog';
+import { lastValueFrom } from 'rxjs';
 
 @Component({
   selector: 'app-usuarios',
@@ -323,29 +324,30 @@ export class UsuariosComponent implements OnInit, OnDestroy {
   }
 
   bulkDeleteUsers() {
-    if (this.selectedUsers.length === 0) {
-      alert('Por favor, selecciona usuarios para eliminar.');
-      return;
-    }
-
-    if (confirm(`¿Estás seguro de que deseas eliminar ${this.selectedUsers.length} usuarios?`)) {
-      console.log('🗑️ Eliminando usuarios seleccionados:', this.selectedUsers);
-
-      // Procesar cada usuario seleccionado
-      const deletePromises = this.selectedUsers.map(userId =>
-        this.backendService.deleteUsuario(userId).toPromise()
-      );
-
-      Promise.all(deletePromises).then(() => {
-        console.log('✅ Usuarios eliminados exitosamente');
-        this.selectedUsers = [];
-        this.loadUsers();
-      }).catch(error => {
-        console.error('❌ Error al eliminar usuarios:', error);
-        alert('Error al eliminar algunos usuarios. Por favor, inténtalo de nuevo.');
-      });
-    }
+  if (this.selectedUsers.length === 0) {
+    alert('Por favor, selecciona usuarios para eliminar.');
+    return;
   }
+
+  if (confirm(`¿Estás seguro de que deseas eliminar ${this.selectedUsers.length} usuarios?`)) {
+    console.log('🗑️ Eliminando usuarios seleccionados:', this.selectedUsers);
+
+    // Usar lastValueFrom en lugar de toPromise()
+    const deletePromises = this.selectedUsers.map(userId =>
+      lastValueFrom(this.backendService.deleteUsuario(userId))
+    );
+
+    Promise.all(deletePromises).then((responses) => {
+      console.log('✅ Respuestas del servidor:', responses);
+      console.log('✅ Usuarios eliminados exitosamente');
+      this.selectedUsers = [];
+      this.loadUsers();
+    }).catch(error => {
+      console.error('❌ Error al eliminar usuarios:', error);
+      alert('Error al eliminar algunos usuarios. Por favor, inténtalo de nuevo.');
+    });
+  }
+}
 
   exportUsersData() {
     console.log('📊 Exportando datos de usuarios...');
@@ -421,12 +423,18 @@ export class UsuariosComponent implements OnInit, OnDestroy {
 
 
   canDeleteUser(): boolean {
+    // Primero verificar que haya usuarios seleccionados
+    if (this.selectedUsers.length === 0) {
+      return false; 
+    }
+    
     const currentUser = this.authService.getCurrentUser();
-    // No permitir eliminar el propio usuario
+    // No permitir eliminar si el usuario actual está en la selección
     if (currentUser && this.selectedUsers.includes(currentUser.id)) {
       return false;
     }
-    return true
+    
+    return true; // Solo permite eliminar si hay usuarios seleccionados Y no incluye el usuario actual
   }
 
   visible: boolean = false;

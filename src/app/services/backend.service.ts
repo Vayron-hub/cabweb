@@ -236,10 +236,42 @@ export class BackendService {
       .pipe(catchError(this.handleError));
   }
 
-  updateUsuario(id: string | number, usuario: Partial<User>): Observable<User> {
-    return this.http.put<User>(`${this.apiUrl}/usuarios/${id}`, usuario)
-      .pipe(catchError(this.handleError));
+updateUsuario(id: string | number, usuario: Partial<User>): Observable<User> {
+  const backendData = this.transformUserToBackend(usuario);
+  
+  console.log('🔄 Enviando datos al backend:', backendData);
+  console.log('🔄 Para usuario ID:', id);
+  
+  return this.http.put<User>(`${this.apiUrl}/usuarios/${id}`, backendData)
+    .pipe(catchError(this.handleError));
+}
+
+private transformUserToBackend(frontendUser: Partial<User>): any {
+  const backendData: any = {};
+  
+  if (frontendUser.nombre) {
+    backendData.Nombre = frontendUser.nombre;
   }
+  
+  if (frontendUser.email) {
+    backendData.Correo = frontendUser.email;
+  }
+  
+  if (frontendUser.correo) {
+    backendData.Correo = frontendUser.correo;
+  }
+  
+  if (frontendUser.password) {
+    backendData.Password = frontendUser.password;
+  }
+  
+  console.log('🔄 Transformación frontend → backend:', {
+    frontend: frontendUser,
+    backend: backendData
+  });
+  
+  return backendData;
+}
 
   deleteUsuario(id: string | number): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/usuarios/${id}`)
