@@ -56,11 +56,11 @@ export interface Deteccion {
 }
 
 export interface Clasificador {
-  id: string | number;
+  id?: string | number;
   nombre: string;
-  descripcion: string;
-  tipo: string;
-  estado: string;
+  descripcion?: string;
+  tipo?: string;
+  estado?: string;
   fechaCreacion: Date;
   usuarioCreador?: User;
   zona?: string;
@@ -372,12 +372,12 @@ export class BackendService {
   }
 
   getEstadisticasTipos(): Observable<EstadisticasTipos[]> {
-    return this.http.get<EstadisticasTipos[]>(`${this.apiUrl}/detecciones/estadisticas/tipos-populares`)
+    return this.http.get<EstadisticasTipos[]>(`${this.apiUrl}/detecciones/estadisticas/populares`)
       .pipe(catchError(this.handleError));
   }
 
   getEstadisticasHorarios(): Observable<EstadisticasHorarios[]> {
-    return this.http.get<EstadisticasHorarios[]>(`${this.apiUrl}/detecciones/estadisticas/horarios-recurrentes`)
+    return this.http.get<EstadisticasHorarios[]>(`${this.apiUrl}/detecciones/estadisticas/horarios`)
       .pipe(catchError(this.handleError));
   }
 

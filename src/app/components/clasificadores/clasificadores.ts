@@ -4,8 +4,9 @@ import { FormsModule } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { Subscription } from 'rxjs';
-import { BackendService, Zona } from '../../services/backend.service';
+import { BackendService, Clasificador, Zona } from '../../services/backend.service';
 import { ZonaService, ZonaInfo } from '../../services/zona.service';
+import { DialogModule } from 'primeng/dialog';
 
 interface Classifier {
   id: string;
@@ -24,7 +25,8 @@ interface Classifier {
     CommonModule,
     FormsModule,
     ButtonModule,
-    InputTextModule
+    InputTextModule,
+    DialogModule
   ],
   templateUrl: './clasificadores.html',
   styleUrl: './clasificadores.css'
@@ -33,21 +35,29 @@ export class ClasificadoresComponent implements OnInit, OnDestroy {
   // Datos de clasificadores del backend (solo por zona)
   clasificadoresPorZona: any[] = [];
   isLoadingClasificadores = false;
-  
+
+  newClassifier: Clasificador = {
+    nombre: '',
+    latitud: 0,
+    longitud: 0,
+    fechaCreacion: new Date(),
+    zonaId: ''
+  };
+
   // Zonas del backend
   zonas: Zona[] = [];
   selectedLocation = '';
   selectedZonaId: string | number = '';
   isLoadingZonas = false;
-  
+
   // Búsqueda
   classifierSearchTerm = '';
   filteredClassifiers: any[] = [];
-  
+
   // Suscripciones
   private zonaSubscription: Subscription = new Subscription();
-  
-  
+
+
 
   constructor(
     private backendService: BackendService,
@@ -74,13 +84,13 @@ export class ClasificadoresComponent implements OnInit, OnDestroy {
         console.log('🔄 ID de nueva zona:', zonaInfo.id, 'tipo:', typeof zonaInfo.id);
         console.log('🔄 Nombre de nueva zona:', zonaInfo.nombre);
         console.log('🔄 Zona actual en componente:', this.selectedZonaId);
-        
+
         // Solo actualizar si es una zona válida
         if (zonaInfo.id) {
           console.log('🔄 Actualizando zona de', this.selectedZonaId, 'a', zonaInfo.id);
           this.selectedLocation = zonaInfo.nombre;
           this.selectedZonaId = zonaInfo.id;
-          
+
           // SIEMPRE cargar clasificadores para la nueva zona
           console.log('📞 Llamando a loadClasificadoresPorZona con ID:', zonaInfo.id);
           this.loadClasificadoresPorZona(zonaInfo.id);
@@ -96,10 +106,10 @@ export class ClasificadoresComponent implements OnInit, OnDestroy {
         console.log('🌍 Zonas del backend:', zonasResponse);
         console.log('🌍 Tipo de zonasResponse:', typeof zonasResponse);
         console.log('🌍 Es array:', Array.isArray(zonasResponse));
-        
+
         this.zonas = zonasResponse;
         this.isLoadingZonas = false;
-        
+
         console.log('📞 Zonas cargadas en clasificadores, esperando selección del admin-layout');
       },
       error: (error) => {
@@ -111,7 +121,8 @@ export class ClasificadoresComponent implements OnInit, OnDestroy {
 
   loadClasificadoresPorZona(zonaId: string | number) {
     console.log('🔍 CARGANDO CLASIFICADORES PARA ZONA:', zonaId);
-    
+    this.newClassifier.zonaId = zonaId;
+
     // Validar que el zonaId no esté vacío
     if (!zonaId || zonaId === '' || zonaId === 0) {
       console.warn('⚠️ zonaId está vacío, no se puede cargar clasificadores');
@@ -119,9 +130,9 @@ export class ClasificadoresComponent implements OnInit, OnDestroy {
       this.isLoadingClasificadores = false;
       return;
     }
-    
+
     this.isLoadingClasificadores = true;
-    
+
     // Obtener clasificadores y detecciones en paralelo
     Promise.all([
       this.backendService.getClasificadoresPorZona(zonaId).toPromise(),
@@ -129,14 +140,14 @@ export class ClasificadoresComponent implements OnInit, OnDestroy {
     ]).then(([clasificadores, detecciones]) => {
       console.log('✅ CLASIFICADORES RECIBIDOS:', clasificadores);
       console.log('✅ DETECCIONES RECIBIDAS:', detecciones);
-      
+
       if (!clasificadores || clasificadores.length === 0) {
         console.log('ℹ️ No hay clasificadores para la zona', zonaId);
         this.clasificadoresPorZona = [];
       } else {
         // Crear un mapa de conteos de detecciones por clasificador
         const deteccionesMap = new Map();
-        
+
         if (detecciones && detecciones.length > 0) {
           detecciones.forEach((deteccion: any) => {
             const clasificadorId = deteccion.clasificadorId;
@@ -148,11 +159,11 @@ export class ClasificadoresComponent implements OnInit, OnDestroy {
                 noValorizable: 0
               });
             }
-            
+
             const stats = deteccionesMap.get(clasificadorId);
             stats.total++;
-            
-            switch(deteccion.tipo) {
+
+            switch (deteccion.tipo) {
               case 'Organico':
                 stats.organico++;
                 break;
@@ -166,13 +177,13 @@ export class ClasificadoresComponent implements OnInit, OnDestroy {
             }
           });
         }
-        
+
         // Mapear clasificadores con sus estadísticas reales
         this.clasificadoresPorZona = clasificadores.map((clf: any) => {
           const stats = deteccionesMap.get(clf.id) || {
             total: 0, organico: 0, valorizable: 0, noValorizable: 0
           };
-          
+
           return {
             id: clf.id,
             name: clf.nombre,
@@ -190,11 +201,11 @@ export class ClasificadoresComponent implements OnInit, OnDestroy {
           };
         });
       }
-      
+
       console.log('🔄 Clasificadores procesados:', this.clasificadoresPorZona.length);
       console.log('🔄 Datos finales:', this.clasificadoresPorZona);
-      
-      this.applySearchFilter();
+
+      this.filteredClassifiers = [...this.clasificadoresPorZona];
       this.isLoadingClasificadores = false;
     }).catch((error) => {
       console.error('❌ ERROR AL CARGAR DATOS:', error);
@@ -204,29 +215,24 @@ export class ClasificadoresComponent implements OnInit, OnDestroy {
   }
 
   filterClassifiers() {
-    this.applySearchFilter();
+  // Aplicar filtro directamente como en usuarios
+  if (!this.classifierSearchTerm.trim()) {
+    this.filteredClassifiers = [...this.clasificadoresPorZona];
+  } else {
+    const searchTerm = this.classifierSearchTerm.toLowerCase().trim();
+    this.filteredClassifiers = this.clasificadoresPorZona.filter((classifier: any) =>
+      classifier.name?.toLowerCase().includes(searchTerm) ||
+      classifier.id?.toString().includes(searchTerm)
+    );
   }
-
-  applySearchFilter() {
-    const currentClassifiers = this.getCurrentClassifiers();
-    
-    if (!this.classifierSearchTerm.trim()) {
-      this.filteredClassifiers = currentClassifiers;
-    } else {
-      const searchTerm = this.classifierSearchTerm.toLowerCase().trim();
-      this.filteredClassifiers = currentClassifiers.filter((classifier: any) =>
-        classifier.name?.toLowerCase().includes(searchTerm) ||
-        classifier.id?.toLowerCase().includes(searchTerm)
-      );
-    }
-  }
+}
 
   // Método para obtener clasificadores de la zona actual (solo backend)
   getCurrentClassifiers() {
     console.log('📋 getCurrentClassifiers llamado:');
     console.log('  - clasificadoresPorZona.length:', this.clasificadoresPorZona.length);
     console.log('  - selectedLocation:', this.selectedLocation);
-    
+
     // Solo usar datos del backend, sin fallback
     console.log('📋 Usando clasificadores del backend:', this.clasificadoresPorZona.length);
     return this.clasificadoresPorZona;
@@ -234,14 +240,17 @@ export class ClasificadoresComponent implements OnInit, OnDestroy {
 
   // Método para obtener clasificadores filtrados (que se usa en el template)
   getDisplayedClassifiers() {
-    const current = this.getCurrentClassifiers();
-    console.log('🎯 getDisplayedClassifiers:', current.length, 'clasificadores');
-    
+    console.log('🎯 getDisplayedClassifiers llamado');
+
+    // Si hay término de búsqueda, usar los filtrados
     if (this.classifierSearchTerm.trim()) {
-      console.log('🔍 Aplicando filtro de búsqueda:', this.classifierSearchTerm);
+      console.log('🔍 Mostrando clasificadores filtrados:', this.filteredClassifiers.length);
       return this.filteredClassifiers;
     }
-    return current;
+
+    // Si no hay búsqueda, mostrar todos los de la zona actual
+    console.log('📋 Mostrando todos los clasificadores:', this.clasificadoresPorZona.length);
+    return this.clasificadoresPorZona;
   }
 
   // Métodos de conteo
@@ -287,5 +296,33 @@ export class ClasificadoresComponent implements OnInit, OnDestroy {
   viewDetails(classifier: any) {
     console.log('Ver detalles del clasificador:', classifier);
     // Implementar vista de detalles
+  }
+
+  visible: boolean = false;
+  showDialog() {
+    this.visible = true;
+  }
+  hideDialog() {
+    this.newClassifier = {
+      nombre: '',
+      latitud: 0,
+      longitud: 0,
+      fechaCreacion: new Date(),
+      zonaId: ''
+    };
+    this.visible = false;
+  }
+
+  postClassifier() {
+    this.backendService.createClasificador(this.newClassifier).subscribe({
+      next: (response) => {
+        console.log('Clasificador creado:', response);
+        this.hideDialog();
+        this.loadClasificadoresPorZona(this.selectedZonaId);
+      },
+      error: (error) => {
+        console.error('Error al crear clasificador:', error);
+      }
+    });
   }
 }

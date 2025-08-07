@@ -9,22 +9,51 @@
       [(ngModel)]="classifierSearchTerm"
       (input)="filterClassifiers()"
       class="classifier-search-input">
-    <button class="search-button">
+    <span class="search-button" >
       <i class="pi pi-search"></i>
-    </button>
+    </span>
   </div>
 </div>
 
+
 <!-- Lista de clasificadores completa -->
 <div class="classifiers-simple-section">
-  <div class="classifiers-header-simple">
+  <div class="classifiers-header-simple" style="display: grid; grid-template-columns: 1fr auto; align-items: center; width: 100%;">
     <h2>
       Clasificadores {{getActiveCount()}} | {{getTotalCount()}}
       <i class="pi pi-spin pi-spinner" *ngIf="isLoadingClasificadores" style="margin-left: 8px; font-size: 14px; color: #666;"></i>
     </h2>
-    <button class="add-classifier-btn">
+    <button class="add-classifier-btn" (click)="showDialog()">
       <i class="pi pi-plus"></i>
     </button>
+    <p-dialog header="Edit Profile" [(visible)]="visible" [style]="{ width: '25rem', background: 'white', color: 'black' }" [modal]="true" [closable]="false">
+        <div class="flex items-center gap-4 mb-4">
+            <label for="username" class="font-semibold text-black w-24">Username</label>
+            <input pInputText id="username"  class="background-input flex-auto" autocomplete="off" 
+            [(ngModel)]="newClassifier.nombre"/>
+        </div>
+        <div class="flex items-center gap-4 mb-8">
+            <label for="latitud" class="font-semibold text-black w-24">Latitud</label>
+            <input pInputText id="latitud" type="number" class="background-input flex-auto" autocomplete="off"
+             [(ngModel)]="newClassifier.latitud"/>
+        </div>
+        <div class="flex text-black items-center gap-4 mb-8">
+            <label for="longitud" class="font-semibold w-24">Longitud</label>
+            <input pInputText id="longitud" type="number" class="background-input flex-auto" autocomplete="off" 
+            [(ngModel)]="newClassifier.longitud"/>
+        </div>
+        <div class="flex text-black items-center gap-4 mb-8">
+            <label for="zona" class="font-semibold w-24">Zona</label>
+            <!-- <input pInputText id="zona" type="text" readonly hidden class="background-input flex-auto" [(ngModel)]="newClassifier.zonaId"/> -->
+            <select pInputText id="zona" [(ngModel)]="newClassifier.zonaId" disabled class="background-input flex-auto">
+              <option *ngFor="let zona of zonas" [value]="zona.id">{{zona.nombre}}</option>
+            </select>
+        </div>
+        <div class="flex justify-end gap-2">
+            <p-button label="Cancel" severity="secondary" (click)="visible = false" />
+            <p-button label="Save" (click)="postClassifier()" />
+        </div>
+    </p-dialog>
   </div>
   
   <div class="classifiers-simple-list" *ngIf="!isLoadingClasificadores">
