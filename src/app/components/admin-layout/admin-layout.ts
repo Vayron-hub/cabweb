@@ -12,7 +12,6 @@ import { AuthService } from '../../services/auth';
   standalone: true,
   imports: [CommonModule, RouterModule, RouterOutlet, FormsModule, NavbarComponent],
   templateUrl: './admin-layout.html',
-  styleUrls: ['./admin-layout.css']
 })
 export class AdminLayoutComponent implements OnInit, OnDestroy {
 

@@ -29,7 +29,6 @@ interface Classifier {
     DialogModule
   ],
   templateUrl: './clasificadores.html',
-  styleUrl: './clasificadores.css'
 })
 export class ClasificadoresComponent implements OnInit, OnDestroy {
   // Datos de clasificadores del backend (solo por zona)

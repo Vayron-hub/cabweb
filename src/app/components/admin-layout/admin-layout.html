@@ -1,59 +1,66 @@
-<div class="admin-layout">
-  <app-navbar [selectedLocation]="selectedLocation" [locations]="locations" [isLoadingZonas]="isLoadingZonas"
-    [currentUser]="currentUser" (locationChange)="onLocationChange($event)" (logout)="onLogout()"
+<div class="min-h-screen bg-gray-50">
+  <app-navbar
+    [selectedLocation]="selectedLocation"
+    [locations]="locations"
+    [isLoadingZonas]="isLoadingZonas"
+    [currentUser]="currentUser"
+    (locationChange)="onLocationChange($event)"
+    (logout)="onLogout()"
     (viewMyAccount)="onViewMyAccount()">
   </app-navbar>
 
-  <div class="dashboard-content">
+  <div class="p-5 max-w-6xl mx-auto">
     <router-outlet></router-outlet>
   </div>
 
-  <!-- Modal de Mi Cuenta -->
-  <div class="modal-overlay" *ngIf="showAccountModal" (click)="closeAccountModal()">
-    <div class="account-modal" (click)="$event.stopPropagation()">
-      <div class="modal-header">
-        <h2>{{ isEditingProfile ? 'Editar Perfil' : 'Mi Cuenta' }}</h2>
-        <button class="close-btn" (click)="closeAccountModal()">
-          <i class="pi pi-times"></i>
+  <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 animate-fade-in" 
+       *ngIf="showAccountModal" (click)="closeAccountModal()">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-11/12 max-h-[90vh] overflow-y-auto animate-slide-up" 
+         (click)="$event.stopPropagation()">
+      <div class="flex justify-between items-center p-6 border-b border-gray-200">
+        <h2 class="text-2xl font-semibold text-gray-800">{{ isEditingProfile ? 'Editar Perfil' : 'Mi Cuenta' }}</h2>
+        <button class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors" 
+                (click)="closeAccountModal()">
+          <i class="pi pi-times text-gray-600"></i>
         </button>
       </div>
 
-      <div class="modal-content">
-        <div class="account-info-section">
-          <div class="account-avatar">
+      <div class="p-6">
+        <div class="flex gap-6 mb-8 md:flex-row flex-col md:text-left text-center">
+          <div class="w-20 h-20 bg-gradient-to-br from-primary-600 to-primary-700 rounded-full flex items-center justify-center text-white text-3xl flex-shrink-0 mx-auto md:mx-0">
             <i class="pi pi-user"></i>
           </div>
 
           <!-- Vista de solo lectura -->
-          <div class="account-details" *ngIf="!isEditingProfile">
-            <div class="info-group">
-              <label>Nombre Completo</label>
-              <span>{{currentUser.nombre}}</span>
+          <div class="flex-1 space-y-4" *ngIf="!isEditingProfile">
+            <div class="space-y-1">
+              <label class="text-xs font-semibold text-gray-500 uppercase tracking-wide">Nombre Completo</label>
+              <span class="block text-base font-medium text-gray-800">{{currentUser.nombre}}</span>
             </div>
-
-            <div class="info-group">
-              <label>Rol</label>
-              <span class="role-tag">Admin</span>
+            
+            <div class="space-y-1">
+              <label class="text-xs font-semibold text-gray-500 uppercase tracking-wide">Rol</label>
+              <span class="inline-block bg-primary-600 text-white px-3 py-1 rounded-full text-xs font-semibold">Admin</span>
             </div>
-
-            <div class="info-group">
-              <label>Email</label>
-              <span>{{currentUser.email}}</span>
+            
+            <div class="space-y-1">
+              <label class="text-xs font-semibold text-gray-500 uppercase tracking-wide">Email</label>
+              <span class="block text-base font-medium text-gray-800">{{currentUser.email}}</span>
             </div>
-
-            <div class="info-group">
-              <label>ID de Usuario</label>
-              <span>{{currentUser.id}}</span>
+            
+            <div class="space-y-1">
+              <label class="text-xs font-semibold text-gray-500 uppercase tracking-wide">ID de Usuario</label>
+              <span class="block text-base font-medium text-gray-800">{{currentUser.id}}</span>
             </div>
-
-            <div class="info-group">
-              <label>Último Acceso</label>
-              <span>{{formatAccountDate(currentUser.ultimoAcceso)}}</span>
+            
+            <div class="space-y-1">
+              <label class="text-xs font-semibold text-gray-500 uppercase tracking-wide">Último Acceso</label>
+              <span class="block text-base font-medium text-gray-800">{{formatAccountDate(currentUser.ultimoAcceso)}}</span>
             </div>
-
-            <div class="info-group">
-              <label>Estado de Cuenta</label>
-              <span class="status-active">
+            
+            <div class="space-y-1">
+              <label class="text-xs font-semibold text-gray-500 uppercase tracking-wide">Estado de Cuenta</label>
+              <span class="flex items-center gap-2 text-green-600 font-medium md:justify-start justify-center">
                 <i class="pi pi-check-circle"></i>
                 Activa
               </span>

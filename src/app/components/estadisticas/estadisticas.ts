@@ -10,7 +10,6 @@ import { Subscription } from 'rxjs';
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './estadisticas.html',
-  styleUrl: './estadisticas.css'
 })
 export class EstadisticasComponent implements OnInit, OnDestroy {
   selectedLocation: string = ''; // Recibir zona del ZonaService

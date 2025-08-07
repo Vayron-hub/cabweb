@@ -25,7 +25,6 @@ import { BackendService, Zona } from '../../services/backend.service';
     ChartModule
   ],
   templateUrl: './dashboard-home.html',
-  styleUrl: './dashboard-home.css'
 })
 export class DashboardHomeComponent implements OnInit {
   selectedLocation = '';

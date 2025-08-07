@@ -27,7 +27,6 @@ import { lastValueFrom } from 'rxjs';
     DialogModule
   ],
   templateUrl: './usuarios.html',
-  styleUrl: './usuarios.css'
 })
 export class UsuariosComponent implements OnInit, OnDestroy {
   // Ubicación actual (sincronizada con ZonaService)

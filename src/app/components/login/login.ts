@@ -23,7 +23,6 @@ import { BackendService } from '../../services/backend.service';
     MessageModule
   ],
   templateUrl: './login.html',
-  styleUrl: './login.css'
 })
 export class Login implements OnInit {
   loginForm: FormGroup;
