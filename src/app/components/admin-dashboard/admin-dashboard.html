@@ -1,40 +1,40 @@
 <div class="dashboard-container">
-  
-
   <!-- Contenido del Dashboard -->
   <div class="dashboard-content" *ngIf="activeTab === 'dashboard'">
-    
     <!-- Mensaje de Bienvenida -->
     <div class="welcome-section">
       <div class="welcome-text">
         <h1>¡Buenos días Administrador!</h1>
         <p>Aquí tienes tu dashboard de visualización de tus datos.</p>
       </div>
-      <div class="welcome-icon">
-        <div class="cam-icon">
-          <div class="cam-body"></div>
-          <div class="cam-lens"></div>
-        </div>
-      </div>
+      <i class="pi pi-chart-bar text-[#4a7c59]" style="font-size: 5rem;"></i>
     </div>
 
     <div class="main-dashboard-grid">
-      
       <!-- Panel Izquierdo - TOP 3 Clasificadores Globales -->
       <div class="classifiers-panel">
         <div class="panel-header">
-          <h2> TOP 3 Clasificadores Más Activos</h2>
+          <h2>TOP 3 Clasificadores Más Activos</h2>
           <small>Del sistema completo</small>
         </div>
-        <div class="classifier-item" *ngFor="let classifier of getCurrentClassifiers()">
+        <div
+          class="classifier-item"
+          *ngFor="let classifier of getCurrentClassifiers()"
+        >
           <div class="classifier-icon">
-            <div class="cam-mini-icon"></div>
+            <img
+              src="assets/images/esp32cam.png"
+              alt="Classifier Icon"
+              class="classifier-image"
+            />
           </div>
           <div class="classifier-info">
             <h3>{{classifier.name}}</h3>
             <small class="zone-info"> {{classifier.zona}}</small>
             <div class="total-detections">
-              <span class="detection-count">{{classifier.totalDetecciones}}</span>
+              <span class="detection-count"
+                >{{classifier.totalDetecciones}}</span
+              >
               <small>detecciones totales</small>
             </div>
           </div>
@@ -44,34 +44,43 @@
       <!-- Panel Central - Comparativa Entre Zonas -->
       <div class="chart-panel">
         <div class="panel-header">
-          <h2> Comparativa Entre Zonas</h2>
+          <h2>Comparativa Entre Zonas</h2>
           <small>Detecciones por zona del sistema</small>
         </div>
         <div class="chart-content">
           <div class="bar-chart-simple">
             <div class="bar-column">
-              <div class="bar" 
-                   [style.height.%]="datosDashboardCentral[0] || 0"
-                   [title]="getZoneTitle(0)"
-                   [attr.data-value]="datosDashboardCentral[0] || 0">
-              </div>
-              <span class="bar-label">{{formatZoneLabel(zonasDeteccionesHoy[0])}}</span>
+              <div
+                class="bar"
+                [style.height.%]="datosDashboardCentral[0] || 0"
+                [title]="getZoneTitle(0)"
+                [attr.data-value]="datosDashboardCentral[0] || 0"
+              ></div>
+              <span class="bar-label"
+                >{{formatZoneLabel(zonasDeteccionesHoy[0])}}</span
+              >
             </div>
             <div class="bar-column">
-              <div class="bar" 
-                   [style.height.%]="datosDashboardCentral[1] || 0"
-                   [title]="getZoneTitle(1)"
-                   [attr.data-value]="datosDashboardCentral[1] || 0">
-              </div>
-              <span class="bar-label">{{formatZoneLabel(zonasDeteccionesHoy[1])}}</span>
+              <div
+                class="bar"
+                [style.height.%]="datosDashboardCentral[1] || 0"
+                [title]="getZoneTitle(1)"
+                [attr.data-value]="datosDashboardCentral[1] || 0"
+              ></div>
+              <span class="bar-label"
+                >{{formatZoneLabel(zonasDeteccionesHoy[1])}}</span
+              >
             </div>
             <div class="bar-column">
-              <div class="bar" 
-                   [style.height.%]="datosDashboardCentral[2] || 0"
-                   [title]="getZoneTitle(2)"
-                   [attr.data-value]="datosDashboardCentral[2] || 0">
-              </div>
-              <span class="bar-label">{{formatZoneLabel(zonasDeteccionesHoy[2])}}</span>
+              <div
+                class="bar"
+                [style.height.%]="datosDashboardCentral[2] || 0"
+                [title]="getZoneTitle(2)"
+                [attr.data-value]="datosDashboardCentral[2] || 0"
+              ></div>
+              <span class="bar-label"
+                >{{formatZoneLabel(zonasDeteccionesHoy[2])}}</span
+              >
             </div>
           </div>
         </div>
@@ -80,92 +89,202 @@
       <!-- Panel Derecho - Distribución Global de Tipos -->
       <div class="pie-charts-panel">
         <div class="panel-header">
-          <h2> Distribución Global</h2>
+          <h2>Distribución Global</h2>
           <small>Tipos más populares del sistema</small>
         </div>
         <div class="pie-chart-row">
           <!-- Gráfico de Valorizable (Azul) -->
-          <div class="pie-chart" title="Residuos Valorizables: {{porcentajeValorizable || 0}}%">
+          <div
+            class="pie-chart"
+            title="Residuos Valorizables: {{porcentajeValorizable || 0}}%"
+          >
             <svg viewBox="0 0 42 42" class="donut">
-              <circle cx="21" cy="21" r="15.915" fill="transparent" stroke="#e6e6e6" stroke-width="3"></circle>
-              <circle cx="21" cy="21" r="15.915" fill="transparent" stroke="#2196F3" stroke-width="3" 
-                      [attr.stroke-dasharray]="(porcentajeValorizable || 0) + ' ' + (100 - (porcentajeValorizable || 0))" stroke-dashoffset="25"></circle>
-              <text x="21" y="24" text-anchor="middle" font-size="8" font-weight="bold" fill="#2196F3">{{porcentajeValorizable || 0}}%</text>
+              <circle
+                cx="21"
+                cy="21"
+                r="15.915"
+                fill="transparent"
+                stroke="#e6e6e6"
+                stroke-width="3"
+              ></circle>
+              <circle
+                cx="21"
+                cy="21"
+                r="15.915"
+                fill="transparent"
+                stroke="#2196F3"
+                stroke-width="3"
+                [attr.stroke-dasharray]="(porcentajeValorizable || 0) + ' ' + (100 - (porcentajeValorizable || 0))"
+                stroke-dashoffset="25"
+              ></circle>
+              <text
+                x="21"
+                y="24"
+                text-anchor="middle"
+                font-size="8"
+                font-weight="bold"
+                fill="#2196F3"
+              >
+                {{porcentajeValorizable || 0}}%
+              </text>
             </svg>
             <div class="chart-label">Valorizable</div>
           </div>
           <!-- Gráfico de Orgánica (Verde) -->
-          <div class="pie-chart" title="Residuos Orgánicos: {{porcentajeOrganica || 0}}%">
+          <div
+            class="pie-chart"
+            title="Residuos Orgánicos: {{porcentajeOrganica || 0}}%"
+          >
             <svg viewBox="0 0 42 42" class="donut">
-              <circle cx="21" cy="21" r="15.915" fill="transparent" stroke="#e6e6e6" stroke-width="3"></circle>
-              <circle cx="21" cy="21" r="15.915" fill="transparent" stroke="#4CAF50" stroke-width="3" 
-                      [attr.stroke-dasharray]="(porcentajeOrganica || 0) + ' ' + (100 - (porcentajeOrganica || 0))" stroke-dashoffset="25"></circle>
-              <text x="21" y="24" text-anchor="middle" font-size="8" font-weight="bold" fill="#4CAF50">{{porcentajeOrganica || 0}}%</text>
+              <circle
+                cx="21"
+                cy="21"
+                r="15.915"
+                fill="transparent"
+                stroke="#e6e6e6"
+                stroke-width="3"
+              ></circle>
+              <circle
+                cx="21"
+                cy="21"
+                r="15.915"
+                fill="transparent"
+                stroke="#4CAF50"
+                stroke-width="3"
+                [attr.stroke-dasharray]="(porcentajeOrganica || 0) + ' ' + (100 - (porcentajeOrganica || 0))"
+                stroke-dashoffset="25"
+              ></circle>
+              <text
+                x="21"
+                y="24"
+                text-anchor="middle"
+                font-size="8"
+                font-weight="bold"
+                fill="#4CAF50"
+              >
+                {{porcentajeOrganica || 0}}%
+              </text>
             </svg>
             <div class="chart-label">Orgánica</div>
           </div>
         </div>
         <div class="pie-chart-single">
           <!-- Gráfico de No Valorizable (Gris) -->
-          <div class="pie-chart" title="Residuos No Valorizables: {{porcentajeNoValorizable || 0}}%">
+          <div
+            class="pie-chart"
+            title="Residuos No Valorizables: {{porcentajeNoValorizable || 0}}%"
+          >
             <svg viewBox="0 0 42 42" class="donut">
-              <circle cx="21" cy="21" r="15.915" fill="transparent" stroke="#e6e6e6" stroke-width="3"></circle>
-              <circle cx="21" cy="21" r="15.915" fill="transparent" stroke="#757575" stroke-width="3" 
-                      [attr.stroke-dasharray]="(porcentajeNoValorizable || 0) + ' ' + (100 - (porcentajeNoValorizable || 0))" stroke-dashoffset="25"></circle>
-              <text x="21" y="24" text-anchor="middle" font-size="8" font-weight="bold" fill="#757575">{{porcentajeNoValorizable || 0}}%</text>
+              <circle
+                cx="21"
+                cy="21"
+                r="15.915"
+                fill="transparent"
+                stroke="#e6e6e6"
+                stroke-width="3"
+              ></circle>
+              <circle
+                cx="21"
+                cy="21"
+                r="15.915"
+                fill="transparent"
+                stroke="#757575"
+                stroke-width="3"
+                [attr.stroke-dasharray]="(porcentajeNoValorizable || 0) + ' ' + (100 - (porcentajeNoValorizable || 0))"
+                stroke-dashoffset="25"
+              ></circle>
+              <text
+                x="21"
+                y="24"
+                text-anchor="middle"
+                font-size="8"
+                font-weight="bold"
+                fill="#757575"
+              >
+                {{porcentajeNoValorizable || 0}}%
+              </text>
             </svg>
             <div class="chart-label">No Valorizable</div>
           </div>
         </div>
       </div>
-
     </div>
 
     <!-- Sección Últimas Detecciones -->
     <div class="recent-detections">
       <div class="recent-detections-header">
-        <h2>Últimas detecciones de <span class="zone-highlight">{{selectedLocation}}</span></h2>
-        <button 
+        <h2>
+          Últimas detecciones de
+          <span class="zone-highlight">{{selectedLocation}}</span>
+        </h2>
+        <button
           class="refresh-btn-small"
           (click)="loadUltimasDetecciones()"
           [disabled]="isLoadingDetecciones"
-          title="Actualizar detecciones">
-          <i class="pi" [class.pi-refresh]="!isLoadingDetecciones" [class.pi-spin]="isLoadingDetecciones" [class.pi-spinner]="isLoadingDetecciones"></i>
+          title="Actualizar detecciones"
+        >
+          <i
+            class="pi"
+            [class.pi-refresh]="!isLoadingDetecciones"
+            [class.pi-spin]="isLoadingDetecciones"
+            [class.pi-spinner]="isLoadingDetecciones"
+          ></i>
         </button>
       </div>
-      
+
       <div class="detections-list" *ngIf="!isLoadingDetecciones">
-        <div class="detection-card" *ngFor="let detection of ultimasDetecciones; trackBy: trackDetectionById">
+        <div
+          class="detection-card"
+          *ngFor="let detection of ultimasDetecciones; trackBy: trackDetectionById"
+        >
           <div class="detection-icon-wrapper">
-            <div class="detection-icon" [style.background-color]="getDetectionTypeColor(detection.tipo || detection.tipoResiduo)">
-              <i class="pi" [ngClass]="getDetectionTypeIcon(detection.tipo || detection.tipoResiduo)"></i>
+            <div
+              class="detection-icon"
+              [style.background-color]="getDetectionTypeColor(detection.tipo || detection.tipoResiduo)"
+            >
+              <i
+                class="pi"
+                [ngClass]="getDetectionTypeIcon(detection.tipo || detection.tipoResiduo)"
+              ></i>
             </div>
           </div>
-          
+
           <div class="detection-content">
             <div class="detection-main-info">
-              <div class="detection-type-label">{{detection.tipo || detection.tipoResiduo || 'Sin tipo'}}</div>
-              <div class="detection-time">{{formatDetectionTime(detection.fechaHora || detection.fecha)}}</div>
+              <div class="detection-type-label">
+                {{detection.tipo || detection.tipoResiduo || 'Sin tipo'}}
+              </div>
+              <div class="detection-time">
+                {{formatDetectionTime(detection.fechaHora || detection.fecha)}}
+              </div>
             </div>
-            
+
             <div class="detection-secondary-info">
               <div class="detection-location">
                 <i class="pi pi-map-marker"></i>
                 <span>{{(detection.clasificador || 'Sin clasificador')}}</span>
                 <span *ngIf="detection.zona" class="zone-separator">•</span>
-                <span *ngIf="detection.zona" class="zone-info">{{detection.zona}}</span>
+                <span *ngIf="detection.zona" class="zone-info"
+                  >{{detection.zona}}</span
+                >
               </div>
             </div>
-            
+
             <div class="detection-status-wrapper" *ngIf="detection.estado">
-              <span class="status-badge" [ngClass]="detection.estado.toLowerCase()">
-                <i class="pi" [ngClass]="detection.estado === 'Confirmada' ? 'pi-check' : 'pi-clock'"></i>
+              <span
+                class="status-badge"
+                [ngClass]="detection.estado.toLowerCase()"
+              >
+                <i
+                  class="pi"
+                  [ngClass]="detection.estado === 'Confirmada' ? 'pi-check' : 'pi-clock'"
+                ></i>
                 {{detection.estado}}
               </span>
             </div>
           </div>
         </div>
-        
+
         <!-- Mensaje cuando no hay detecciones -->
         <div class="no-detections" *ngIf="ultimasDetecciones.length === 0">
           <div class="no-detections-icon">
@@ -173,23 +292,24 @@
           </div>
           <div class="no-detections-text">
             <h3>No hay detecciones recientes en {{selectedLocation}}</h3>
-            <p>Las nuevas detecciones de esta zona aparecerán aquí cuando se procesen</p>
+            <p>
+              Las nuevas detecciones de esta zona aparecerán aquí cuando se
+              procesen
+            </p>
           </div>
         </div>
       </div>
-      
+
       <!-- Indicador de carga -->
       <div class="loading-detections" *ngIf="isLoadingDetecciones">
         <i class="pi pi-spin pi-spinner"></i>
         <p>Cargando detecciones...</p>
       </div>
     </div>
-
   </div>
 
   <!-- Vista de Estadísticas -->
   <div class="dashboard-content" *ngIf="activeTab === 'estadisticas'">
-    
     <!-- Header de Estadísticas -->
     <div class="statistics-header">
       <div class="statistics-title">
@@ -197,17 +317,21 @@
         <p>Análisis general de datos para {{selectedLocation}}</p>
       </div>
       <div class="statistics-actions">
-        <button 
-          class="btn-primary"
-          (click)="exportStatisticsData()">
+        <button class="btn-primary" (click)="exportStatisticsData()">
           <i class="pi pi-download"></i>
           Exportar
         </button>
-        <button 
+        <button
           class="btn-secondary"
           (click)="refreshStatistics()"
-          [disabled]="isLoadingStats">
-          <i class="pi" [class.pi-refresh]="!isLoadingStats" [class.pi-spin]="isLoadingStats" [class.pi-spinner]="isLoadingStats"></i>
+          [disabled]="isLoadingStats"
+        >
+          <i
+            class="pi"
+            [class.pi-refresh]="!isLoadingStats"
+            [class.pi-spin]="isLoadingStats"
+            [class.pi-spinner]="isLoadingStats"
+          ></i>
           {{isLoadingStats ? 'Actualizando...' : 'Actualizar'}}
         </button>
       </div>
@@ -215,7 +339,6 @@
 
     <!-- Grid de Estadísticas -->
     <div class="statistics-grid">
-      
       <!-- Módulo de Detecciones -->
       <div class="stat-module">
         <div class="module-header">
@@ -224,16 +347,28 @@
         </div>
         <div class="module-chart">
           <div class="bar-chart-container">
-            <div class="chart-bar" [style.height.%]="datosDeteccionesPorHora[0]">
+            <div
+              class="chart-bar"
+              [style.height.%]="datosDeteccionesPorHora[0]"
+            >
               <div class="bar-value">{{datosDeteccionesPorHora[0]}}</div>
             </div>
-            <div class="chart-bar" [style.height.%]="datosDeteccionesPorHora[1]">
+            <div
+              class="chart-bar"
+              [style.height.%]="datosDeteccionesPorHora[1]"
+            >
               <div class="bar-value">{{datosDeteccionesPorHora[1]}}</div>
             </div>
-            <div class="chart-bar" [style.height.%]="datosDeteccionesPorHora[2]">
+            <div
+              class="chart-bar"
+              [style.height.%]="datosDeteccionesPorHora[2]"
+            >
               <div class="bar-value">{{datosDeteccionesPorHora[2]}}</div>
             </div>
-            <div class="chart-bar" [style.height.%]="datosDeteccionesPorHora[3]">
+            <div
+              class="chart-bar"
+              [style.height.%]="datosDeteccionesPorHora[3]"
+            >
               <div class="bar-value">{{datosDeteccionesPorHora[3]}}</div>
             </div>
           </div>
@@ -254,16 +389,28 @@
         </div>
         <div class="module-chart">
           <div class="bar-chart-container">
-            <div class="chart-bar" [style.height.%]="datosClasificacionesExitosas[0]">
+            <div
+              class="chart-bar"
+              [style.height.%]="datosClasificacionesExitosas[0]"
+            >
               <div class="bar-value">{{datosClasificacionesExitosas[0]}}</div>
             </div>
-            <div class="chart-bar" [style.height.%]="datosClasificacionesExitosas[1]">
+            <div
+              class="chart-bar"
+              [style.height.%]="datosClasificacionesExitosas[1]"
+            >
               <div class="bar-value">{{datosClasificacionesExitosas[1]}}</div>
             </div>
-            <div class="chart-bar" [style.height.%]="datosClasificacionesExitosas[2]">
+            <div
+              class="chart-bar"
+              [style.height.%]="datosClasificacionesExitosas[2]"
+            >
               <div class="bar-value">{{datosClasificacionesExitosas[2]}}</div>
             </div>
-            <div class="chart-bar" [style.height.%]="datosClasificacionesExitosas[3]">
+            <div
+              class="chart-bar"
+              [style.height.%]="datosClasificacionesExitosas[3]"
+            >
               <div class="bar-value">{{datosClasificacionesExitosas[3]}}</div>
             </div>
           </div>
@@ -335,13 +482,10 @@
           </div>
         </div>
       </div>
-
     </div>
-
   </div>
 
   <div class="dashboard-content" *ngIf="activeTab === 'usuarios'">
-    
     <!-- Header de Usuarios -->
     <div class="users-header">
       <div class="users-title">
@@ -349,23 +493,25 @@
         <p>Administrar usuarios del sistema para {{selectedLocation}}</p>
       </div>
       <div class="users-actions">
-        <button 
-          class="btn-primary"
-          (click)="exportUsersData()">
+        <button class="btn-primary" (click)="exportUsersData()">
           <i class="pi pi-download"></i>
           Exportar
         </button>
-        <button 
+        <button
           class="btn-secondary"
           (click)="loadUsers()"
           [disabled]="isLoadingUsers"
-          title="Actualizar usuarios">
-          <i class="pi" [class.pi-refresh]="!isLoadingUsers" [class.pi-spin]="isLoadingUsers" [class.pi-spinner]="isLoadingUsers"></i>
+          title="Actualizar usuarios"
+        >
+          <i
+            class="pi"
+            [class.pi-refresh]="!isLoadingUsers"
+            [class.pi-spin]="isLoadingUsers"
+            [class.pi-spinner]="isLoadingUsers"
+          ></i>
           {{isLoadingUsers ? 'Actualizando...' : 'Actualizar'}}
         </button>
-        <button 
-          class="btn-success"
-          (click)="addNewUser()">
+        <button class="btn-success" (click)="addNewUser()">
           <i class="pi pi-plus"></i>
           Nuevo Usuario
         </button>
@@ -377,23 +523,25 @@
       <div class="search-bar">
         <div class="search-input-container">
           <i class="pi pi-search search-icon"></i>
-          <input 
-            type="text" 
+          <input
+            type="text"
             placeholder="Buscar usuarios por nombre o correo..."
             [(ngModel)]="searchTerm"
             (input)="filterUsers()"
-            class="search-input">
+            class="search-input"
+          />
         </div>
       </div>
       <div class="role-filters">
         <label class="filter-label">Filtrar por rol:</label>
         <div class="role-checkboxes">
           <label class="checkbox-item" *ngFor="let role of roleOptions">
-            <input 
-              type="checkbox" 
+            <input
+              type="checkbox"
               [value]="role.value"
               (change)="onRoleFilterChange($event)"
-              [checked]="selectedRoles.includes(role.value)">
+              [checked]="selectedRoles.includes(role.value)"
+            />
             <span class="checkmark"></span>
             {{role.label}}
           </label>
@@ -438,10 +586,11 @@
         <thead>
           <tr>
             <th>
-              <input 
-                type="checkbox" 
+              <input
+                type="checkbox"
                 (change)="selectAllUsers($event)"
-                [checked]="allUsersSelected()">
+                [checked]="allUsersSelected()"
+              />
             </th>
             <th>Usuario</th>
             <th>Email</th>
@@ -452,14 +601,17 @@
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let user of filteredUsers; trackBy: trackByUserId" 
-              [class.selected]="selectedUsers.includes(user.id)">
+          <tr
+            *ngFor="let user of filteredUsers; trackBy: trackByUserId"
+            [class.selected]="selectedUsers.includes(user.id)"
+          >
             <td>
-              <input 
-                type="checkbox" 
+              <input
+                type="checkbox"
                 [value]="user.id"
                 (change)="toggleUserSelection(user.id, $event)"
-                [checked]="selectedUsers.includes(user.id)">
+                [checked]="selectedUsers.includes(user.id)"
+              />
             </td>
             <td>
               <div class="user-info">
@@ -474,42 +626,49 @@
             </td>
             <td class="user-email">{{user.email}}</td>
             <td>
-              <span class="role-badge">
-                Admin
-              </span>
+              <span class="role-badge"> Admin </span>
             </td>
             <td>
-              <span class="status-badge" [ngClass]="getStatusClass(user.activo)">
+              <span
+                class="status-badge"
+                [ngClass]="getStatusClass(user.activo)"
+              >
                 <i class="pi" [ngClass]="getStatusIcon(user.activo)"></i>
                 {{getStatusText(user.activo)}}
               </span>
             </td>
             <td class="last-access">{{formatDate(user.ultimoAcceso)}}</td>
             <td class="actions">
-              <button 
+              <button
                 class="action-btn edit"
                 (click)="editUser(user)"
-                title="Editar usuario">
+                title="Editar usuario"
+              >
                 <i class="pi pi-pencil"></i>
               </button>
-              <button 
+              <button
                 class="action-btn delete"
                 (click)="deleteUser(user)"
                 [disabled]="!canDeleteUser()"
-                title="Eliminar usuario">
+                title="Eliminar usuario"
+              >
                 <i class="pi pi-trash"></i>
               </button>
-              <button 
+              <button
                 class="action-btn toggle"
                 (click)="toggleUserStatus(user)"
-                [title]="user.estado === 'Activo' ? 'Desactivar usuario' : 'Activar usuario'">
-                <i class="pi" [ngClass]="user.estado === 'Activo' ? 'pi-eye-slash' : 'pi-eye'"></i>
+                [title]="user.estado === 'Activo' ? 'Desactivar usuario' : 'Activar usuario'"
+              >
+                <i
+                  class="pi"
+                  [ngClass]="user.estado === 'Activo' ? 'pi-eye-slash' : 'pi-eye'"
+                ></i>
               </button>
             </td>
           </tr>
         </tbody>
       </table>
-      
+
       <!-- Mensaje cuando no hay usuarios -->
       <div class="no-users" *ngIf="filteredUsers.length === 0">
         <i class="pi pi-users"></i>
@@ -519,9 +678,18 @@
     </div>
 
     <!-- Indicador de carga para usuarios -->
-    <div class="loading-container" *ngIf="isLoadingUsers" style="text-align: center; padding: 40px;">
-      <i class="pi pi-spin pi-spinner" style="font-size: 2rem; color: #4a7c59;"></i>
-      <p style="margin-top: 16px; color: #666;">Cargando usuarios del sistema...</p>
+    <div
+      class="loading-container"
+      *ngIf="isLoadingUsers"
+      style="text-align: center; padding: 40px"
+    >
+      <i
+        class="pi pi-spin pi-spinner"
+        style="font-size: 2rem; color: #4a7c59"
+      ></i>
+      <p style="margin-top: 16px; color: #666">
+        Cargando usuarios del sistema...
+      </p>
     </div>
 
     <!-- Acciones masivas -->
@@ -530,42 +698,38 @@
         {{selectedUsers.length}} usuario(s) seleccionado(s)
       </div>
       <div class="bulk-buttons">
-        <button 
-          class="btn-warning"
-          (click)="bulkDeactivateUsers()">
+        <button class="btn-warning" (click)="bulkDeactivateUsers()">
           <i class="pi pi-eye-slash"></i>
           Desactivar
         </button>
-        <button 
-          class="btn-success"
-          (click)="bulkActivateUsers()">
+        <button class="btn-success" (click)="bulkActivateUsers()">
           <i class="pi pi-eye"></i>
           Activar
         </button>
-        <button 
+        <button
           class="btn-danger"
           (click)="bulkDeleteUsers()"
-          [disabled]="!canDeleteUser()">
+          [disabled]="!canDeleteUser()"
+        >
           <i class="pi pi-trash"></i>
           Eliminar
         </button>
       </div>
     </div>
-
   </div>
 
   <div class="dashboard-content" *ngIf="activeTab === 'clasificadores'">
-    
     <!-- Sección de filtro de búsqueda -->
     <div class="classifiers-search-section">
       <h2>Filtro de búsqueda</h2>
       <div class="search-input-wrapper">
-        <input 
-          type="text" 
+        <input
+          type="text"
           placeholder="Buscar clasificadores por nombre..."
           [(ngModel)]="classifierSearchTerm"
           (input)="filterClassifiers()"
-          class="classifier-search-input">
+          class="classifier-search-input"
+        />
         <button class="search-button">
           <i class="pi pi-search"></i>
         </button>
@@ -577,30 +741,46 @@
       <div class="classifiers-header-simple">
         <h2>
           Clasificadores {{getActiveCount()}} | {{getTotalCount()}}
-          <i class="pi pi-spin pi-spinner" *ngIf="isLoadingClasificadores" style="margin-left: 8px; font-size: 14px; color: #666;"></i>
+          <i
+            class="pi pi-spin pi-spinner"
+            *ngIf="isLoadingClasificadores"
+            style="margin-left: 8px; font-size: 14px; color: #666"
+          ></i>
         </h2>
         <button class="add-classifier-btn">
           <i class="pi pi-plus"></i>
         </button>
       </div>
-      
+
       <div class="classifiers-simple-list" *ngIf="!isLoadingClasificadores">
-        <div class="classifier-simple-item" *ngFor="let classifier of getCurrentClassifiers()">
+        <div
+          class="classifier-simple-item"
+          *ngFor="let classifier of getCurrentClassifiers()"
+        >
           <div class="classifier-device-icon">
             <div class="device-screen"></div>
           </div>
           <div class="classifier-simple-info">
             <h3>{{classifier.name}}</h3>
             <div class="classifier-simple-counters">
-              <span class="simple-counter blue" title="Detecciones de valorizable/reciclables">
+              <span
+                class="simple-counter blue"
+                title="Detecciones de valorizable/reciclables"
+              >
                 <i class="pi pi-trash"></i>
                 {{classifier.inactiveCount}}
               </span>
-              <span class="simple-counter green" title="Detecciones de residuos orgánicos">
+              <span
+                class="simple-counter green"
+                title="Detecciones de residuos orgánicos"
+              >
                 <i class="pi pi-trash"></i>
                 {{classifier.activeCount}}
               </span>
-              <span class="simple-counter gray" title="Detecciones de desechos generales">
+              <span
+                class="simple-counter gray"
+                title="Detecciones de desechos generales"
+              >
                 <i class="pi pi-trash"></i>
                 {{classifier.pendingCount}}
               </span>
@@ -608,24 +788,40 @@
           </div>
         </div>
       </div>
-      
+
       <!-- Indicador de carga para clasificadores -->
-      <div class="loading-container" *ngIf="isLoadingClasificadores" style="text-align: center; padding: 40px;">
-        <i class="pi pi-spin pi-spinner" style="font-size: 2rem; color: #4a7c59;"></i>
-        <p style="margin-top: 16px; color: #666;">Cargando clasificadores...</p>
+      <div
+        class="loading-container"
+        *ngIf="isLoadingClasificadores"
+        style="text-align: center; padding: 40px"
+      >
+        <i
+          class="pi pi-spin pi-spinner"
+          style="font-size: 2rem; color: #4a7c59"
+        ></i>
+        <p style="margin-top: 16px; color: #666">Cargando clasificadores...</p>
       </div>
-      
+
       <!-- Mensaje cuando no hay clasificadores -->
-      <div class="no-data-container" *ngIf="!isLoadingClasificadores && getCurrentClassifiers().length === 0" style="text-align: center; padding: 40px;">
-        <i class="pi pi-info-circle" style="font-size: 2rem; color: #999;"></i>
-        <p style="margin-top: 16px; color: #666;">No hay clasificadores disponibles para esta zona</p>
+      <div
+        class="no-data-container"
+        *ngIf="!isLoadingClasificadores && getCurrentClassifiers().length === 0"
+        style="text-align: center; padding: 40px"
+      >
+        <i class="pi pi-info-circle" style="font-size: 2rem; color: #999"></i>
+        <p style="margin-top: 16px; color: #666">
+          No hay clasificadores disponibles para esta zona
+        </p>
       </div>
     </div>
-
   </div>
 
   <!-- Modal de Mi Cuenta -->
-  <div class="modal-overlay" *ngIf="showAccountModal" (click)="closeAccountModal()">
+  <div
+    class="modal-overlay"
+    *ngIf="showAccountModal"
+    (click)="closeAccountModal()"
+  >
     <div class="account-modal" (click)="$event.stopPropagation()">
       <div class="modal-header">
         <h2>Mi Cuenta</h2>
@@ -633,39 +829,39 @@
           <i class="pi pi-times"></i>
         </button>
       </div>
-      
+
       <div class="modal-content">
         <div class="account-info-section">
           <div class="account-avatar">
             <i class="pi pi-user"></i>
           </div>
-          
+
           <div class="account-details">
             <div class="info-group">
               <label>Nombre Completo</label>
               <span>{{currentUser.nombre}}</span>
             </div>
-            
+
             <div class="info-group">
               <label>Rol</label>
               <span class="role-tag">Admin</span>
             </div>
-            
+
             <div class="info-group">
               <label>Email</label>
               <span>{{currentUser.email}}</span>
             </div>
-            
+
             <div class="info-group">
               <label>ID de Usuario</label>
               <span>{{currentUser.id}}</span>
             </div>
-            
+
             <div class="info-group">
               <label>Último Acceso</label>
               <span>{{formatAccountDate(currentUser.ultimoAcceso)}}</span>
             </div>
-            
+
             <div class="info-group">
               <label>Estado de Cuenta</label>
               <span class="status-active">
@@ -675,7 +871,7 @@
             </div>
           </div>
         </div>
-        
+
         <div class="account-actions">
           <button class="btn-secondary" (click)="editProfile()">
             <i class="pi pi-pencil"></i>
@@ -689,5 +885,4 @@
       </div>
     </div>
   </div>
-
 </div>

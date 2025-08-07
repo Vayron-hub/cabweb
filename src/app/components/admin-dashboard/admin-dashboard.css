@@ -300,11 +300,6 @@
   margin: 0;
 }
 
-.welcome-icon {
-  display: flex;
-  align-items: center;
-}
-
 .cam-icon {
   width: 60px;
   height: 40px;
