@@ -17,7 +17,6 @@ export interface User {
   standalone: true,
   imports: [CommonModule, FormsModule, RouterModule],
   templateUrl: './navbar.html',
-  styleUrls: ['./navbar.css']
 })
 export class NavbarComponent {
   @Input() selectedLocation: string = '';

@@ -1,31 +1,31 @@
 
-<!-- Sección de filtro de búsqueda -->
-<div class="classifiers-search-section">
-  <h2>Filtro de búsqueda</h2>
-  <div class="search-input-wrapper">
+<div class="bg-white rounded-xl p-6 shadow-sm mb-6">
+  <h2 class="text-lg font-semibold text-gray-800 mb-4">Filtro de búsqueda</h2>
+  <div class="relative">
     <input 
       type="text" 
       placeholder="Buscar clasificadores por nombre..."
       [(ngModel)]="classifierSearchTerm"
       (input)="filterClassifiers()"
-      class="classifier-search-input">
-    <span class="search-button" >
+      class="w-full pl-4 pr-10 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-colors">
+    <span class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400">
       <i class="pi pi-search"></i>
     </span>
   </div>
 </div>
 
 
-<!-- Lista de clasificadores completa -->
-<div class="classifiers-simple-section">
-  <div class="classifiers-header-simple" style="display: grid; grid-template-columns: 1fr auto; align-items: center; width: 100%;">
-    <h2>
+<div class="bg-white rounded-xl p-6 shadow-sm">
+  <div class="flex items-center justify-between mb-6">
+    <h2 class="text-lg font-semibold text-gray-800 flex items-center gap-2">
       Clasificadores {{getActiveCount()}} | {{getTotalCount()}}
-      <i class="pi pi-spin pi-spinner" *ngIf="isLoadingClasificadores" style="margin-left: 8px; font-size: 14px; color: #666;"></i>
+      <i class="pi pi-spin pi-spinner text-sm text-gray-600" *ngIf="isLoadingClasificadores"></i>
     </h2>
-    <button class="add-classifier-btn" (click)="showDialog()">
+    <button class="w-10 h-10 bg-primary-600 hover:bg-primary-700 rounded-lg flex items-center justify-center text-white transition-colors" 
+            (click)="showDialog()">
       <i class="pi pi-plus"></i>
     </button>
+    
     <p-dialog header="Edit Profile" [(visible)]="visible" [style]="{ width: '25rem', background: 'white', color: 'black' }" [modal]="true" [closable]="false">
         <div class="flex items-center gap-4 mb-4">
             <label for="username" class="font-semibold text-black w-24">Username</label>
@@ -44,7 +44,6 @@
         </div>
         <div class="flex text-black items-center gap-4 mb-8">
             <label for="zona" class="font-semibold w-24">Zona</label>
-            <!-- <input pInputText id="zona" type="text" readonly hidden class="background-input flex-auto" [(ngModel)]="newClassifier.zonaId"/> -->
             <select pInputText id="zona" [(ngModel)]="newClassifier.zonaId" disabled class="background-input flex-auto">
               <option *ngFor="let zona of zonas" [value]="zona.id">{{zona.nombre}}</option>
             </select>
@@ -56,25 +55,29 @@
     </p-dialog>
   </div>
   
-  <div class="classifiers-simple-list" *ngIf="!isLoadingClasificadores">
-    <div class="classifier-simple-item" *ngFor="let classifier of getDisplayedClassifiers()">
-      <div class="classifier-device-icon">
-        <div class="device-screen"></div>
+  <div class="space-y-4" *ngIf="!isLoadingClasificadores">
+    <div class="flex items-center gap-6 p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors" 
+         *ngFor="let classifier of getDisplayedClassifiers()">
+      <div class="w-16 h-16 flex items-center justify-center">
+        <img src="assets/images/esp32cam.png" alt="Classifier Icon" class="w-full h-full object-contain">
       </div>
       
-      <div class="classifier-simple-info">
-        <h3>{{classifier.name}}</h3>
-        <div class="classifier-simple-counters">
-          <span class="simple-counter blue" title="Detecciones de valorizable/reciclables">
-            <i class="pi pi-trash"></i>
+      <div class="flex-1">
+        <h3 class="font-medium text-gray-800 mb-3">{{classifier.name}}</h3>
+        <div class="flex gap-3">
+          <span class="flex items-center gap-2 px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm" 
+                title="Detecciones de valorizable/reciclables">
+            <i class="pi pi-trash text-xs"></i>
             {{classifier.inactiveCount || 0}}
           </span>
-          <span class="simple-counter green" title="Detecciones de residuos orgánicos">
-            <i class="pi pi-trash"></i>
+          <span class="flex items-center gap-2 px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm" 
+                title="Detecciones de residuos orgánicos">
+            <i class="pi pi-trash text-xs"></i>
             {{classifier.activeCount || 0}}
           </span>
-          <span class="simple-counter gray" title="Detecciones de desechos generales">
-            <i class="pi pi-trash"></i>
+          <span class="flex items-center gap-2 px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm" 
+                title="Detecciones de desechos generales">
+            <i class="pi pi-trash text-xs"></i>
             {{classifier.pendingCount || 0}}
           </span>
         </div>
@@ -82,19 +85,19 @@
     </div>
   </div>
   
-  <!-- Indicador de carga para clasificadores -->
-  <div class="loading-container" *ngIf="isLoadingClasificadores" style="text-align: center; padding: 40px;">
-    <i class="pi pi-spin pi-spinner" style="font-size: 2rem; color: #4a7c59;"></i>
-    <p style="margin-top: 16px; color: #666;">Cargando clasificadores...</p>
+  <div class="flex flex-col items-center justify-center py-16" *ngIf="isLoadingClasificadores">
+    <i class="pi pi-spin pi-spinner text-3xl text-primary-600 mb-4"></i>
+    <p class="text-gray-600">Cargando clasificadores...</p>
   </div>
   
-  <!-- Mensaje cuando no hay clasificadores -->
-  <div class="no-data-container" *ngIf="!isLoadingClasificadores && getDisplayedClassifiers().length === 0" style="text-align: center; padding: 40px;">
-    <i class="pi pi-info-circle" style="font-size: 2rem; color: #999;"></i>
-    <p style="margin-top: 16px; color: #666;" *ngIf="!classifierSearchTerm.trim()">
+  <div class="flex flex-col items-center justify-center py-16" *ngIf="!isLoadingClasificadores && getDisplayedClassifiers().length === 0">
+    <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+      <i class="pi pi-info-circle text-2xl text-gray-400"></i>
+    </div>
+    <p class="text-gray-600 text-center" *ngIf="!classifierSearchTerm.trim()">
       No hay clasificadores disponibles para esta zona
     </p>
-    <p style="margin-top: 16px; color: #666;" *ngIf="classifierSearchTerm.trim()">
+    <p class="text-gray-600 text-center" *ngIf="classifierSearchTerm.trim()">
       No se encontraron clasificadores que coincidan con "{{classifierSearchTerm}}"
     </p>
   </div>

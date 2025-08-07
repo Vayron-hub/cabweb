@@ -11,7 +11,6 @@ import { ZonaService } from '../../services/zona.service';
   standalone: true,
   imports: [CommonModule, RouterModule, RouterOutlet, FormsModule, NavbarComponent],
   templateUrl: './admin-layout.html',
-  styleUrls: ['./admin-layout.css']
 })
 export class AdminLayoutComponent implements OnInit {
   

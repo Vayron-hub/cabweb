@@ -9,7 +9,6 @@ import { AuthService } from '../../services/auth';
   selector: 'app-landing',
   imports: [CommonModule, CardModule, ButtonModule],
   templateUrl: './landing.html',
-  styleUrl: './landing.css'
 })
 export class Landing {
   

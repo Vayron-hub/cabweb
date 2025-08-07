@@ -1,201 +1,213 @@
-<!-- Mensaje de Bienvenida -->
-<div class="welcome-section">
+<div class="flex items-center justify-between mb-8 p-6 bg-white rounded-xl shadow-sm">
   <div class="welcome-text">
-    <h1>¡Buenos días Administrador!</h1>
-    <p>Aquí tienes tu dashboard de visualización de tus datos.</p>
+    <h1 class="text-3xl font-bold text-gray-800 mb-2">¡Buenos días Administrador!</h1>
+    <p class="text-gray-600">Aquí tienes tu dashboard de visualización de tus datos.</p>
   </div>
-  <div class="welcome-icon">
-    <div class="cam-icon">
-      <div class="cam-body"></div>
-      <div class="cam-lens"></div>
-    </div>
-  </div>
-</div>
-
-<!-- Sección de Estadísticas Principales -->
-<div class="dashboard-stats">
-  <div class="stat-card">
-    <div class="stat-icon active">
-      <i class="pi pi-play"></i>
-    </div>
-    <div class="stat-info">
-      <span class="stat-number">{{getCurrentStats().active}}</span>
-      <span class="stat-label">Activos</span>
-    </div>
-  </div>
-  
-  <div class="stat-card">
-    <div class="stat-icon processing">
-      <i class="pi pi-sync"></i>
-    </div>
-    <div class="stat-info">
-      <span class="stat-number">{{getCurrentStats().processing}}</span>
-      <span class="stat-label">Procesando</span>
-    </div>
-  </div>
-  
-  <div class="stat-card">
-    <div class="stat-icon reports">
-      <i class="pi pi-file-text"></i>
-    </div>
-    <div class="stat-info">
-      <span class="stat-number">{{getCurrentStats().totalReports}}</span>
-      <span class="stat-label">Total reportes</span>
-    </div>
-  </div>
-  
-  <div class="stat-card">
-    <div class="stat-icon users">
-      <i class="pi pi-users"></i>
-    </div>
-    <div class="stat-info">
-      <span class="stat-number">{{getCurrentStats().totalUsers}}</span>
-      <span class="stat-label">Total usuarios</span>
-    </div>
-  </div>
-  
-  <div class="stat-card">
-    <div class="stat-icon month">
-      <i class="pi pi-calendar"></i>
-    </div>
-    <div class="stat-info">
-      <span class="stat-number">{{getCurrentStats().thisMonth}}</span>
-      <span class="stat-label">Este mes</span>
+  <div class="hidden md:block">
+    <div class="relative w-16 h-16">
+      <div class="w-12 h-8 bg-primary-600 rounded-lg transform rotate-12"></div>
+      <div class="absolute top-1 left-2 w-6 h-6 bg-primary-800 rounded-full"></div>
     </div>
   </div>
 </div>
 
-<div class="main-dashboard-grid">
-  
-  <!-- Panel Izquierdo - Clasificadores -->
-  <div class="classifiers-panel">
-    <div class="classifier-item" *ngFor="let classifier of getCurrentClassifiers()">
-      <div class="classifier-icon">
-        <div class="cam-mini-icon"></div>
+<div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-8">
+  <div class="bg-white rounded-xl p-6 shadow-sm hover:shadow-md transition-all duration-200 transform hover:-translate-y-1">
+    <div class="flex items-center gap-4">
+      <div class="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
+        <i class="pi pi-play text-green-600 text-xl"></i>
       </div>
-      <div class="classifier-info">
-        <h3>{{classifier.name}}</h3>
-        <div class="classifier-counters">
-          <span class="counter blue" title="Detecciones de valorizable/reciclables">
-            <i class="pi pi-trash blue"></i>
-            {{classifier.inactiveCount}}
-          </span>
-          <span class="counter green" title="Detecciones de residuos orgánicos">
-            <i class="pi pi-trash green"></i>
-            {{classifier.activeCount}}
-          </span>
-          <span class="counter gray" title="Detecciones de desechos generales">
-            <i class="pi pi-trash gray"></i>
-            {{classifier.pendingCount}}
-          </span>
+      <div class="stat-info">
+        <span class="block text-2xl font-bold text-gray-800">{{getCurrentStats().active}}</span>
+        <span class="text-sm text-gray-600">Activos</span>
+      </div>
+    </div>
+  </div>
+  
+  <div class="bg-white rounded-xl p-6 shadow-sm hover:shadow-md transition-all duration-200 transform hover:-translate-y-1">
+    <div class="flex items-center gap-4">
+      <div class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
+        <i class="pi pi-sync text-blue-600 text-xl"></i>
+      </div>
+      <div class="stat-info">
+        <span class="block text-2xl font-bold text-gray-800">{{getCurrentStats().processing}}</span>
+        <span class="text-sm text-gray-600">Procesando</span>
+      </div>
+    </div>
+  </div>
+  
+  <div class="bg-white rounded-xl p-6 shadow-sm hover:shadow-md transition-all duration-200 transform hover:-translate-y-1">
+    <div class="flex items-center gap-4">
+      <div class="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center">
+        <i class="pi pi-file-text text-purple-600 text-xl"></i>
+      </div>
+      <div class="stat-info">
+        <span class="block text-2xl font-bold text-gray-800">{{getCurrentStats().totalReports}}</span>
+        <span class="text-sm text-gray-600">Total reportes</span>
+      </div>
+    </div>
+  </div>
+  
+  <div class="bg-white rounded-xl p-6 shadow-sm hover:shadow-md transition-all duration-200 transform hover:-translate-y-1">
+    <div class="flex items-center gap-4">
+      <div class="w-12 h-12 bg-orange-100 rounded-xl flex items-center justify-center">
+        <i class="pi pi-users text-orange-600 text-xl"></i>
+      </div>
+      <div class="stat-info">
+        <span class="block text-2xl font-bold text-gray-800">{{getCurrentStats().totalUsers}}</span>
+        <span class="text-sm text-gray-600">Total usuarios</span>
+      </div>
+    </div>
+  </div>
+  
+  <div class="bg-white rounded-xl p-6 shadow-sm hover:shadow-md transition-all duration-200 transform hover:-translate-y-1">
+    <div class="flex items-center gap-4">
+      <div class="w-12 h-12 bg-indigo-100 rounded-xl flex items-center justify-center">
+        <i class="pi pi-calendar text-indigo-600 text-xl"></i>
+      </div>
+      <div class="stat-info">
+        <span class="block text-2xl font-bold text-gray-800">{{getCurrentStats().thisMonth}}</span>
+        <span class="text-sm text-gray-600">Este mes</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
+  <div class="bg-white rounded-xl p-6 shadow-sm">
+    <h3 class="text-lg font-semibold text-gray-800 mb-4">Clasificadores</h3>
+    <div class="space-y-4">
+      <div class="flex items-center gap-4 p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors" 
+           *ngFor="let classifier of getCurrentClassifiers()">
+        <div class="w-10 h-10 bg-primary-100 rounded-lg flex items-center justify-center">
+          <div class="w-6 h-4 bg-primary-600 rounded-sm"></div>
+        </div>
+        <div class="flex-1">
+          <h3 class="font-medium text-gray-800 mb-2">{{classifier.name}}</h3>
+          <div class="flex gap-3">
+            <span class="flex items-center gap-1 text-sm px-2 py-1 bg-blue-100 text-blue-700 rounded-full" 
+                  title="Detecciones de valorizable/reciclables">
+              <i class="pi pi-trash text-xs"></i>
+              {{classifier.inactiveCount}}
+            </span>
+            <span class="flex items-center gap-1 text-sm px-2 py-1 bg-green-100 text-green-700 rounded-full" 
+                  title="Detecciones de residuos orgánicos">
+              <i class="pi pi-trash text-xs"></i>
+              {{classifier.activeCount}}
+            </span>
+            <span class="flex items-center gap-1 text-sm px-2 py-1 bg-gray-100 text-gray-700 rounded-full" 
+                  title="Detecciones de desechos generales">
+              <i class="pi pi-trash text-xs"></i>
+              {{classifier.pendingCount}}
+            </span>
+          </div>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- Panel Central - Gráfico de Barras -->
-  <div class="chart-panel">
-    <div class="bar-chart">
-      <div class="bar" [style.height.%]="75"></div>
-      <div class="bar" [style.height.%]="45"></div>
-      <div class="bar" [style.height.%]="60"></div>
-      <div class="bar" [style.height.%]="85"></div>
+  <div class="bg-white rounded-xl p-6 shadow-sm">
+    <h3 class="text-lg font-semibold text-gray-800 mb-4">Actividad</h3>
+    <div class="flex items-end justify-center gap-4 h-32">
+      <div class="w-8 bg-primary-500 rounded-t-md" [style.height.%]="75"></div>
+      <div class="w-8 bg-primary-400 rounded-t-md" [style.height.%]="45"></div>
+      <div class="w-8 bg-primary-600 rounded-t-md" [style.height.%]="60"></div>
+      <div class="w-8 bg-primary-700 rounded-t-md" [style.height.%]="85"></div>
     </div>
   </div>
 
-  <!-- Panel Derecho - Gráficos Circulares -->
-  <div class="pie-charts-panel">
-    <div class="pie-chart-row">
-      <div class="pie-chart">
-        <svg viewBox="0 0 42 42" class="donut">
-          <circle cx="21" cy="21" r="15.915" fill="transparent" stroke="#e6e6e6" stroke-width="3"></circle>
-          <circle cx="21" cy="21" r="15.915" fill="transparent" stroke="#4a7c59" stroke-width="3" 
-                  stroke-dasharray="60 40" stroke-dashoffset="25"></circle>
-        </svg>
+  <div class="bg-white rounded-xl p-6 shadow-sm">
+    <h3 class="text-lg font-semibold text-gray-800 mb-4">Distribución</h3>
+    <div class="space-y-4">
+      <div class="flex justify-center gap-4">
+        <div class="w-16 h-16">
+          <svg viewBox="0 0 42 42" class="w-full h-full transform -rotate-90">
+            <circle cx="21" cy="21" r="15.915" fill="transparent" stroke="#e6e6e6" stroke-width="3"></circle>
+            <circle cx="21" cy="21" r="15.915" fill="transparent" stroke="#4a7c59" stroke-width="3" 
+                    stroke-dasharray="60 40" stroke-dashoffset="25"></circle>
+          </svg>
+        </div>
+        <div class="w-16 h-16">
+          <svg viewBox="0 0 42 42" class="w-full h-full transform -rotate-90">
+            <circle cx="21" cy="21" r="15.915" fill="transparent" stroke="#e6e6e6" stroke-width="3"></circle>
+            <circle cx="21" cy="21" r="15.915" fill="transparent" stroke="#4a7c59" stroke-width="3" 
+                    stroke-dasharray="40 60" stroke-dashoffset="25"></circle>
+          </svg>
+        </div>
       </div>
-      <div class="pie-chart">
-        <svg viewBox="0 0 42 42" class="donut">
-          <circle cx="21" cy="21" r="15.915" fill="transparent" stroke="#e6e6e6" stroke-width="3"></circle>
-          <circle cx="21" cy="21" r="15.915" fill="transparent" stroke="#4a7c59" stroke-width="3" 
-                  stroke-dasharray="40 60" stroke-dashoffset="25"></circle>
-        </svg>
-      </div>
-    </div>
-    <div class="pie-chart-single">
-      <div class="pie-chart">
-        <svg viewBox="0 0 42 42" class="donut">
-          <circle cx="21" cy="21" r="15.915" fill="transparent" stroke="#e6e6e6" stroke-width="3"></circle>
-          <circle cx="21" cy="21" r="15.915" fill="transparent" stroke="#4a7c59" stroke-width="3" 
-                  stroke-dasharray="70 30" stroke-dashoffset="25"></circle>
-        </svg>
+      <div class="flex justify-center">
+        <div class="w-20 h-20">
+          <svg viewBox="0 0 42 42" class="w-full h-full transform -rotate-90">
+            <circle cx="21" cy="21" r="15.915" fill="transparent" stroke="#e6e6e6" stroke-width="3"></circle>
+            <circle cx="21" cy="21" r="15.915" fill="transparent" stroke="#4a7c59" stroke-width="3" 
+                    stroke-dasharray="70 30" stroke-dashoffset="25"></circle>
+          </svg>
+        </div>
       </div>
     </div>
   </div>
 
 </div>
 
-<!-- Sección Últimas Detecciones -->
-<div class="recent-detections">
-  <div class="recent-detections-header">
-    <h2>Últimas detecciones</h2>
+<div class="bg-white rounded-xl p-6 shadow-sm">
+  <div class="flex items-center justify-between mb-6">
+    <h2 class="text-lg font-semibold text-gray-800">Últimas detecciones</h2>
     <button 
-      class="refresh-btn-small"
+      class="w-8 h-8 flex items-center justify-center bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
       (click)="loadUltimasDetecciones()"
       [disabled]="isLoadingDetecciones"
       title="Actualizar detecciones">
-      <i class="pi" [class.pi-refresh]="!isLoadingDetecciones" [class.pi-spin]="isLoadingDetecciones" [class.pi-spinner]="isLoadingDetecciones"></i>
+      <i class="pi text-sm" [class.pi-refresh]="!isLoadingDetecciones" [class.pi-spin]="isLoadingDetecciones" [class.pi-spinner]="isLoadingDetecciones"></i>
     </button>
   </div>
   
-  <div class="detections-list" *ngIf="!isLoadingDetecciones">
-    <div class="detection-card" *ngFor="let detection of ultimasDetecciones; trackBy: trackDetectionById">
-      <div class="detection-icon-wrapper">
-        <div class="detection-icon" [style.background-color]="getDetectionTypeColor(detection.tipo || detection.tipoResiduo)">
-          <i class="pi" [ngClass]="getDetectionTypeIcon(detection.tipo || detection.tipoResiduo)"></i>
-        </div>
+  <div class="space-y-4" *ngIf="!isLoadingDetecciones">
+    <div class="flex items-start gap-4 p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors" 
+         *ngFor="let detection of ultimasDetecciones; trackBy: trackDetectionById">
+      <div class="w-12 h-12 rounded-xl flex items-center justify-center" 
+           [style.background-color]="getDetectionTypeColor(detection.tipo || detection.tipoResiduo)">
+        <i class="pi text-white" [ngClass]="getDetectionTypeIcon(detection.tipo || detection.tipoResiduo)"></i>
       </div>
       
-      <div class="detection-content">
-        <div class="detection-main-info">
-          <div class="detection-type-label">{{detection.tipo || detection.tipoResiduo || 'Sin tipo'}}</div>
-          <div class="detection-time">{{formatDetectionTime(detection.fecha || detection.fechaHora)}}</div>
+      <div class="flex-1 min-w-0">
+        <div class="flex items-start justify-between mb-2">
+          <div class="font-medium text-gray-800 truncate">{{detection.tipo || detection.tipoResiduo || 'Sin tipo'}}</div>
+          <div class="text-sm text-gray-500 ml-2">{{formatDetectionTime(detection.fecha || detection.fechaHora)}}</div>
         </div>
         
-        <div class="detection-secondary-info">
-          <div class="detection-location">
-            <i class="pi pi-map-marker"></i>
-            <span>{{(detection.clasificador || 'Sin clasificador') + ' - ' + (detection.zona || 'Sin zona')}}</span>
+        <div class="space-y-2 text-sm text-gray-600">
+          <div class="flex items-center gap-2">
+            <i class="pi pi-map-marker text-xs"></i>
+            <span class="truncate">{{(detection.clasificador || 'Sin clasificador') + ' - ' + (detection.zona || 'Sin zona')}}</span>
           </div>
-          <div class="detection-confidence">
-            <i class="pi pi-percentage"></i>
-            <span>{{detection.confianza || 0}}% confianza</span>
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <i class="pi pi-percentage text-xs"></i>
+              <span>{{detection.confianza || 0}}% confianza</span>
+            </div>
+            <span class="px-2 py-1 text-xs rounded-full" 
+                  [ngClass]="(detection.estado || 'pendiente').toLowerCase() === 'confirmada' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'">
+              <i class="pi mr-1" [ngClass]="detection.estado === 'Confirmada' ? 'pi-check' : 'pi-clock'"></i>
+              {{detection.estado || 'Pendiente'}}
+            </span>
           </div>
-        </div>
-        
-        <div class="detection-status-wrapper">
-          <span class="status-badge" [ngClass]="(detection.estado || 'pendiente').toLowerCase()">
-            <i class="pi" [ngClass]="detection.estado === 'Confirmada' ? 'pi-check' : 'pi-clock'"></i>
-            {{detection.estado || 'Pendiente'}}
-          </span>
         </div>
       </div>
     </div>
     
-    <!-- Mensaje cuando no hay detecciones -->
-    <div class="no-detections" *ngIf="ultimasDetecciones.length === 0">
-      <div class="no-detections-icon">
-        <i class="pi pi-info-circle"></i>
+    <div class="text-center py-12" *ngIf="ultimasDetecciones.length === 0">
+      <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+        <i class="pi pi-info-circle text-gray-400 text-2xl"></i>
       </div>
-      <div class="no-detections-text">
-        <h3>No hay detecciones recientes</h3>
-        <p>Las nuevas detecciones aparecerán aquí cuando se procesen</p>
+      <div class="space-y-2">
+        <h3 class="font-medium text-gray-800">No hay detecciones recientes</h3>
+        <p class="text-sm text-gray-600">Las nuevas detecciones aparecerán aquí cuando se procesen</p>
       </div>
     </div>
   </div>
   
-  <!-- Indicador de carga -->
-  <div class="loading-detections" *ngIf="isLoadingDetecciones">
-    <i class="pi pi-spin pi-spinner"></i>
-    <p>Cargando detecciones...</p>
+  <div class="flex flex-col items-center justify-center py-12" *ngIf="isLoadingDetecciones">
+    <i class="pi pi-spin pi-spinner text-2xl text-gray-400 mb-2"></i>
+    <p class="text-gray-600">Cargando detecciones...</p>
   </div>
 </div>

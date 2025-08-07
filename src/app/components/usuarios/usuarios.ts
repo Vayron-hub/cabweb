@@ -26,7 +26,6 @@ import { DialogModule } from 'primeng/dialog';
     DialogModule
   ],
   templateUrl: './usuarios.html',
-  styleUrl: './usuarios.css'
 })
 export class UsuariosComponent implements OnInit, OnDestroy {
   // Ubicación actual (sincronizada con ZonaService)

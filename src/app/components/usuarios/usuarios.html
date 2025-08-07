@@ -1,131 +1,135 @@
-<!-- Header de Usuarios -->
-<div class="users-header" >
-  <div class="users-title" style="display: grid; grid-template-columns: 1fr auto; align-items: center; width: 100%;">
-    <h2>Gestión de Usuarios</h2>
+<div class="bg-white p-5 mb-5 rounded-xl shadow-card flex justify-between items-center">
+  <div class="grid grid-cols-1 auto items-center w-full">
+    <div>
+      <h2 class="text-2xl font-semibold text-gray-800 mb-1">Gestión de Usuarios</h2>
+      <p class="text-sm text-gray-600">Administrar usuarios del sistema</p>
+    </div>
   </div>
-    <button 
-      class="btn-success"
-      (click)="showDialog()">
-      <i class="pi pi-plus"></i>
-      Nuevo Usuario
-    </button>
-    <p-dialog header="Edit Profile" [(visible)]="visible" [style]="{ width: '25rem', background: 'white', color: 'black' }" [modal]="true" [closable]="false">
-        <div class="flex items-center gap-4 mb-4">
-            <label for="username" class="font-semibold text-black w-24">Username</label>
-            <input pInputText id="username"  class="background-input flex-auto" autocomplete="off" 
-            [(ngModel)]="newUser.nombre"/>
-        </div>
-        <div class="flex items-center gap-4 mb-8">
-            <label for="email" class="font-semibold text-black w-24">Email</label>
-            <input pInputText id="email" type="email" class="background-input flex-auto" autocomplete="off"
-             [(ngModel)]="newUser.correo"/>
-        </div>
-        <div class="flex text-black items-center gap-4 mb-8">
-            <label for="password" class="font-semibold w-24">Password</label>
-            <input pInputText id="password" type="password" class="background-input flex-auto" autocomplete="off" 
-            [(ngModel)]="newUser.password"/>
-        </div>
-        <div class="flex justify-end gap-2">
-            <p-button label="Cancel" severity="secondary" (click)="visible = false" />
-            <p-button label="Save" (click)="postUser()" />
-        </div>
-    </p-dialog>
-  </div>
+  <button 
+    class="bg-primary-500 text-white border-0 px-4 py-2.5 rounded-lg text-sm font-medium cursor-pointer flex items-center gap-2 transition-all duration-200 hover:bg-primary-600 hover:-translate-y-0.5"
+    (click)="showDialog()">
+    <i class="pi pi-plus"></i>
+    Nuevo Usuario
+  </button>
+  <p-dialog header="Edit Profile" [(visible)]="visible" [style]="{ width: '25rem', background: 'white', color: 'black' }" [modal]="true" [closable]="false">
+    <div class="flex items-center gap-4 mb-4">
+      <label for="username" class="font-semibold text-black w-24">Username</label>
+      <input pInputText id="username" class="bg-white text-black flex-auto" autocomplete="off" 
+      [(ngModel)]="newUser.nombre"/>
+    </div>
+    <div class="flex items-center gap-4 mb-8">
+      <label for="email" class="font-semibold text-black w-24">Email</label>
+      <input pInputText id="email" type="email" class="bg-white text-black flex-auto" autocomplete="off"
+       [(ngModel)]="newUser.correo"/>
+    </div>
+    <div class="flex text-black items-center gap-4 mb-8">
+      <label for="password" class="font-semibold w-24">Password</label>
+      <input pInputText id="password" type="password" class="bg-white text-black flex-auto" autocomplete="off" 
+      [(ngModel)]="newUser.password"/>
+    </div>
+    <div class="flex justify-end gap-2">
+      <p-button label="Cancel" severity="secondary" (click)="visible = false" />
+      <p-button label="Save" (click)="postUser()" />
+    </div>
+  </p-dialog>
+</div>
 
-<!-- Filtros de búsqueda -->
-<div class="search-filters">
-  <div class="search-bar">
-    <div class="search-input-container">
-      <i class="pi pi-search search-icon"></i>
+<div class="bg-white p-5 mb-5 rounded-xl shadow-card">
+  <div class="mb-4">
+    <div class="relative w-full">
+      <i class="pi pi-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 z-10"></i>
       <input 
         type="text" 
         placeholder="Buscar usuarios por nombre o correo..."
         [(ngModel)]="searchTerm"
         (input)="filterUsers()"
-        class="search-input background-input">
+        class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg text-sm transition-colors duration-200 bg-white text-black focus:border-primary-500">
     </div>
   </div>
 </div>
 
-<!-- Estadísticas de usuarios -->
-<div class="users-stats">
-  <div class="stat-card">
-    <div class="stat-icon active">
-      <i class="pi pi-users"></i>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+  <div class="bg-white rounded-xl p-6 shadow-card flex items-center gap-4 transition-all duration-200 hover:shadow-lg">
+    <div class="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
+      <i class="pi pi-users text-2xl text-green-600"></i>
     </div>
-    <div class="stat-info">
-      <span class="stat-number">{{getActiveUsersCount()}}</span>
-      <span class="stat-label">Usuarios Activos</span>
-    </div>
-  </div>
-  <div class="stat-card">
-    <div class="stat-icon inactive">
-      <i class="pi pi-user-minus"></i>
-    </div>
-    <div class="stat-info">
-      <span class="stat-number">{{getInactiveUsersCount()}}</span>
-      <span class="stat-label">Usuarios Inactivos</span>
+    <div>
+      <span class="text-2xl font-bold text-gray-800">{{getActiveUsersCount()}}</span>
+      <div class="text-sm text-gray-600">Usuarios Activos</div>
     </div>
   </div>
-  <div class="stat-card">
-    <div class="stat-icon total">
-      <i class="pi pi-chart-bar"></i>
+  <div class="bg-white rounded-xl p-6 shadow-card flex items-center gap-4 transition-all duration-200 hover:shadow-lg">
+    <div class="w-12 h-12 bg-red-100 rounded-xl flex items-center justify-center">
+      <i class="pi pi-user-minus text-2xl text-red-600"></i>
     </div>
-    <div class="stat-info">
-      <span class="stat-number">{{getTotalUsersCount()}}</span>
-      <span class="stat-label">Total Usuarios</span>
+    <div>
+      <span class="text-2xl font-bold text-gray-800">{{getInactiveUsersCount()}}</span>
+      <div class="text-sm text-gray-600">Usuarios Inactivos</div>
+    </div>
+  </div>
+  <div class="bg-white rounded-xl p-6 shadow-card flex items-center gap-4 transition-all duration-200 hover:shadow-lg">
+    <div class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
+      <i class="pi pi-chart-bar text-2xl text-blue-600"></i>
+    </div>
+    <div>
+      <span class="text-2xl font-bold text-gray-800">{{getTotalUsersCount()}}</span>
+      <div class="text-sm text-gray-600">Total Usuarios</div>
     </div>
   </div>
 </div>
 
-<!-- Tabla de usuarios -->
-<div class="users-table-container" *ngIf="!isLoadingUsers">
-  <table class="users-table">
+<div class="bg-white rounded-xl shadow-card overflow-hidden" *ngIf="!isLoadingUsers">
+  <table class="w-full">
     <thead>
-      <tr>
-        <th>
+      <tr class="bg-gray-50 border-b border-gray-200">
+        <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
           <input 
             type="checkbox" 
             (change)="selectAllUsers($event)"
             [checked]="allUsersSelected()"
-            >
+            class="rounded border-gray-300 text-primary-600 focus:ring-primary-500">
         </th>
-        <th>Usuario</th>
-        <th>Email</th>
-        <th>Rol</th>
-        <th>Estado</th>
+        <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Usuario</th>
+        <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
+        <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Rol</th>
+        <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estado</th>
       </tr>
     </thead>
-    <tbody>
+    <tbody class="bg-white divide-y divide-gray-200">
       <tr *ngFor="let user of filteredUsers; trackBy: trackByUserId" 
-          [class.selected]="selectedUsers.includes(user.id)">
-        <td>
+          class="transition-colors duration-200 hover:bg-gray-50"
+          [class.bg-blue-50]="selectedUsers.includes(user.id)">
+        <td class="px-6 py-4 whitespace-nowrap">
           <input 
             type="checkbox" 
             [value]="user.id"
             (change)="toggleUserSelection(user.id, $event)"
             [checked]="selectedUsers.includes(user.id)"
-            >
+            class="rounded border-gray-300 text-primary-600 focus:ring-primary-500">
         </td>
-        <td>
-          <div class="user-info">
-            <div class="user-avatar">
-              <i class="pi pi-user"></i>
+        <td class="px-6 py-4 whitespace-nowrap">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center">
+              <i class="pi pi-user text-gray-600"></i>
             </div>
-            <div class="user-details">
-              <span class="user-name">{{user.nombre}}</span>
-              <span class="user-id">ID: {{user.id}}</span>
+            <div>
+              <div class="text-sm font-medium text-gray-900">{{user.nombre}}</div>
+              <div class="text-xs text-gray-500">ID: {{user.id}}</div>
             </div>
           </div>
         </td>
-        <td class="user-email">{{user.correo || 'Sin email'}}</td>
-        <td>
-          <span class="role-badge">
+        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{user.correo || 'Sin email'}}</td>
+        <td class="px-6 py-4 whitespace-nowrap">
+          <span class="px-3 py-1 rounded-full text-xs font-medium bg-primary-100 text-primary-800">
             Admin
           </span>
         </td>
-        <td>
-          <span class="status-badge" [ngClass]="getStatusClass(user.estado)">
+        <td class="px-6 py-4 whitespace-nowrap">
+          <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium"
+                [class.bg-green-100]="user.estado === 'activo'"
+                [class.text-green-800]="user.estado === 'activo'"
+                [class.bg-red-100]="user.estado === 'inactivo'"
+                [class.text-red-800]="user.estado === 'inactivo'">
             <i class="pi" [ngClass]="getStatusIcon(user.estado)"></i>
             {{user.estado || 'Sin estado'}}
           </span>
@@ -134,40 +138,39 @@
     </tbody>
   </table>
   
-  <!-- Mensaje cuando no hay usuarios -->
-  <div class="no-users" *ngIf="filteredUsers.length === 0">
-    <i class="pi pi-users"></i>
-    <h3>No se encontraron usuarios</h3>
-    <p>No hay usuarios que coincidan con los filtros aplicados.</p>
+  <div class="text-center py-10" *ngIf="filteredUsers.length === 0">
+    <div class="w-16 h-16 mx-auto bg-gray-100 rounded-full flex items-center justify-center mb-4">
+      <i class="pi pi-users text-2xl text-gray-400"></i>
+    </div>
+    <h3 class="text-lg font-medium text-gray-900 mb-2">No se encontraron usuarios</h3>
+    <p class="text-gray-600">No hay usuarios que coincidan con los filtros aplicados.</p>
   </div>
 </div>
 
-<!-- Indicador de carga para usuarios -->
-<div class="loading-container" *ngIf="isLoadingUsers" style="text-align: center; padding: 40px;">
-  <i class="pi pi-spin pi-spinner" style="font-size: 2rem; color: #4a7c59;"></i>
-  <p style="margin-top: 16px; color: #666;">Cargando usuarios del sistema...</p>
+<div class="text-center py-10" *ngIf="isLoadingUsers">
+  <i class="pi pi-spin pi-spinner text-4xl text-primary-500"></i>
+  <p class="mt-4 text-gray-600">Cargando usuarios del sistema...</p>
 </div>
 
-<!-- Acciones masivas -->
-<div class="bulk-actions" *ngIf="selectedUsers.length > 0">
-  <div class="selected-count">
+<div class="fixed bottom-6 left-1/2 transform -translate-x-1/2 bg-white rounded-xl shadow-2xl border border-gray-200 p-4 flex items-center gap-4 animate-slide-up" *ngIf="selectedUsers.length > 0">
+  <div class="text-sm font-medium text-gray-700">
     {{selectedUsers.length}} usuario(s) seleccionado(s)
   </div>
-  <div class="bulk-buttons">
+  <div class="flex gap-2">
     <button 
-      class="btn-warning"
+      class="bg-yellow-500 text-white border-0 px-3 py-2 rounded-lg text-sm font-medium cursor-pointer flex items-center gap-2 transition-all duration-200 hover:bg-yellow-600"
       (click)="bulkDeactivateUsers()">
       <i class="pi pi-eye-slash"></i>
       Desactivar
     </button>
     <button 
-      class="btn-success"
+      class="bg-green-500 text-white border-0 px-3 py-2 rounded-lg text-sm font-medium cursor-pointer flex items-center gap-2 transition-all duration-200 hover:bg-green-600"
       (click)="bulkActivateUsers()">
       <i class="pi pi-eye"></i>
       Activar
     </button>
     <button 
-      class="btn-danger"
+      class="bg-red-500 text-white border-0 px-3 py-2 rounded-lg text-sm font-medium cursor-pointer flex items-center gap-2 transition-all duration-200 hover:bg-red-600 disabled:opacity-50 disabled:cursor-not-allowed"
       (click)="bulkDeleteUsers()"
       [disabled]="!canDeleteUser()">
       <i class="pi pi-trash"></i>

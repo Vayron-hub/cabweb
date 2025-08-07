@@ -23,7 +23,6 @@ export interface ClasificadorGlobal {
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './admin-dashboard.html',
-  styleUrl: './admin-dashboard.css'
 })
 export class AdminDashboardComponent implements OnInit, OnDestroy {
 

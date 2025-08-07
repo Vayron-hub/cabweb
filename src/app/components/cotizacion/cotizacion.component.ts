@@ -28,7 +28,6 @@ interface CustomerInfo {
   imports: [CommonModule, FormsModule, CheckboxModule, ToastModule],
   providers: [MessageService],
   templateUrl: './cotizacion.component.html',
-  styleUrls: ['./cotizacion.component.css'],
 })
 export class CotizacionComponent {
   selectedComponents: SelectedComponents = {
