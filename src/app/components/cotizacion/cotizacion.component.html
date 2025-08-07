@@ -25,7 +25,7 @@
             (click)="selectComponent('esp32', 'basic')">
             <h4 class="font-semibold text-gray-800">Básico</h4>
             <p class="text-sm text-gray-600 mb-2">ESP32-CAM estándar</p>
-            <span class="text-lg font-bold text-green-600">${{prices.esp32.basic | currency:'USD':'symbol':'1.0-0'}}</span>
+            <span class="text-lg font-bold text-green-600">${{formatPrice(prices.esp32.basic)}} MXN</span>
           </div>
           <div 
             class="border-2 rounded-lg p-4 cursor-pointer transition-all"
@@ -34,7 +34,7 @@
             (click)="selectComponent('esp32', 'advanced')">
             <h4 class="font-semibold text-gray-800">Avanzado</h4>
             <p class="text-sm text-gray-600 mb-2">ESP32-S3 con mayor capacidad</p>
-            <span class="text-lg font-bold text-green-600">${{prices.esp32.advanced | currency:'USD':'symbol':'1.0-0'}}</span>
+            <span class="text-lg font-bold text-green-600">${{formatPrice(prices.esp32.advanced)}} MXN</span>
           </div>
         </div>
       </div>
@@ -54,7 +54,7 @@
             (click)="selectComponent('servos', 'standard')">
             <h4 class="font-semibold text-gray-800">Estándar</h4>
             <p class="text-sm text-gray-600 mb-2">3 servos SG90 (torque básico)</p>
-            <span class="text-lg font-bold text-green-600">${{prices.servos.standard | currency:'USD':'symbol':'1.0-0'}}</span>
+            <span class="text-lg font-bold text-green-600">${{formatPrice(prices.servos.standard)}} MXN</span>
           </div>
           <div 
             class="border-2 rounded-lg p-4 cursor-pointer transition-all"
@@ -63,7 +63,7 @@
             (click)="selectComponent('servos', 'premium')">
             <h4 class="font-semibold text-gray-800">Premium</h4>
             <p class="text-sm text-gray-600 mb-2">3 servos MG996R (alto torque)</p>
-            <span class="text-lg font-bold text-green-600">${{prices.servos.premium | currency:'USD':'symbol':'1.0-0'}}</span>
+            <span class="text-lg font-bold text-green-600">${{formatPrice(prices.servos.premium)}} MXN</span>
           </div>
         </div>
       </div>
@@ -83,7 +83,7 @@
             (click)="selectComponent('arduino', 'uno')">
             <h4 class="font-semibold text-gray-800">Arduino Uno</h4>
             <p class="text-sm text-gray-600 mb-2">Placa estándar</p>
-            <span class="text-lg font-bold text-green-600">${{prices.arduino.uno | currency:'USD':'symbol':'1.0-0'}}</span>
+            <span class="text-lg font-bold text-green-600">${{formatPrice(prices.arduino.uno)}} MXN</span>
           </div>
           <div 
             class="border-2 rounded-lg p-4 cursor-pointer transition-all"
@@ -92,7 +92,7 @@
             (click)="selectComponent('arduino', 'nano')">
             <h4 class="font-semibold text-gray-800">Arduino Nano</h4>
             <p class="text-sm text-gray-600 mb-2">Versión compacta</p>
-            <span class="text-lg font-bold text-green-600">${{prices.arduino.nano | currency:'USD':'symbol':'1.0-0'}}</span>
+            <span class="text-lg font-bold text-green-600">${{formatPrice(prices.arduino.nano)}} MXN</span>
           </div>
         </div>
       </div>
@@ -112,7 +112,7 @@
             (click)="selectComponent('camera', 'basic')">
             <h4 class="font-semibold text-gray-800">Básica</h4>
             <p class="text-sm text-gray-600 mb-2">Cámara USB 720p</p>
-            <span class="text-lg font-bold text-green-600">${{prices.camera.basic | currency:'USD':'symbol':'1.0-0'}}</span>
+            <span class="text-lg font-bold text-green-600">${{formatPrice(prices.camera.basic)}} MXN</span>
           </div>
           <div 
             class="border-2 rounded-lg p-4 cursor-pointer transition-all"
@@ -121,7 +121,7 @@
             (click)="selectComponent('camera', 'hd')">
             <h4 class="font-semibold text-gray-800">HD</h4>
             <p class="text-sm text-gray-600 mb-2">Cámara USB 1080p</p>
-            <span class="text-lg font-bold text-green-600">${{prices.camera.hd | currency:'USD':'symbol':'1.0-0'}}</span>
+            <span class="text-lg font-bold text-green-600">${{formatPrice(prices.camera.hd)}} MXN</span>
           </div>
         </div>
       </div>
@@ -136,25 +136,25 @@
         <div class="space-y-3">
           <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
             <div class="flex items-center">
-              <p-checkbox 
+              <input 
+                type="checkbox"
                 [(ngModel)]="selectedComponents.mobileApp" 
-                [binary]="true"
-                (onChange)="updateTotal()">
-              </p-checkbox>
-              <span class="ml-3 font-medium text-gray-800">App Móvil</span>
+                (change)="updateTotal()"
+                class="mr-3 w-4 h-4 text-indigo-600 bg-gray-100 border-gray-300 rounded">
+              <span class="font-medium text-gray-800">App Móvil</span>
             </div>
-            <span class="text-lg font-bold text-green-600">${{prices.apps.mobile | currency:'USD':'symbol':'1.0-0'}}</span>
+            <span class="text-lg font-bold text-green-600">${{formatPrice(prices.apps.mobile)}} MXN</span>
           </div>
           <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
             <div class="flex items-center">
-              <p-checkbox 
+              <input 
+                type="checkbox"
                 [(ngModel)]="selectedComponents.webApp" 
-                [binary]="true"
-                (onChange)="updateTotal()">
-              </p-checkbox>
-              <span class="ml-3 font-medium text-gray-800">App Web</span>
+                (change)="updateTotal()"
+                class="mr-3 w-4 h-4 text-indigo-600 bg-gray-100 border-gray-300 rounded">
+              <span class="font-medium text-gray-800">App Web</span>
             </div>
-            <span class="text-lg font-bold text-green-600">${{prices.apps.web | currency:'USD':'symbol':'1.0-0'}}</span>
+            <span class="text-lg font-bold text-green-600">${{formatPrice(prices.apps.web)}} MXN</span>
           </div>
         </div>
       </div>
@@ -168,27 +168,27 @@
         <div class="space-y-3 mb-6">
           <div *ngIf="selectedComponents.esp32" class="flex justify-between items-center">
             <span class="text-gray-600">ESP32 {{selectedComponents.esp32}}</span>
-            <span class="font-medium">${{getCurrentPrice('esp32') | currency:'USD':'symbol':'1.0-0'}}</span>
+            <span class="font-medium">${{formatPrice(getCurrentPrice('esp32'))}} MXN</span>
           </div>
           <div *ngIf="selectedComponents.servos" class="flex justify-between items-center">
             <span class="text-gray-600">Servos {{selectedComponents.servos}}</span>
-            <span class="font-medium">${{getCurrentPrice('servos') | currency:'USD':'symbol':'1.0-0'}}</span>
+            <span class="font-medium">${{formatPrice(getCurrentPrice('servos'))}} MXN</span>
           </div>
           <div *ngIf="selectedComponents.arduino" class="flex justify-between items-center">
             <span class="text-gray-600">Arduino {{selectedComponents.arduino}}</span>
-            <span class="font-medium">${{getCurrentPrice('arduino') | currency:'USD':'symbol':'1.0-0'}}</span>
+            <span class="font-medium">${{formatPrice(getCurrentPrice('arduino'))}} MXN</span>
           </div>
           <div *ngIf="selectedComponents.camera" class="flex justify-between items-center">
             <span class="text-gray-600">Cámara {{selectedComponents.camera}}</span>
-            <span class="font-medium">${{getCurrentPrice('camera') | currency:'USD':'symbol':'1.0-0'}}</span>
+            <span class="font-medium">${{formatPrice(getCurrentPrice('camera'))}} MXN</span>
           </div>
           <div *ngIf="selectedComponents.mobileApp" class="flex justify-between items-center">
             <span class="text-gray-600">App Móvil</span>
-            <span class="font-medium">${{prices.apps.mobile | currency:'USD':'symbol':'1.0-0'}}</span>
+            <span class="font-medium">${{formatPrice(prices.apps.mobile)}} MXN</span>
           </div>
           <div *ngIf="selectedComponents.webApp" class="flex justify-between items-center">
             <span class="text-gray-600">App Web</span>
-            <span class="font-medium">${{prices.apps.web | currency:'USD':'symbol':'1.0-0'}}</span>
+            <span class="font-medium">${{formatPrice(prices.apps.web)}} MXN</span>
           </div>
         </div>
 
@@ -196,7 +196,7 @@
         
         <div class="flex justify-between items-center mb-6">
           <span class="text-xl font-bold text-gray-800">Total</span>
-          <span class="text-2xl font-bold text-green-600">${{totalPrice | currency:'USD':'symbol':'1.0-0'}}</span>
+          <span class="text-2xl font-bold text-green-600">${{formatPrice(totalPrice)}} MXN</span>
         </div>
 
         <!-- Formulario de Envío -->
@@ -237,15 +237,22 @@
         </div>
 
         <button 
-          class="w-full mt-6 bg-green-600 text-white font-medium py-3 px-4 rounded-lg hover:bg-green-700 transition-colors"
-          [disabled]="!isFormValid() || totalPrice === 0"
+          class="w-full mt-6 bg-green-600 text-white font-medium py-3 px-4 rounded-lg hover:bg-green-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
+          [disabled]="!isFormValid() || totalPrice === 0 || isLoading"
           (click)="sendQuote()">
-          <i class="pi pi-send mr-2"></i>
-          Enviar Cotización
+          <span *ngIf="!isLoading" class="flex items-center justify-center">
+            <i class="pi pi-send mr-2"></i>
+            Enviar Cotización
+          </span>
+          <span *ngIf="isLoading" class="flex items-center justify-center">
+            <i class="pi pi-spin pi-spinner mr-2"></i>
+            Enviando...
+          </span>
         </button>
 
         <button 
-          class="w-full mt-3 border border-gray-300 text-gray-600 font-medium py-2 px-4 rounded-lg hover:bg-gray-50 transition-colors"
+          class="w-full mt-3 border border-gray-300 text-gray-600 font-medium py-2 px-4 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50"
+          [disabled]="isLoading"
           (click)="goBack()">
           <i class="pi pi-arrow-left mr-2"></i>
           Regresar
@@ -257,3 +264,34 @@
 
 <!-- Toast para notificaciones -->
 <p-toast></p-toast>
+
+<style>
+.header-green {
+  background: linear-gradient(135deg, #16a085 0%, #27ae60 100%);
+  color: white;
+}
+
+/* Estilos para los checkboxes nativos */
+input[type="checkbox"] {
+  cursor: pointer;
+}
+
+input[type="checkbox"]:checked {
+  background-color: #4f46e5;
+  border-color: #4f46e5;
+}
+
+/* Animación de loading */
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.pi-spinner {
+  animation: spin 1s linear infinite;
+}
+</style>
