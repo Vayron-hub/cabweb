@@ -65,6 +65,11 @@
   overflow: hidden;
 }
 
+.background-input {
+  background: white;
+  color: black
+}
+
 .classifiers-header-simple {
   background: linear-gradient(135deg, #4a7c59, #5a8a6b);
   color: white;
