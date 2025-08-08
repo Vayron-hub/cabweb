@@ -425,6 +425,15 @@ private transformUserToBackend(frontendUser: Partial<User>): any {
       .pipe(catchError(this.handleError));
   }
 
+  getDeteccionesPorClasificador(clasificadorId: string | number): Observable<{valorizable: number, no_valorizable: number, organico: number}> {
+    console.log('🔗 BackendService - getDeteccionesPorClasificador llamado con ID:', clasificadorId);
+    const url = `${this.apiUrl}/detecciones/clasificador/${clasificadorId}`;
+    console.log('🔗 URL construida para detecciones del clasificador:', url);
+    
+    return this.http.get<{valorizable: number, no_valorizable: number, organico: number}>(url)
+      .pipe(catchError(this.handleError));
+  }
+
   getDeteccionesPorUsuario(usuarioId: string | number): Observable<Deteccion[]> {
     return this.http.get<Deteccion[]>(`${this.apiUrl}/detecciones/usuario/${usuarioId}`)
       .pipe(catchError(this.handleError));
