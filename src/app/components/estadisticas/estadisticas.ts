@@ -671,11 +671,9 @@ export class EstadisticasComponent implements OnInit, OnDestroy {
 
   getTipoColor(tipo: string): string {
     const colors: { [key: string]: string } = {
-      'Valorizable': '#2196F3',
-      'Organico': '#4CAF50',
-      'Orgánico': '#4CAF50',
-      'No Valorizable': '#757575',
-      'NoValorizable': '#757575'
+      'valorizable': '#2196F3',
+      'organico': '#4CAF50',
+      'no_valorizable': '#757575'
     };
     return colors[tipo] || '#9E9E9E';
   }

@@ -263,13 +263,6 @@
               </div>
             </div>
 
-            <div class="flex justify-end" *ngIf="detection.estado">
-              <span class="px-2 py-1 text-xs rounded-full"
-                [ngClass]="detection.estado.toLowerCase() === 'confirmada' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'">
-                <i class="pi mr-1" [ngClass]="detection.estado === 'Confirmada' ? 'pi-check' : 'pi-clock'"></i>
-                {{detection.estado}}
-              </span>
-            </div>
           </div>
         </div>
 

@@ -42,6 +42,10 @@ export const routes: Routes = [
         loadComponent: () => import('./components/usuarios/usuarios.js').then(m => m.UsuariosComponent)
       },
       {
+        path: 'zonas',
+        loadComponent: () => import('./components/zonas/zonas.js').then(m => m.ZonasComponent)
+      },
+      {
         path: 'clasificadores',
         loadComponent: () => import('./components/clasificadores/clasificadores.js').then(m => m.ClasificadoresComponent)
       }
