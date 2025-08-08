@@ -613,8 +613,8 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
 
       if (zonasConDetecciones.length === 0) {
         console.warn('⚠️ No hay zonas con detecciones');
-        this.datosDashboardCentral = [];
-        this.zonasDeteccionesHoy = [];
+        this.datosDashboardCentral = [0, 0, 0, 0];
+        this.zonasDeteccionesHoy = ['Sin datos', 'Sin datos', 'Sin datos', 'Sin datos'];
         return;
       }
 
@@ -624,34 +624,32 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
       // Encontrar el máximo para calcular porcentajes relativos
       const maxDetecciones = zonasOrdenadas[0].totalDetecciones;
 
-      // Extraer datos para el gráfico de barras (porcentajes relativos para la altura)
-      this.datosDashboardCentral = zonasOrdenadas.slice(0, 4).map(zona => {
-        return maxDetecciones > 0 ? Math.round((zona.totalDetecciones / maxDetecciones) * 100) : 0;
-      });
+      // Tomar las primeras 3-4 zonas y asegurar que tenemos al menos 3 elementos
+      const topZonas = zonasOrdenadas.slice(0, 3);
+      
+      // Rellenar con datos vacíos si necesario
+      while (topZonas.length < 3) {
+        topZonas.push({ nombre: 'Sin datos', totalDetecciones: 0 } as EstadisticasZonas);
+      }
 
-      this.zonasDeteccionesHoy = zonasOrdenadas.slice(0, 4).map(zona =>
-        zona.nombre
-      );
+      // Calcular los valores para el gráfico
+      // Usar los valores reales de detecciones directamente (no porcentajes)
+      this.datosDashboardCentral = topZonas.map(zona => zona.totalDetecciones);
+
+      this.zonasDeteccionesHoy = topZonas.map(zona => zona.nombre);
 
       console.log('✅ Gráfico de comparativa de zonas actualizado');
-      console.log('📊 Datos del gráfico (porcentajes):', this.datosDashboardCentral);
+      console.log('📊 Datos del gráfico (detecciones reales):', this.datosDashboardCentral);
       console.log('🏷️ Labels del gráfico:', this.zonasDeteccionesHoy);
-      console.log('🔢 Datos numéricos para verificación:', zonasOrdenadas.map(z => ({
-        nombre: z.nombre,
-        detecciones: z.totalDetecciones,
-        porcentaje: Math.round((z.totalDetecciones / maxDetecciones) * 100)
-      })));
+      console.log('🔢 Max detecciones:', maxDetecciones);
 
-      // DEBUG: Verificar que los datos lleguen al template
-      setTimeout(() => {
-        console.log('🎯 VERIFICACIÓN FINAL - Datos en las variables del componente:');
-        console.log('  datosDashboardCentral:', this.datosDashboardCentral);
-        console.log('  zonasDeteccionesHoy:', this.zonasDeteccionesHoy);
-      }, 100);
+      // Forzar detección de cambios
+      this.cdr.detectChanges();
+
     } else {
       console.warn('⚠️ No hay datos de zonas disponibles');
-      this.datosDashboardCentral = [];
-      this.zonasDeteccionesHoy = [];
+      this.datosDashboardCentral = [0, 0, 0, 0];
+      this.zonasDeteccionesHoy = ['Sin datos', 'Sin datos', 'Sin datos', 'Sin datos'];
     }
   }
 

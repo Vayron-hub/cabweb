@@ -31,7 +31,7 @@
     </div>
     <div class="kpi-content">
       <span class="block text-2xl font-bold text-gray-800">{{getActiveClassifiersCount()}}</span>
-      <span class="text-sm text-gray-600">Clasificadores Activos</span>
+      <span class="text-sm text-gray-600">Clasificadores </span>
     </div>
   </div>
 
@@ -160,58 +160,6 @@
       <div class="flex flex-col items-center justify-center py-8" *ngIf="isLoadingStats">
         <i class="pi pi-spin pi-spinner text-2xl text-gray-400 mb-2"></i>
         <p class="text-gray-600">Cargando datos...</p>
-      </div>
-    </div>
-  </div>
-
-  <div class="lg:col-span-2 bg-white rounded-xl p-6 shadow-sm">
-    <div class="mb-6">
-      <h3 class="text-lg font-semibold text-gray-800 mb-1">Tendencia de Detecciones</h3>
-      <p class="text-sm text-gray-600">Evolución en los últimos días</p>
-    </div>
-    <div class="chart-content">
-      <div class="line-chart" *ngIf="estadisticasGenerales">
-        <div class="mb-6">
-          <svg viewBox="0 0 600 200" class="w-full h-48">
-            <defs>
-              <pattern id="grid" width="60" height="40" patternUnits="userSpaceOnUse">
-                <path d="M 60 0 L 0 0 0 40" fill="none" stroke="#f0f0f0" stroke-width="1" />
-              </pattern>
-            </defs>
-            <rect width="600" height="200" fill="url(#grid)" />
-
-            <polyline [attr.points]="getSimpleTrendPoints()" fill="none" stroke="#4a7c59" stroke-width="3"
-              stroke-linecap="round" stroke-linejoin="round">
-            </polyline>
-
-            <circle *ngFor="let point of getSimpleDataPoints(); let i = index" [attr.cx]="point.x" [attr.cy]="point.y"
-              r="4" fill="#4a7c59" [attr.title]="point.label + ': ' + point.value">
-            </circle>
-
-            <polygon [attr.points]="getSimpleTrendAreaPoints()" fill="rgba(74, 124, 89, 0.1)">
-            </polygon>
-          </svg>
-        </div>
-
-        <div class="grid grid-cols-3 gap-4">
-          <div class="text-center p-4 bg-gray-50 rounded-lg">
-            <span class="block text-sm text-gray-600 mb-1">Promedio</span>
-            <span class="text-xl font-bold text-gray-800">{{getAverageDetections()}}</span>
-          </div>
-          <div class="text-center p-4 bg-gray-50 rounded-lg">
-            <span class="block text-sm text-gray-600 mb-1">Máximo</span>
-            <span class="text-xl font-bold text-gray-800">{{getMaxDetections()}}</span>
-          </div>
-          <div class="text-center p-4 bg-gray-50 rounded-lg">
-            <span class="block text-sm text-gray-600 mb-1">Tendencia</span>
-            <span class="text-xl font-bold" 
-                  [class.text-green-600]="getTrendDirection() > 0"
-                  [class.text-red-600]="getTrendDirection() < 0"
-                  [class.text-gray-600]="getTrendDirection() === 0">
-              {{getTrendDirection() > 0 ? '↗' : getTrendDirection() < 0 ? '↘' : '→' }} 
-            </span>
-          </div>
-        </div>
       </div>
     </div>
   </div>
