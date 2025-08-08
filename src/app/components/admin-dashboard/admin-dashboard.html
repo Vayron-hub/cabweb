@@ -485,17 +485,6 @@
             (input)="filterUsers()" class="search-input" />
         </div>
       </div>
-      <div class="role-filters">
-        <label class="filter-label">Filtrar por rol:</label>
-        <div class="role-checkboxes">
-          <label class="checkbox-item" *ngFor="let role of roleOptions">
-            <input type="checkbox" [value]="role.value" (change)="onRoleFilterChange($event)"
-              [checked]="selectedRoles.includes(role.value)" />
-            <span class="checkmark"></span>
-            {{role.label}}
-          </label>
-        </div>
-      </div>
     </div>
 
     <div class="users-stats">
@@ -537,7 +526,6 @@
             </th>
             <th>Usuario</th>
             <th>Email</th>
-            <th>Rol</th>
             <th>Estado</th>
             <th>Último Acceso</th>
             <th>Acciones</th>
@@ -562,9 +550,6 @@
               </div>
             </td>
             <td class="user-email">{{user.email}}</td>
-            <td>
-              <span class="role-badge"> Admin </span>
-            </td>
             <td>
               <span class="status-badge" [ngClass]="getStatusClass(user.activo)">
                 <i class="pi" [ngClass]="getStatusIcon(user.activo)"></i>
@@ -708,11 +693,6 @@
             <div class="info-group">
               <label>Nombre Completo</label>
               <span>{{currentUser.nombre}}</span>
-            </div>
-
-            <div class="info-group">
-              <label>Rol</label>
-              <span class="role-tag">Admin</span>
             </div>
 
             <div class="info-group">
