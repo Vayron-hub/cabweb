@@ -7,30 +7,54 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        // Paleta de colores del proyecto CAB
+        // Paleta de colores del proyecto CAB - Sustentabilidad y Ecología
         primary: {
-          50: '#f0f9f4',
-          100: '#dcf4e6',
-          200: '#bbe7d0',
-          300: '#8dd5b0',
-          400: '#5bb98a',
-          500: '#4a7c59', // Color principal verde
-          600: '#3a6249',
-          700: '#2f4f3a',
-          800: '#273f2f',
-          900: '#1f3324',
+          50: '#f4f6f4',
+          100: '#e6ebe7',
+          200: '#cdd6cf',
+          300: '#a8b8ab',
+          400: '#7a9580',
+          500: '#4c6b4f', // Verde primario - Color principal del sistema
+          600: '#3d4d40', // Verde oscuro - Para hover y énfasis
+          700: '#353e37',
+          800: '#2d332e',
+          900: '#262b27',
         },
         secondary: {
-          50: '#f8fafc',
-          100: '#f1f5f9',
-          200: '#e2e8f0',
-          300: '#cbd5e1',
-          400: '#94a3b8',
-          500: '#64748b',
-          600: '#475569',
-          700: '#334155',
-          800: '#1e293b',
-          900: '#0f172a',
+          50: '#f9f8f7',
+          100: '#f2f0ed',
+          200: '#e8e4df',
+          300: '#d9d2ca',
+          400: '#c6baae',
+          500: '#b6a89a', // Beige - Para fondos neutros y elementos suaves
+          600: '#a8967e',
+          700: '#8a7865',
+          800: '#706256',
+          900: '#5c5049',
+        },
+        accent: {
+          50: '#f6f7f6',
+          100: '#e9ecea',
+          200: '#d5d9d6',
+          300: '#b8c0ba',
+          400: '#94a097',
+          500: '#5e7958', // Verde claro - Para elementos secundarios
+          600: '#4e6348',
+          700: '#414f3c',
+          800: '#364032',
+          900: '#2d342a',
+        },
+        neutral: {
+          50: '#f8f7f7',
+          100: '#efeeee',
+          200: '#dddcdc',
+          300: '#c4c2c2',
+          400: '#a5a2a2',
+          500: '#8b8787',
+          600: '#6f6a6a',
+          700: '#565151',
+          800: '#3c2f2f', // Café - Para textos y elementos de contraste
+          900: '#2a1f1f',
         },
         success: {
           50: '#f0fdf4',
@@ -68,11 +92,19 @@ module.exports = {
           800: '#991b1b',
           900: '#7f1d1d',
         },
-        // Colores específicos para tipos de residuos
+        // Colores específicos para tipos de residuos (manteniendo los originales)
         residue: {
           valorizable: '#2196F3',
           organico: '#4CAF50',
           noValorizable: '#757575',
+        },
+        // Nuevos colores temáticos para el proyecto sustentable
+        earth: {
+          green: '#4c6b4f',      // Verde primario
+          darkGreen: '#3d4d40',  // Verde oscuro
+          lightGreen: '#5e7958', // Verde claro
+          beige: '#b6a89a',      // Beige
+          brown: '#3c2f2f',      // Café
         }
       },
       fontFamily: {
