@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { Observable, of, BehaviorSubject } from 'rxjs';
 import { BackendService, LoginRequest, User } from './backend.service';
-import { catchError, tap, map } from 'rxjs/operators';
+import { catchError, tap, map, switchMap } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
@@ -46,11 +46,23 @@ export class AuthService {
 
   logout(): void {
     if (this.useBackend && this.isAuthenticated()) {
-      this.backendService.logout();
-      this.clearLocalAuthData();
+      this.backendService.logout().subscribe({
+        next: (response) => {
+          console.log('✅ Logout completado:', response.message);
+          this.clearLocalAuthData();
+          this.router.navigate(['/login']);
+        },
+        error: (error) => {
+          console.error('❌ Error en logout:', error);
+          // Aunque el backend falle, limpiamos los datos locales
+          this.clearLocalAuthData();
+          this.router.navigate(['/login']);
+        }
+      });
     } else {
       // Logout con datos simulados
       this.clearLocalAuthData();
+      this.router.navigate(['/login']);
     }
   }
 

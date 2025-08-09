@@ -34,7 +34,7 @@
       
       <div class="relative">
         <button
-          class="w-10 h-10 border-0 bg-white bg-opacity-20 rounded-full text-primary-500 cursor-pointer flex items-center justify-center transition-all duration-200 hover:bg-primary-800 hover:text-white"
+          class="size-10 border-0 bg-white bg-opacity-20 rounded-full text-primary-500 cursor-pointer flex items-center justify-center transition-all duration-200 hover:bg-primary-800 hover:text-white"
           (click)="toggleUserMenu()"
           [class.bg-opacity-20]="userMenuOpen"
         >
@@ -42,11 +42,11 @@
         </button>
 
         <div
-          class="absolute top-full right-0 mt-2 min-w-70 bg-white rounded-xl shadow-2xl border border-gray-200 z-50 animate-slide-up"
+          class="absolute top-full right-0 mt-2 min-w-70 bg-white rounded-xl shadow-2xl z-50 animate-slide-up"
           *ngIf="userMenuOpen"
         >
           <div
-            class="flex items-center gap-3 p-5 bg-gradient-primary rounded-t-xl text-white"
+            class="flex items-center gap-3 p-5 bg-primary-600 rounded-t-xl text-white"
           >
             <div
               class="w-11 h-11 bg-white bg-opacity-20 rounded-full flex items-center justify-center text-lg flex-shrink-0"
@@ -56,10 +56,6 @@
             <div class="flex flex-col gap-1">
               <span class="text-base font-semibold text-white"
                 >{{currentUser.nombre}}</span
-              >
-              <span
-                class="text-xs text-white text-opacity-80 bg-white bg-opacity-10 px-2 py-0.5 rounded-xl inline-block w-fit"
-                >Admin</span
               >
             </div>
           </div>
@@ -88,8 +84,8 @@
   </div>
 </div>
 
-<div class="bg-primary-600 px-5 pt-2">
-  <div class="flex gap-1">
+<div class="bg-primary-600 px-5">
+  <div class="flex gap-4 h-16">
     <button
       class="flex items-center gap-2 px-4 py-2 font-medium transition-all duration-200 text-primary-100 hover:bg-primary-700 hover:text-white border-b-2 border-transparent"
       routerLink="/admin/dashboard"
@@ -121,6 +117,14 @@
     >
       <i class="pi pi-filter"></i>
       <span>Clasificadores</span>
+    </button>
+    <button
+      class="flex items-center gap-2 px-4 py-2 font-medium transition-all duration-200 text-primary-100 hover:bg-primary-700 hover:text-white border-b-2 border-transparent"
+      routerLink="/admin/zonas"
+      routerLinkActive="text-white border-b-primary-100"
+    >
+      <i class="pi pi-map"></i>
+      <span>Zonas</span>
     </button>
   </div>
 </div>

@@ -10,11 +10,16 @@ import { AuthService } from '../../services/auth';
 @Component({
   selector: 'app-admin-layout',
   standalone: true,
-  imports: [CommonModule, RouterModule, RouterOutlet, FormsModule, NavbarComponent],
+  imports: [
+    CommonModule,
+    RouterModule,
+    RouterOutlet,
+    FormsModule,
+    NavbarComponent,
+  ],
   templateUrl: './admin-layout.html',
 })
 export class AdminLayoutComponent implements OnInit, OnDestroy {
-
   selectedLocation: string = 'Edificio D';
   locations: string[] = [];
   zonas: Zona[] = [];
@@ -26,7 +31,7 @@ export class AdminLayoutComponent implements OnInit, OnDestroy {
     nombre: '',
     email: '',
     rol: '',
-    ultimoAcceso: new Date()
+    ultimoAcceso: new Date(),
   };
 
   // Nuevas propiedades para edición de perfil
@@ -36,10 +41,9 @@ export class AdminLayoutComponent implements OnInit, OnDestroy {
     nombre: string;
     email: string;
   } = {
-      nombre: '',
-      email: ''
-    };
-
+    nombre: '',
+    email: '',
+  };
 
   isChangingPassword: boolean = false;
   isSavingPassword: boolean = false;
@@ -48,17 +52,17 @@ export class AdminLayoutComponent implements OnInit, OnDestroy {
     newPassword: string;
     confirmPassword: string;
   } = {
-      currentPassword: '',
-      newPassword: '',
-      confirmPassword: ''
-    };
+    currentPassword: '',
+    newPassword: '',
+    confirmPassword: '',
+  };
 
   constructor(
     private backendService: BackendService,
     private zonaService: ZonaService,
     private authService: AuthService,
     private router: Router
-  ) { }
+  ) {}
 
   ngOnInit() {
     this.getCurrentUser(); // Add this line
@@ -78,7 +82,7 @@ export class AdminLayoutComponent implements OnInit, OnDestroy {
       next: (zonas) => {
         console.log('✅ Zonas cargadas:', zonas);
         this.zonas = zonas;
-        this.locations = zonas.map(zona => zona.nombre);
+        this.locations = zonas.map((zona) => zona.nombre);
 
         if (this.zonas.length > 0) {
           // Usar la primera zona disponible
@@ -88,7 +92,7 @@ export class AdminLayoutComponent implements OnInit, OnDestroy {
           // Actualizar el ZonaService con la primera zona
           this.zonaService.setSelectedZona({
             id: primeraZona.id,
-            nombre: primeraZona.nombre
+            nombre: primeraZona.nombre,
           });
 
           console.log('🎯 Zona inicial establecida:', primeraZona);
@@ -99,7 +103,7 @@ export class AdminLayoutComponent implements OnInit, OnDestroy {
       error: (error) => {
         console.error('❌ Error cargando zonas:', error);
         this.isLoadingZonas = false;
-      }
+      },
     });
   }
 
@@ -110,7 +114,9 @@ export class AdminLayoutComponent implements OnInit, OnDestroy {
     this.selectedLocation = newLocation;
 
     // Encontrar la zona seleccionada por nombre
-    const zonaSeleccionada = this.zonas.find(zona => zona.nombre === newLocation);
+    const zonaSeleccionada = this.zonas.find(
+      (zona) => zona.nombre === newLocation
+    );
 
     if (zonaSeleccionada) {
       console.log('🔄 Actualizando ZonaService con:', zonaSeleccionada);
@@ -118,7 +124,7 @@ export class AdminLayoutComponent implements OnInit, OnDestroy {
       // Actualizar el ZonaService
       this.zonaService.setSelectedZona({
         id: zonaSeleccionada.id,
-        nombre: zonaSeleccionada.nombre
+        nombre: zonaSeleccionada.nombre,
       });
     } else {
       console.warn('⚠️ No se encontró la zona:', newLocation);
@@ -128,33 +134,32 @@ export class AdminLayoutComponent implements OnInit, OnDestroy {
   onLogout() {
     console.log('👋 Iniciando proceso de cierre de sesión...');
 
-    // Confirmar la acción con el usuario
     if (confirm('¿Estás seguro de que deseas cerrar sesión?')) {
-      try {
-        // Limpiar datos de autenticación usando BackendService
-        this.backendService.logout();
-
-        // Limpiar datos de zona
-        this.zonaService.clearSelectedZona();
-
-        console.log('✅ Sesión cerrada correctamente');
-
-        // Redirigir a la página de login
-        this.router.navigate(['/login']).then(() => {
-          console.log('🔄 Redirigido a login');
-        }).catch(error => {
-          console.error('❌ Error al redirigir:', error);
-          // Fallback: recargar la página
-          window.location.href = '/login';
-        });
-      } catch (error) {
-        console.error('❌ Error durante el logout:', error);
-        // Aún así intentar redirigir
-        window.location.href = '/login';
-      }
-    } else {
-      console.log('🚫 Logout cancelado por el usuario');
-    }
+      this.backendService.logout().subscribe({
+        next: (response) => {
+          this.zonaService.clearSelectedZona();
+          this.router
+            .navigate(['/login'])
+            .then(() => {})
+            .catch((error) => {
+              window.location.href = '/login';
+            });
+        },
+        error: (error) => {
+          localStorage.removeItem('authToken');
+          localStorage.removeItem('currentUser');
+          this.zonaService.clearSelectedZona();
+          this.router
+            .navigate(['/login'])
+            .then(() => {
+              console.log('🔄 Redirigido a login después del error');
+            })
+            .catch((routeError) => {
+              window.location.href = '/login';
+            });
+        },
+      });
+    } 
   }
 
   onViewMyAccount() {
@@ -162,10 +167,8 @@ export class AdminLayoutComponent implements OnInit, OnDestroy {
     this.showAccountModal = true;
   }
 
-  // Método existente mejorado
   closeAccountModal() {
     this.showAccountModal = false;
-    // Si estaba editando perfil o cambiando contraseña, cancelar
     if (this.isEditingProfile) {
       this.cancelEditingProfile();
     }
@@ -177,18 +180,15 @@ export class AdminLayoutComponent implements OnInit, OnDestroy {
   getCurrentUser() {
     const user = this.backendService.getCurrentUser();
     if (user) {
-      // Ensure all required fields are present and have the correct types
       this.currentUser = {
         id: user.id || '',
         nombre: user.nombre || '',
         email: user.correo || '', // Handle undefined email
         rol: 'Admin',
-        ultimoAcceso: this.convertToDate(user.fechaUltimoAcceso)
+        ultimoAcceso: this.convertToDate(user.fechaUltimoAcceso),
       };
     } else {
-      // Handle the case when user is null
       console.warn('Usuario no encontrado');
-      // Keep the existing default user or redirect to login
     }
   }
 
@@ -201,13 +201,11 @@ export class AdminLayoutComponent implements OnInit, OnDestroy {
       return dateValue;
     }
 
-    // If it's a string, try to parse it
     if (typeof dateValue === 'string') {
       const parsedDate = new Date(dateValue);
       return isNaN(parsedDate.getTime()) ? new Date() : parsedDate;
     }
 
-    // Fallback to current date
     return new Date();
   }
 
@@ -218,7 +216,7 @@ export class AdminLayoutComponent implements OnInit, OnDestroy {
       month: 'long',
       day: 'numeric',
       hour: '2-digit',
-      minute: '2-digit'
+      minute: '2-digit',
     });
   }
 
@@ -228,7 +226,7 @@ export class AdminLayoutComponent implements OnInit, OnDestroy {
     // Copiar datos actuales al formulario de edición
     this.editProfileData = {
       nombre: this.currentUser.nombre || '',
-      email: this.currentUser.email || ''
+      email: this.currentUser.email || '',
     };
   }
 
@@ -237,29 +235,31 @@ export class AdminLayoutComponent implements OnInit, OnDestroy {
     // Limpiar datos de edición
     this.editProfileData = {
       nombre: '',
-      email: ''
+      email: '',
     };
   }
 
-
   canSaveProfile(): boolean {
     // Validar datos
-    const hasValidData = this.editProfileData.nombre.trim() !== '' &&
+    const hasValidData =
+      this.editProfileData.nombre.trim() !== '' &&
       this.editProfileData.email.trim() !== '' &&
       this.isValidEmail(this.editProfileData.email);
 
     // Validar cambios
-    const hasChanges = this.editProfileData.nombre !== this.currentUser.nombre ||
+    const hasChanges =
+      this.editProfileData.nombre !== this.currentUser.nombre ||
       this.editProfileData.email !== this.currentUser.email;
 
     // Validar usuario - más explícito
-    const hasValidUser = this.currentUser?.id != null && this.currentUser.id !== '';
+    const hasValidUser =
+      this.currentUser?.id != null && this.currentUser.id !== '';
 
     console.log('🔍 Validación de guardado:', {
       hasValidData,
       hasChanges,
       hasValidUser,
-      currentUserID: this.currentUser?.id
+      currentUserID: this.currentUser?.id,
     });
 
     return hasValidData && hasChanges && hasValidUser;
@@ -282,7 +282,7 @@ export class AdminLayoutComponent implements OnInit, OnDestroy {
     // Preparar datos en el formato correcto para el backend
     const updateData = {
       nombre: this.editProfileData.nombre.trim(),
-      email: this.editProfileData.email.trim()
+      email: this.editProfileData.email.trim(),
       // NO incluir password a menos que se cambie
     };
 
@@ -290,42 +290,48 @@ export class AdminLayoutComponent implements OnInit, OnDestroy {
     console.log('🔄 Usuario ID:', this.currentUser.id);
 
     // Llamar al servicio backend para actualizar
-    this.backendService.updateUsuario(this.currentUser.id, updateData).subscribe({
-      next: (response) => {
-        console.log('✅ Perfil actualizado exitosamente:', response);
+    this.backendService
+      .updateUsuario(this.currentUser.id, updateData)
+      .subscribe({
+        next: (response) => {
+          console.log('✅ Perfil actualizado exitosamente:', response);
 
-        // Actualizar el usuario actual en memoria
-        this.currentUser = {
-          ...this.currentUser,
-          nombre: updateData.nombre,
-          email: updateData.email,
-        };
+          // Actualizar el usuario actual en memoria
+          this.currentUser = {
+            ...this.currentUser,
+            nombre: updateData.nombre,
+            email: updateData.email,
+          };
 
-        // Actualizar en localStorage
-        localStorage.setItem('currentUser', JSON.stringify(this.currentUser));
+          // Actualizar en localStorage
+          localStorage.setItem('currentUser', JSON.stringify(this.currentUser));
 
-        // Salir del modo edición
-        this.isEditingProfile = false;
-        this.isSavingProfile = false;
+          // Salir del modo edición
+          this.isEditingProfile = false;
+          this.isSavingProfile = false;
 
-        // Mostrar mensaje de éxito
-        alert('Perfil actualizado exitosamente');
-      },
-      error: (error) => {
-        console.error('❌ Error completo:', error);
-        console.error('❌ Status:', error.status);
-        console.error('❌ Message:', error.message);
+          // Mostrar mensaje de éxito
+          alert('Perfil actualizado exitosamente');
+        },
+        error: (error) => {
+          console.error('❌ Error completo:', error);
+          console.error('❌ Status:', error.status);
+          console.error('❌ Message:', error.message);
 
-        this.isSavingProfile = false;
+          this.isSavingProfile = false;
 
-        // Manejo específico de errores
-        if (error.status === 400) {
-          alert('Error: El email ya está registrado por otro usuario o los datos son inválidos.');
-        } else {
-          alert('Error al actualizar el perfil. Por favor, inténtalo de nuevo.');
-        }
-      }
-    });
+          // Manejo específico de errores
+          if (error.status === 400) {
+            alert(
+              'Error: El email ya está registrado por otro usuario o los datos son inválidos.'
+            );
+          } else {
+            alert(
+              'Error al actualizar el perfil. Por favor, inténtalo de nuevo.'
+            );
+          }
+        },
+      });
   }
 
   // Agregar estos métodos después de saveProfileChanges():
@@ -336,7 +342,7 @@ export class AdminLayoutComponent implements OnInit, OnDestroy {
     this.changePasswordData = {
       currentPassword: '',
       newPassword: '',
-      confirmPassword: ''
+      confirmPassword: '',
     };
   }
 
@@ -346,46 +352,55 @@ export class AdminLayoutComponent implements OnInit, OnDestroy {
     this.changePasswordData = {
       currentPassword: '',
       newPassword: '',
-      confirmPassword: ''
+      confirmPassword: '',
     };
   }
 
   canSavePassword(): boolean {
-    const hasAllFields = this.changePasswordData.currentPassword.trim() !== '' &&
-                        this.changePasswordData.newPassword.trim() !== '' &&
-                        this.changePasswordData.confirmPassword.trim() !== '';
-    
-    const passwordsMatch = this.changePasswordData.newPassword === this.changePasswordData.confirmPassword;
-    
-    const isValidNewPassword = this.isStrongPassword(this.changePasswordData.newPassword);
-    
-    const isNotSamePassword = this.changePasswordData.currentPassword !== this.changePasswordData.newPassword;
-    
+    const hasAllFields =
+      this.changePasswordData.currentPassword.trim() !== '' &&
+      this.changePasswordData.newPassword.trim() !== '' &&
+      this.changePasswordData.confirmPassword.trim() !== '';
+
+    const passwordsMatch =
+      this.changePasswordData.newPassword ===
+      this.changePasswordData.confirmPassword;
+
+    const isValidNewPassword = this.isStrongPassword(
+      this.changePasswordData.newPassword
+    );
+
+    const isNotSamePassword =
+      this.changePasswordData.currentPassword !==
+      this.changePasswordData.newPassword;
+
     console.log('🔍 Validación de contraseña:', {
       hasAllFields,
       passwordsMatch,
       isValidNewPassword,
-      isNotSamePassword
+      isNotSamePassword,
     });
-    
-    return hasAllFields && passwordsMatch && isValidNewPassword && isNotSamePassword;
+
+    return (
+      hasAllFields && passwordsMatch && isValidNewPassword && isNotSamePassword
+    );
   }
 
   isStrongPassword(password: string): boolean {
     if (password.length < 8) return false;
-    
+
     // Al menos una mayúscula
     if (!/[A-Z]/.test(password)) return false;
-    
-    // Al menos una minúscula  
+
+    // Al menos una minúscula
     if (!/[a-z]/.test(password)) return false;
-    
+
     // Al menos un número
     if (!/\d/.test(password)) return false;
-    
+
     // Al menos un carácter especial
     if (!/[!@#$%^&*(),.?":{}|<>]/.test(password)) return false;
-    
+
     return true;
   }
 
@@ -395,7 +410,8 @@ export class AdminLayoutComponent implements OnInit, OnDestroy {
     if (!/[A-Z]/.test(password)) return 'Debe incluir al menos una mayúscula';
     if (!/[a-z]/.test(password)) return 'Debe incluir al menos una minúscula';
     if (!/\d/.test(password)) return 'Debe incluir al menos un número';
-    if (!/[!@#$%^&*(),.?":{}|<>]/.test(password)) return 'Debe incluir al menos un carácter especial';
+    if (!/[!@#$%^&*(),.?":{}|<>]/.test(password))
+      return 'Debe incluir al menos un carácter especial';
     return '';
   }
 
@@ -409,53 +425,66 @@ export class AdminLayoutComponent implements OnInit, OnDestroy {
 
     // Primero verificar la contraseña actual
     console.log('🔍 Verificando contraseña actual...');
-    
-    this.backendService.verifyCurrentPassword(this.currentUser.id, this.changePasswordData.currentPassword).subscribe({
-      next: (verifyResponse) => {
-        if (!verifyResponse.isValid) {
-          console.error('❌ Contraseña actual incorrecta');
-          this.isSavingPassword = false;
-          alert('Error: La contraseña actual es incorrecta.');
-          return;
-        }
 
-        console.log('✅ Contraseña actual verificada, procediendo con el cambio...');
-        
-        // Si la contraseña actual es correcta, proceder con el cambio
-        const updateData = {
-          nombre: this.currentUser.nombre,
-          email: this.currentUser.email,
-          password: this.changePasswordData.newPassword
-        };
-
-        this.backendService.updateUsuario(this.currentUser.id, updateData).subscribe({
-          next: (response) => {
-            console.log('✅ Contraseña cambiada exitosamente:', response);
-            
-            this.isChangingPassword = false;
+    this.backendService
+      .verifyCurrentPassword(
+        this.currentUser.id,
+        this.changePasswordData.currentPassword
+      )
+      .subscribe({
+        next: (verifyResponse) => {
+          if (!verifyResponse.isValid) {
+            console.error('❌ Contraseña actual incorrecta');
             this.isSavingPassword = false;
-            this.cancelChangingPassword();
-            
-            alert('Contraseña cambiada exitosamente');
-          },
-          error: (error) => {
-            console.error('❌ Error al cambiar contraseña:', error);
-            this.isSavingPassword = false;
-            alert('Error al cambiar la contraseña. Por favor, inténtalo de nuevo.');
+            alert('Error: La contraseña actual es incorrecta.');
+            return;
           }
-        });
-      },
-      error: (error) => {
-        console.error('❌ Error al verificar contraseña actual:', error);
-        this.isSavingPassword = false;
-        
-        if (error.status === 403) {
-          alert('Error: No tienes permisos para cambiar esta contraseña.');
-        } else {
-          alert('Error al verificar la contraseña actual. Por favor, inténtalo de nuevo.');
-        }
-      }
-    });
+
+          console.log(
+            '✅ Contraseña actual verificada, procediendo con el cambio...'
+          );
+
+          // Si la contraseña actual es correcta, proceder con el cambio
+          const updateData = {
+            nombre: this.currentUser.nombre,
+            email: this.currentUser.email,
+            password: this.changePasswordData.newPassword,
+          };
+
+          this.backendService
+            .updateUsuario(this.currentUser.id, updateData)
+            .subscribe({
+              next: (response) => {
+                console.log('✅ Contraseña cambiada exitosamente:', response);
+
+                this.isChangingPassword = false;
+                this.isSavingPassword = false;
+                this.cancelChangingPassword();
+
+                alert('Contraseña cambiada exitosamente');
+              },
+              error: (error) => {
+                console.error('❌ Error al cambiar contraseña:', error);
+                this.isSavingPassword = false;
+                alert(
+                  'Error al cambiar la contraseña. Por favor, inténtalo de nuevo.'
+                );
+              },
+            });
+        },
+        error: (error) => {
+          console.error('❌ Error al verificar contraseña actual:', error);
+          this.isSavingPassword = false;
+
+          if (error.status === 403) {
+            alert('Error: No tienes permisos para cambiar esta contraseña.');
+          } else {
+            alert(
+              'Error al verificar la contraseña actual. Por favor, inténtalo de nuevo.'
+            );
+          }
+        },
+      });
   }
 
   // Alternativa: Un método que devuelve todas las validaciones
@@ -467,7 +496,7 @@ export class AdminLayoutComponent implements OnInit, OnDestroy {
       hasLower: /[a-z]/.test(password),
       hasNumber: /\d/.test(password),
       hasSpecial: /[!@#$%^&*(),.?":{}|<>]/.test(password),
-      hasContent: password.length > 0
+      hasContent: password.length > 0,
     };
   }
 }

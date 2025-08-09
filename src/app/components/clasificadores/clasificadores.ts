@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
-import { Subscription } from 'rxjs';
+import { Subscription, forkJoin } from 'rxjs';
 import { BackendService, Clasificador, Zona } from '../../services/backend.service';
 import { ZonaService, ZonaInfo } from '../../services/zona.service';
 import { DialogModule } from 'primeng/dialog';
@@ -12,9 +12,6 @@ interface Classifier {
   id: string;
   name: string;
   count: number;
-  activeCount: number;
-  inactiveCount: number;
-  pendingCount: number;
   detections: number;
 }
 
@@ -55,8 +52,7 @@ export class ClasificadoresComponent implements OnInit, OnDestroy {
 
   // Suscripciones
   private zonaSubscription: Subscription = new Subscription();
-
-
+console: any;
 
   constructor(
     private backendService: BackendService,
@@ -132,84 +128,83 @@ export class ClasificadoresComponent implements OnInit, OnDestroy {
 
     this.isLoadingClasificadores = true;
 
-    // Obtener clasificadores y detecciones en paralelo
-    Promise.all([
-      this.backendService.getClasificadoresPorZona(zonaId).toPromise(),
-      this.backendService.getDeteccionesPorZona(zonaId).toPromise()
-    ]).then(([clasificadores, detecciones]) => {
-      console.log('✅ CLASIFICADORES RECIBIDOS:', clasificadores);
-      console.log('✅ DETECCIONES RECIBIDAS:', detecciones);
+    // Primero obtener los clasificadores
+    this.backendService.getClasificadoresPorZona(zonaId).subscribe({
+      next: (clasificadores) => {
+        console.log('✅ CLASIFICADORES RECIBIDOS:', clasificadores);
 
-      if (!clasificadores || clasificadores.length === 0) {
-        console.log('ℹ️ No hay clasificadores para la zona', zonaId);
-        this.clasificadoresPorZona = [];
-      } else {
-        // Crear un mapa de conteos de detecciones por clasificador
-        const deteccionesMap = new Map();
-
-        if (detecciones && detecciones.length > 0) {
-          detecciones.forEach((deteccion: any) => {
-            const clasificadorId = deteccion.clasificadorId;
-            if (!deteccionesMap.has(clasificadorId)) {
-              deteccionesMap.set(clasificadorId, {
-                total: 0,
-                organico: 0,
-                valorizable: 0,
-                noValorizable: 0
-              });
-            }
-
-            const stats = deteccionesMap.get(clasificadorId);
-            stats.total++;
-
-            switch (deteccion.tipo) {
-              case 'Organico':
-                stats.organico++;
-                break;
-              case 'Valorizable':
-                stats.valorizable++;
-                break;
-              case 'No Valorizable':
-              case 'No Valorizanble': // Por si hay typo en la BD
-                stats.noValorizable++;
-                break;
-            }
-          });
+        if (!clasificadores || clasificadores.length === 0) {
+          console.log('ℹ️ No hay clasificadores para la zona', zonaId);
+          this.clasificadoresPorZona = [];
+          this.isLoadingClasificadores = false;
+          return;
         }
 
-        // Mapear clasificadores con sus estadísticas reales
-        this.clasificadoresPorZona = clasificadores.map((clf: any) => {
-          const stats = deteccionesMap.get(clf.id) || {
-            total: 0, organico: 0, valorizable: 0, noValorizable: 0
-          };
+        // Para cada clasificador, obtener sus estadísticas de detecciones usando forkJoin
+        const detectionRequests = clasificadores
+          .filter(clf => clf.id) // Filtrar clasificadores con ID válido
+          .map(clf => this.backendService.getDeteccionesPorClasificador(clf.id!));
 
-          return {
-            id: clf.id,
-            name: clf.nombre,
-            zonaId: clf.zonaId,
-            zona: clf.zona?.nombre || `Zona ${clf.zonaId}`,
-            latitud: clf.latitud,
-            longitud: clf.longitud,
-            fechaCreacion: clf.fechaCreacion,
-            // Estadísticas reales de detecciones
-            detections: stats.total,
-            activeCount: stats.organico,
-            inactiveCount: stats.valorizable,
-            pendingCount: stats.noValorizable,
-            count: stats.total
-          };
+        if (detectionRequests.length === 0) {
+          // Si no hay clasificadores válidos, mostrar lista vacía
+          this.clasificadoresPorZona = [];
+          this.isLoadingClasificadores = false;
+          return;
+        }
+
+        // Ejecutar todas las peticiones en paralelo usando forkJoin
+        forkJoin(detectionRequests).subscribe({
+          next: (deteccionesStats) => {
+            console.log('✅ ESTADÍSTICAS DE DETECCIONES RECIBIDAS:', deteccionesStats);
+
+            // Mapear clasificadores con sus estadísticas reales
+            this.clasificadoresPorZona = clasificadores
+              .filter(clf => clf.id) // Solo clasificadores con ID válido
+              .map((clf: any, index: number) => {
+                const stats = deteccionesStats[index] || {
+                  valorizable: 0,
+                  no_valorizable: 0,
+                  organico: 0
+                };
+
+                return {
+                  id: clf.id,
+                  name: clf.nombre,
+                  zonaId: clf.zonaId,
+                  zona: clf.zona?.nombre || `Zona ${clf.zonaId}`,
+                  latitud: clf.latitud,
+                  longitud: clf.longitud,
+                  fechaCreacion: clf.fechaCreacion,
+                  activo: clf.activo,
+                  valorizable: stats.valorizable,
+                  no_valorizable: stats.no_valorizable,
+                  organico: stats.organico,
+                  count: stats.valorizable + stats.no_valorizable + stats.organico,
+                };
+              });
+
+            console.log('🔄 Clasificadores procesados:', this.clasificadoresPorZona.length);
+            console.log('🔄 Datos finales:', this.clasificadoresPorZona);
+
+            this.filteredClassifiers = [...this.clasificadoresPorZona];
+            this.isLoadingClasificadores = false;
+          },
+          error: (error) => {
+            console.error('❌ ERROR AL CARGAR ESTADÍSTICAS DE DETECCIONES:', error);
+            // Si falla, mostrar clasificadores sin estadísticas
+            this.clasificadoresPorZona = clasificadores
+              .filter(clf => clf.id)
+            this.filteredClassifiers = [...this.clasificadoresPorZona];
+            this.isLoadingClasificadores = false;
+          }
         });
+
+      },
+      error: (error) => {
+        console.error('❌ ERROR AL CARGAR CLASIFICADORES:', error);
+        this.clasificadoresPorZona = [];
+        this.isLoadingClasificadores = false;
       }
-
-      console.log('🔄 Clasificadores procesados:', this.clasificadoresPorZona.length);
-      console.log('🔄 Datos finales:', this.clasificadoresPorZona);
-
-      this.filteredClassifiers = [...this.clasificadoresPorZona];
-      this.isLoadingClasificadores = false;
-    }).catch((error) => {
-      console.error('❌ ERROR AL CARGAR DATOS:', error);
-      this.clasificadoresPorZona = [];
-      this.isLoadingClasificadores = false;
     });
   }
 
@@ -248,7 +243,7 @@ export class ClasificadoresComponent implements OnInit, OnDestroy {
     }
 
     // Si no hay búsqueda, mostrar todos los de la zona actual
-    console.log('📋 Mostrando todos los clasificadores:', this.clasificadoresPorZona.length);
+    console.log('📋 Mostrando todos los clasificadores:', this.clasificadoresPorZona);
     return this.clasificadoresPorZona;
   }
 
@@ -260,6 +255,16 @@ export class ClasificadoresComponent implements OnInit, OnDestroy {
 
   getTotalCount(): number {
     return this.getCurrentClassifiers().length;
+  }
+
+  getTotalDetectionsCount(): number {
+    const classifiers = this.getCurrentClassifiers();
+    return classifiers.reduce((sum: number, classifier: any) => {
+      const activeCount = classifier.activeCount || 0;
+      const inactiveCount = classifier.inactiveCount || 0;
+      const pendingCount = classifier.pendingCount || 0;
+      return sum + activeCount + inactiveCount + pendingCount;
+    }, 0);
   }
 
   // Método para cambiar zona (si se implementa selector de zona)

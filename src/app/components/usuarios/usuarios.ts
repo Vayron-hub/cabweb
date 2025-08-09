@@ -7,7 +7,12 @@ import { TagModule } from 'primeng/tag';
 import { InputTextModule } from 'primeng/inputtext';
 import { CheckboxModule } from 'primeng/checkbox';
 import { Subscription } from 'rxjs';
-import { BackendService, Zona, User, newUser } from '../../services/backend.service';
+import {
+  BackendService,
+  Zona,
+  User,
+  newUser,
+} from '../../services/backend.service';
 import { ZonaService, ZonaInfo } from '../../services/zona.service';
 import { AuthService } from '../../services/auth';
 import { DialogModule } from 'primeng/dialog';
@@ -24,7 +29,7 @@ import { lastValueFrom } from 'rxjs';
     TagModule,
     InputTextModule,
     CheckboxModule,
-    DialogModule
+    DialogModule,
   ],
   templateUrl: './usuarios.html',
 })
@@ -44,7 +49,7 @@ export class UsuariosComponent implements OnInit, OnDestroy {
   roleOptions = [
     { label: 'Administrador', value: 'administrador' },
     { label: 'Usuario', value: 'usuario' },
-    { label: 'Operador', value: 'operador' }
+    { label: 'Operador', value: 'operador' },
   ];
 
   newUser: newUser = {
@@ -87,9 +92,12 @@ export class UsuariosComponent implements OnInit, OnDestroy {
         if (zonaInfo.id) {
           this.selectedLocation = zonaInfo.nombre;
           this.selectedZonaId = zonaInfo.id;
-          console.log('📍 Zona actualizada en usuarios:', this.selectedLocation);
+          console.log(
+            '📍 Zona actualizada en usuarios:',
+            this.selectedLocation
+          );
         }
-      }
+      },
     });
   }
 
@@ -112,12 +120,16 @@ export class UsuariosComponent implements OnInit, OnDestroy {
         this.allUsers = this.authService.getAllUsers();
         this.filteredUsers = [...this.allUsers];
         this.isLoadingUsers = false;
-      }
+      },
     });
   }
 
   postUser() {
-    if (!this.newUser.nombre || !this.newUser.correo || !this.newUser.password) {
+    if (
+      !this.newUser.nombre ||
+      !this.newUser.correo ||
+      !this.newUser.password
+    ) {
       alert('Por favor, completa todos los campos del formulario.');
       return;
     } else if (this.newUser.password.length < 8) {
@@ -135,30 +147,32 @@ export class UsuariosComponent implements OnInit, OnDestroy {
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(this.newUser.correo)) {
       alert('Por favor, ingresa un correo electrónico válido.');
       return;
-    } else if (this.allUsers.some(user => user.correo === this.newUser.correo)) {
+    } else if (
+      this.allUsers.some((user) => user.correo === this.newUser.correo)
+    ) {
       alert('Ya existe un usuario con este correo electrónico.');
       return;
     } else {
-      console.log('📤 Enviando nuevo usuario al backend:', this.newUser)
+      console.log('📤 Enviando nuevo usuario al backend:', this.newUser);
       this.backendService.postUsuarios(this.newUser).subscribe({
         next: (response) => {
-          console.log('✅ Usuario creado exitosamente:', response)
+          console.log('✅ Usuario creado exitosamente:', response);
           this.loadUsers();
           this.hideDialog();
         },
         error: (error) => {
           console.error('Error al crear usuario:', error);
           alert('Error al crear el usuario. Por favor, inténtalo de nuevo.');
-        }
+        },
       });
     }
   }
 
   filterUsers() {
-    this.filteredUsers = this.allUsers.filter(user => {
-      const matchesSearch = user.nombre.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
+    this.filteredUsers = this.allUsers.filter((user) => {
+      const matchesSearch =
+        user.nombre.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
         user.correo.toLowerCase().includes(this.searchTerm.toLowerCase());
-
 
       return matchesSearch;
     });
@@ -169,18 +183,18 @@ export class UsuariosComponent implements OnInit, OnDestroy {
     if (event.target.checked) {
       this.selectedRoles.push(role);
     } else {
-      this.selectedRoles = this.selectedRoles.filter(r => r !== role);
+      this.selectedRoles = this.selectedRoles.filter((r) => r !== role);
     }
     this.filterUsers();
   }
 
   // Métodos de estadísticas
   getActiveUsersCount(): number {
-    return this.allUsers.filter(user => user.estado === 'Activo').length;
+    return this.allUsers.filter((user) => user.estado === 'Activo').length;
   }
 
   getInactiveUsersCount(): number {
-    return this.allUsers.filter(user => user.estado !== 'Activo').length;
+    return this.allUsers.filter((user) => user.estado !== 'Activo').length;
   }
 
   getTotalUsersCount(): number {
@@ -192,20 +206,23 @@ export class UsuariosComponent implements OnInit, OnDestroy {
     if (event.target.checked) {
       this.selectedUsers.push(userId);
     } else {
-      this.selectedUsers = this.selectedUsers.filter(id => id !== userId);
+      this.selectedUsers = this.selectedUsers.filter((id) => id !== userId);
     }
   }
 
   selectAllUsers(event: any) {
     if (event.target.checked) {
-      this.selectedUsers = [...this.filteredUsers.map(user => user.id)];
+      this.selectedUsers = [...this.filteredUsers.map((user) => user.id)];
     } else {
       this.selectedUsers = [];
     }
   }
 
   allUsersSelected(): boolean {
-    return this.selectedUsers.length === this.filteredUsers.length && this.filteredUsers.length > 0;
+    return (
+      this.selectedUsers.length === this.filteredUsers.length &&
+      this.filteredUsers.length > 0
+    );
   }
 
   // Métodos de acción
@@ -220,7 +237,9 @@ export class UsuariosComponent implements OnInit, OnDestroy {
   }
 
   deleteUser(user: User) {
-    if (confirm(`¿Estás seguro de que deseas eliminar al usuario ${user.nombre}?`)) {
+    if (
+      confirm(`¿Estás seguro de que deseas eliminar al usuario ${user.nombre}?`)
+    ) {
       console.log('🗑️ Eliminando usuario:', user.nombre);
 
       this.backendService.deleteUsuario(user.id).subscribe({
@@ -232,7 +251,7 @@ export class UsuariosComponent implements OnInit, OnDestroy {
         error: (error) => {
           console.error('❌ Error al eliminar usuario:', error);
           alert('Error al eliminar el usuario. Por favor, inténtalo de nuevo.');
-        }
+        },
       });
     }
   }
@@ -246,14 +265,14 @@ export class UsuariosComponent implements OnInit, OnDestroy {
     // Actualizar el estado (asumiendo que el backend maneja 'activo' como boolean)
     const updateData = {
       ...user,
-      activo: newStatus === 'Activo'
+      activo: newStatus === 'Activo',
     };
 
     this.backendService.updateUsuario(user.id, updateData).subscribe({
       next: (updatedUser) => {
         console.log('✅ Estado de usuario actualizado exitosamente');
         // Actualizar el usuario en la lista local
-        const userIndex = this.allUsers.findIndex(u => u.id === user.id);
+        const userIndex = this.allUsers.findIndex((u) => u.id === user.id);
         if (userIndex !== -1) {
           this.allUsers[userIndex] = updatedUser;
           this.filterUsers();
@@ -261,8 +280,10 @@ export class UsuariosComponent implements OnInit, OnDestroy {
       },
       error: (error) => {
         console.error('❌ Error al actualizar estado del usuario:', error);
-        alert('Error al cambiar el estado del usuario. Por favor, inténtalo de nuevo.');
-      }
+        alert(
+          'Error al cambiar el estado del usuario. Por favor, inténtalo de nuevo.'
+        );
+      },
     });
   }
 
@@ -276,23 +297,31 @@ export class UsuariosComponent implements OnInit, OnDestroy {
     console.log('🔄 Activando usuarios seleccionados:', this.selectedUsers);
 
     // Procesar cada usuario seleccionado
-    const updatePromises = this.selectedUsers.map(userId => {
-      const user = this.allUsers.find(u => u.id === userId);
-      if (user) {
-        const updateData = { ...user, activo: true };
-        return this.backendService.updateUsuario(userId, updateData).toPromise();
-      }
-      return null;
-    }).filter(promise => promise !== null);
+    const updatePromises = this.selectedUsers
+      .map((userId) => {
+        const user = this.allUsers.find((u) => u.id === userId);
+        if (user) {
+          const updateData = { ...user, activo: true };
+          return this.backendService
+            .updateUsuario(userId, updateData)
+            .toPromise();
+        }
+        return null;
+      })
+      .filter((promise) => promise !== null);
 
-    Promise.all(updatePromises).then(() => {
-      console.log('✅ Usuarios activados exitosamente');
-      this.selectedUsers = [];
-      this.loadUsers();
-    }).catch(error => {
-      console.error('❌ Error al activar usuarios:', error);
-      alert('Error al activar algunos usuarios. Por favor, inténtalo de nuevo.');
-    });
+    Promise.all(updatePromises)
+      .then(() => {
+        console.log('✅ Usuarios activados exitosamente');
+        this.selectedUsers = [];
+        this.loadUsers();
+      })
+      .catch((error) => {
+        console.error('❌ Error al activar usuarios:', error);
+        alert(
+          'Error al activar algunos usuarios. Por favor, inténtalo de nuevo.'
+        );
+      });
   }
 
   bulkDeactivateUsers() {
@@ -304,108 +333,65 @@ export class UsuariosComponent implements OnInit, OnDestroy {
     console.log('🔄 Desactivando usuarios seleccionados:', this.selectedUsers);
 
     // Procesar cada usuario seleccionado
-    const updatePromises = this.selectedUsers.map(userId => {
-      const user = this.allUsers.find(u => u.id === userId);
-      if (user) {
-        const updateData = { ...user, activo: false };
-        return this.backendService.updateUsuario(userId, updateData).toPromise();
-      }
-      return null;
-    }).filter(promise => promise !== null);
+    const updatePromises = this.selectedUsers
+      .map((userId) => {
+        const user = this.allUsers.find((u) => u.id === userId);
+        if (user) {
+          const updateData = { ...user, activo: false };
+          return this.backendService
+            .updateUsuario(userId, updateData)
+            .toPromise();
+        }
+        return null;
+      })
+      .filter((promise) => promise !== null);
 
-    Promise.all(updatePromises).then(() => {
-      console.log('✅ Usuarios desactivados exitosamente');
-      this.selectedUsers = [];
-      this.loadUsers();
-    }).catch(error => {
-      console.error('❌ Error al desactivar usuarios:', error);
-      alert('Error al desactivar algunos usuarios. Por favor, inténtalo de nuevo.');
-    });
+    Promise.all(updatePromises)
+      .then(() => {
+        console.log('✅ Usuarios desactivados exitosamente');
+        this.selectedUsers = [];
+        this.loadUsers();
+      })
+      .catch((error) => {
+        console.error('❌ Error al desactivar usuarios:', error);
+        alert(
+          'Error al desactivar algunos usuarios. Por favor, inténtalo de nuevo.'
+        );
+      });
   }
 
   bulkDeleteUsers() {
-  if (this.selectedUsers.length === 0) {
-    alert('Por favor, selecciona usuarios para eliminar.');
-    return;
-  }
-
-  if (confirm(`¿Estás seguro de que deseas eliminar ${this.selectedUsers.length} usuarios?`)) {
-    console.log('🗑️ Eliminando usuarios seleccionados:', this.selectedUsers);
-
-    // Usar lastValueFrom en lugar de toPromise()
-    const deletePromises = this.selectedUsers.map(userId =>
-      lastValueFrom(this.backendService.deleteUsuario(userId))
-    );
-
-    Promise.all(deletePromises).then((responses) => {
-      console.log('✅ Respuestas del servidor:', responses);
-      console.log('✅ Usuarios eliminados exitosamente');
-      this.selectedUsers = [];
-      this.loadUsers();
-    }).catch(error => {
-      console.error('❌ Error al eliminar usuarios:', error);
-      alert('Error al eliminar algunos usuarios. Por favor, inténtalo de nuevo.');
-    });
-  }
-}
-
-  exportUsersData() {
-    console.log('📊 Exportando datos de usuarios...');
-
-    if (this.filteredUsers.length === 0) {
-      alert('No hay usuarios para exportar.');
+    if (this.selectedUsers.length === 0) {
+      alert('Por favor, selecciona usuarios para eliminar.');
       return;
     }
 
-    // Crear datos CSV
-    const csvHeaders = ['ID', 'Nombre', 'Correo', 'Rol', 'Estado', 'Fecha Creación', 'Último Acceso'];
-    const csvData = this.filteredUsers.map(user => [
-      user.id,
-      user.nombre,
-      user.correo,
-      user.estado || 'Inactivo',
-      this.formatDate(user.fechaCreacion),
-      this.formatDate(user.ultimoAcceso)
-    ]);
+    if (
+      confirm(
+        `¿Estás seguro de que deseas eliminar ${this.selectedUsers.length} usuarios?`
+      )
+    ) {
+      console.log('🗑️ Eliminando usuarios seleccionados:', this.selectedUsers);
 
-    // Convertir a CSV
-    const csvContent = [csvHeaders, ...csvData]
-      .map(row => row.map(field => `"${field}"`).join(','))
-      .join('\n');
+      // Usar lastValueFrom en lugar de toPromise()
+      const deletePromises = this.selectedUsers.map((userId) =>
+        lastValueFrom(this.backendService.deleteUsuario(userId))
+      );
 
-    // Crear y descargar archivo
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement('a');
-    const url = URL.createObjectURL(blob);
-    link.setAttribute('href', url);
-    link.setAttribute('download', `usuarios_${new Date().toISOString().split('T')[0]}.csv`);
-    link.style.visibility = 'hidden';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-
-    console.log('✅ Datos exportados exitosamente');
-  }
-
-  // Métodos de utilidad
-  getRoleClass(rol: string | undefined): string {
-    if (!rol) return 'role-user';
-    switch (rol.toLowerCase()) {
-      case 'administrador': return 'role-admin';
-      case 'operador': return 'role-moderator';
-      case 'usuario': return 'role-user';
-      default: return 'role-user';
+      Promise.all(deletePromises)
+        .then((responses) => {
+          console.log('✅ Respuestas del servidor:', responses);
+          console.log('✅ Usuarios eliminados exitosamente');
+          this.selectedUsers = [];
+          this.loadUsers();
+        })
+        .catch((error) => {
+          console.error('❌ Error al eliminar usuarios:', error);
+          alert(
+            'Error al eliminar algunos usuarios. Por favor, inténtalo de nuevo.'
+          );
+        });
     }
-  }
-
-  getStatusClass(estado: string | undefined): string {
-    if (!estado) return 'status-inactive';
-    return estado === 'Activo' ? 'status-active' : 'status-inactive';
-  }
-
-  getStatusIcon(estado: string | undefined): string {
-    if (!estado) return 'pi-times-circle';
-    return estado === 'Activo' ? 'pi-check-circle' : 'pi-times-circle';
   }
 
   formatDate(fecha: Date | string | undefined): string {
@@ -413,7 +399,7 @@ export class UsuariosComponent implements OnInit, OnDestroy {
     return new Date(fecha).toLocaleDateString('es-ES', {
       day: '2-digit',
       month: '2-digit',
-      year: 'numeric'
+      year: 'numeric',
     });
   }
 
@@ -421,19 +407,18 @@ export class UsuariosComponent implements OnInit, OnDestroy {
     return user.id;
   }
 
-
   canDeleteUser(): boolean {
     // Primero verificar que haya usuarios seleccionados
     if (this.selectedUsers.length === 0) {
-      return false; 
+      return false;
     }
-    
+
     const currentUser = this.authService.getCurrentUser();
     // No permitir eliminar si el usuario actual está en la selección
     if (currentUser && this.selectedUsers.includes(currentUser.id)) {
       return false;
     }
-    
+
     return true; // Solo permite eliminar si hay usuarios seleccionados Y no incluye el usuario actual
   }
 
