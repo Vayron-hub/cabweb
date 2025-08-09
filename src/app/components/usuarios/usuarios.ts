@@ -51,6 +51,7 @@ export class UsuariosComponent implements OnInit, OnDestroy {
     nombre: '',
     correo: '',
     password: '',
+    rol: ''
   };
 
   // Selección múltiple
@@ -445,7 +446,8 @@ export class UsuariosComponent implements OnInit, OnDestroy {
     this.newUser = {
       nombre: '',
       correo: '',
-      password: ''
+      password: '',
+      rol: ''
     };
     this.visible = false;
   }

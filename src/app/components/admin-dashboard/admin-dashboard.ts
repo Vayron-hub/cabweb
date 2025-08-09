@@ -40,12 +40,13 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
     nombre: 'root',
     correo: 'admin@utleon.edu.mx',
     email: 'admin@utleon.edu.mx',
-    password: '',// Compatibilidad
+    rol: 'admin', 
+    password: '',
     activo: true,
     enLinea: false,
     fechaCreacion: '2025-07-26',
     fechaUltimoAcceso: null,
-    ultimoAcceso: new Date() // Compatibilidad con frontend
+    ultimoAcceso: new Date() 
   };
   userMenuOpen = false;
   showAccountModal = false;

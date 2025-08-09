@@ -10,6 +10,7 @@ export interface User {
   nombre: string;
   correo: string;
   password: string; // Tu backend usa 'correo', no 'email'
+  rol: string;
   fechaCreacion?: string;
   fechaUltimoAcceso?: string | null; // Puede ser null
   enLinea?: boolean; // Estado online/offline
@@ -18,13 +19,14 @@ export interface User {
   // Propiedades calculadas para compatibilidad con el frontend
   email?: string; // Mapeado desde 'correo'
   estado?: string; // Mapeado desde 'activo'
-  ultimoAcceso?: Date | string; // Mapeado desde 'fechaUltimoAcceso'
+  ultimoAcceso?: Date | string;
 }
 
 export interface newUser{
   nombre: string;
   correo: string;
   password: string;
+  rol: string
 }
 
 export interface LoginRequest {
@@ -215,6 +217,14 @@ export class BackendService {
       );
   }
 
+  getRole(id: number): Observable<string>{
+    
+    return this.http.get<User>(`${this.apiUrl}/usuarios/${id}`)
+    .pipe(
+      map(usuario => usuario.rol || 'client'),
+      catchError(this.handleError));
+  }
+
   // Método helper para transformar usuarios del backend al formato del frontend
   private transformUserFromBackend(backendUser: any): User {
     return {
@@ -222,7 +232,7 @@ export class BackendService {
       email: backendUser.correo, // Mapear correo -> email
       estado: backendUser.activo ? 'Activo' : 'Inactivo', // Mapear boolean -> string
       ultimoAcceso: backendUser.fechaUltimoAcceso || 'Nunca', // Manejar null
-      rol: backendUser.rol || 'Usuario' // Rol por defecto si no existe
+      rol: backendUser.rol || 'client' // Rol por defecto si no existe
     };
   }
 
