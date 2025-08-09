@@ -10,23 +10,24 @@ import { Subscription } from 'rxjs';
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './estadisticas.html',
-  styleUrl: './estadisticas.css'
 })
 export class EstadisticasComponent implements OnInit, OnDestroy {
   selectedLocation: string = ''; // Recibir zona del ZonaService
-  
+
   private zonaSubscription?: Subscription;
-  
+
   isLoadingStats = false;
-  
+
   // Datos del backend - SIN hardcode
   allDetecciones: any[] = [];
   allZonas: any[] = [];
   allUsuarios: any[] = [];
-  
+  classifierPerformance: any[] = [];
+  hourlyActivity: any[] = [];
+
   // Datos filtrados por zona
   deteccionesPorHora: number[] = [0, 0, 0, 0];
-  clasificacionesExitosas: number[] = [0, 0, 0, 0]; 
+  clasificacionesExitosas: number[] = [0, 0, 0, 0];
   flujoTransporte: number[] = [0, 0, 0, 0];
   actividadUsuarios: number[] = [0, 0, 0, 0];
 
@@ -35,16 +36,17 @@ export class EstadisticasComponent implements OnInit, OnDestroy {
   estadisticasZonas: EstadisticasZonas[] = [];
   estadisticasTipos: EstadisticasTipos[] = [];
   estadisticasHorarios: EstadisticasHorarios[] = [];
+  
 
   constructor(
     private backendService: BackendService,
     private cdr: ChangeDetectorRef,
     private zonaService: ZonaService
-  ) {}
+  ) { }
 
   ngOnInit() {
     console.log('📊 EstadisticasComponent iniciado');
-    
+
     // Suscribirse a los cambios de zona
     this.zonaSubscription = this.zonaService.selectedZona$.subscribe(zona => {
       console.log('🗺️ Zona recibida del ZonaService:', zona);
@@ -52,9 +54,12 @@ export class EstadisticasComponent implements OnInit, OnDestroy {
         this.selectedLocation = zona.nombre;
         console.log(`� Cambiando estadísticas a zona: ${this.selectedLocation}`);
         this.loadDataForSelectedZone();
+
+        this.loadClassifierPerformance();
+        this.loadHourlyActivity();
       }
     });
-    
+
     this.loadBackendData();
   }
 
@@ -70,16 +75,13 @@ export class EstadisticasComponent implements OnInit, OnDestroy {
     // Aquí puedes usar el endpoint /api/reportes/exportar/estadisticas
   }
 
-  refreshStatistics() {
-    console.log('🔄 Actualizando estadísticas desde el backend...');
-    this.loadDataForSelectedZone(); // Usar método correcto
-  }
+
 
   // Cargar todos los datos del backend
   private loadBackendData() {
     this.isLoadingStats = true;
     console.log('📊 Cargando datos del backend...');
-    
+
     // Solo cargar todas las zonas y usuarios inicialmente
     // Las detecciones se cargarán específicamente por zona cuando se seleccione
 
@@ -109,7 +111,7 @@ export class EstadisticasComponent implements OnInit, OnDestroy {
         this.actividadUsuarios = [0, 0, 0, 0];
       }
     });
-    
+
     setTimeout(() => {
       this.isLoadingStats = false;
       this.cdr.detectChanges();
@@ -121,11 +123,13 @@ export class EstadisticasComponent implements OnInit, OnDestroy {
     if (!this.selectedLocation) {
       console.log('⚠️ No hay zona seleccionada');
       this.generateEmptyStats();
+      this.loadClassifierPerformance();
+      this.loadHourlyActivity();
       return;
     }
 
     console.log(`🔍 Cargando datos reales para zona: ${this.selectedLocation}`);
-    
+
     // Encontrar la zona seleccionada
     const zonaSeleccionada = this.allZonas.find(z => z.nombre === this.selectedLocation);
     if (!zonaSeleccionada) {
@@ -138,6 +142,9 @@ export class EstadisticasComponent implements OnInit, OnDestroy {
 
     // USAR ENDPOINTS REALES ESPECÍFICOS PARA LA ZONA
     this.loadRealStatisticsForZone(zonaSeleccionada);
+
+    this.loadClassifierPerformance();
+    this.loadHourlyActivity();
   }
 
   // Cargar estadísticas usando endpoints reales del backend para zona específica
@@ -155,7 +162,7 @@ export class EstadisticasComponent implements OnInit, OnDestroy {
         console.log(`✅ Detecciones cargadas para ${zona.nombre}:`, detecciones);
         this.processZoneDetections(detecciones, zona, clasificadoresCount);
         deteccionesLoaded = true;
-        
+
         // Si ambos están cargados, finalizar loading
         if (clasificadoresLoaded) {
           this.finishLoading();
@@ -174,16 +181,16 @@ export class EstadisticasComponent implements OnInit, OnDestroy {
       next: (clasificadores: any[]) => {
         console.log(`✅ Clasificadores cargados para ${zona.nombre}:`, clasificadores);
         clasificadoresCount = clasificadores.length;
-        
+
         // Actualizar las estadísticas con el contador correcto
         if (this.estadisticasGenerales) {
           this.estadisticasGenerales.totalClasificadores = clasificadoresCount;
           console.log(`🔢 Clasificadores actualizados: ${clasificadoresCount}`);
           this.cdr.detectChanges();
         }
-        
+
         clasificadoresLoaded = true;
-        
+
         // Si ambos están cargados, finalizar loading
         if (deteccionesLoaded) {
           this.finishLoading();
@@ -198,7 +205,7 @@ export class EstadisticasComponent implements OnInit, OnDestroy {
           this.cdr.detectChanges();
         }
         clasificadoresLoaded = true;
-        
+
         // Si detecciones están cargadas, finalizar loading
         if (deteccionesLoaded) {
           this.finishLoading();
@@ -220,13 +227,13 @@ export class EstadisticasComponent implements OnInit, OnDestroy {
   // Procesar detecciones reales de la zona
   private processZoneDetections(detecciones: any[], zona: any, clasificadoresCount: number = 0) {
     console.log(`📈 Procesando ${detecciones.length} detecciones para ${zona.nombre}...`);
-    
+
     const totalDetecciones = detecciones.length;
     const hoy = new Date().toDateString();
-    const deteccionesHoy = detecciones.filter(d => 
+    const deteccionesHoy = detecciones.filter(d =>
       new Date(d.fechaHora).toDateString() === hoy
     ).length;
-    
+
     // Estadísticas generales con datos reales
     this.estadisticasGenerales = {
       totalDetecciones: totalDetecciones,
@@ -247,7 +254,7 @@ export class EstadisticasComponent implements OnInit, OnDestroy {
     this.clasificacionesExitosas = this.generateRealTypeDistribution(detecciones);
     this.estadisticasTipos = this.generateRealTypesFromDetections(detecciones);
     this.estadisticasHorarios = this.generateRealHourlyStats(detecciones);
-    
+
     // Estadísticas de zona (solo la seleccionada)
     this.estadisticasZonas = [{
       id: zona.id,
@@ -258,10 +265,10 @@ export class EstadisticasComponent implements OnInit, OnDestroy {
       ultimaActividad: null,
       tipoMasComun: null
     }];
-    
+
     // Flujo de transporte basado en detecciones por horas pico
     this.flujoTransporte = this.deteccionesPorHora;
-    
+
     console.log(`✅ Estadísticas reales procesadas para ${zona.nombre} con ${clasificadoresCount} clasificadores`);
     // No finalizar loading aquí - se hace en finishLoading()
     this.cdr.detectChanges();
@@ -270,7 +277,7 @@ export class EstadisticasComponent implements OnInit, OnDestroy {
   // Procesar clasificadores reales de la zona (método simplificado)
   private processZoneClassifiers(clasificadores: any[], zona: any) {
     console.log(`🤖 Procesando ${clasificadores.length} clasificadores para ${zona.nombre}...`);
-    
+
     // Este método ya no necesita actualizar estadísticas - se hace en loadRealStatisticsForZone
     console.log(`✅ Clasificadores procesados para ${zona.nombre}: ${clasificadores.length} encontrados`);
   }
@@ -333,7 +340,7 @@ export class EstadisticasComponent implements OnInit, OnDestroy {
   // Generar estadísticas vacías cuando no hay datos
   private generateEmptyStats() {
     console.log(`🔄 Generando estadísticas vacías para ${this.selectedLocation}`);
-    
+
     this.estadisticasGenerales = {
       totalDetecciones: 0,
       deteccionesHoy: 0,
@@ -343,14 +350,14 @@ export class EstadisticasComponent implements OnInit, OnDestroy {
       totalClasificadores: 0, // Siempre inicializar en 0
       totalZonas: 1
     };
-    
+
     this.deteccionesPorHora = [0, 0, 0, 0];
     this.clasificacionesExitosas = [0, 0, 0, 0];
     this.flujoTransporte = [0, 0, 0, 0];
     this.estadisticasTipos = [];
     this.estadisticasZonas = [];
     this.estadisticasHorarios = [];
-    
+
     this.isLoadingStats = false;
     this.cdr.detectChanges();
     console.log(`✅ Estadísticas vacías generadas para ${this.selectedLocation}`);
@@ -360,7 +367,7 @@ export class EstadisticasComponent implements OnInit, OnDestroy {
   private loadRealStatistics() {
     this.isLoadingStats = true;
     console.log('📊 Cargando estadísticas usando endpoints existentes...');
-    
+
     // Usar datos de detecciones existentes para generar estadísticas
     this.backendService.getDetecciones().subscribe({
       next: (detecciones: any[]) => {
@@ -401,7 +408,7 @@ export class EstadisticasComponent implements OnInit, OnDestroy {
         this.actividadUsuarios = [2, 8, 12, 5]; // Valores por defecto
       }
     });
-    
+
     setTimeout(() => {
       this.isLoadingStats = false;
       this.cdr.detectChanges();
@@ -411,24 +418,24 @@ export class EstadisticasComponent implements OnInit, OnDestroy {
   // Generar estadísticas desde detecciones reales (filtradas por zona)
   private generateStatisticsFromDetections(detecciones: any[]) {
     console.log(`📈 Generando estadísticas desde detecciones de ${this.selectedLocation}...`);
-    
+
     // Filtrar detecciones por zona seleccionada
     const zonaSeleccionada = this.allZonas.find(z => z.nombre === this.selectedLocation);
     const deteccionesFiltradas = detecciones.filter(d => {
-      return d.id === zonaSeleccionada?.id || 
-             d.zona === this.selectedLocation ||
-             d.ubicacion === this.selectedLocation;
+      return d.id === zonaSeleccionada?.id ||
+        d.zona === this.selectedLocation ||
+        d.ubicacion === this.selectedLocation;
     });
-    
+
     console.log(`🔍 Detecciones filtradas para ${this.selectedLocation}:`, deteccionesFiltradas);
-    
+
     // Simular estadísticas generales basadas en detecciones filtradas
     const totalDetecciones = deteccionesFiltradas.length;
     const hoy = new Date().toDateString();
-    const deteccionesHoy = deteccionesFiltradas.filter(d => 
+    const deteccionesHoy = deteccionesFiltradas.filter(d =>
       new Date(d.fechaHora || d.fecha).toDateString() === hoy
     ).length;
-    
+
     this.estadisticasGenerales = {
       totalDetecciones: totalDetecciones,
       deteccionesHoy: deteccionesHoy,
@@ -441,13 +448,13 @@ export class EstadisticasComponent implements OnInit, OnDestroy {
 
     // Generar distribución por horas (6AM, 12PM, 6PM, 12AM) para la zona
     this.deteccionesPorHora = this.generateHourlyDistribution(deteccionesFiltradas);
-    
+
     // Generar clasificaciones por tipo para la zona
     this.clasificacionesExitosas = this.generateTypeDistribution(deteccionesFiltradas);
-    
+
     // Generar estadísticas de tipos para gráficos avanzados
     this.estadisticasTipos = this.generateTiposFromDetections(deteccionesFiltradas);
-    
+
     console.log(`✅ Estadísticas generadas para ${this.selectedLocation}:`, {
       generales: this.estadisticasGenerales,
       porHora: this.deteccionesPorHora,
@@ -467,7 +474,7 @@ export class EstadisticasComponent implements OnInit, OnDestroy {
       'Cafetería': 2,
       'Almacén': 3
     };
-    
+
     return classifiersByZone[this.selectedLocation] || 2;
   }
 
@@ -478,8 +485,8 @@ export class EstadisticasComponent implements OnInit, OnDestroy {
         const date = new Date(d.fechaHora || d.fecha);
         const hour = date.getHours();
         // Contar detecciones en un rango de ±2 horas
-        return Math.abs(hour - targetHour) <= 2 || 
-               (targetHour === 0 && (hour >= 22 || hour <= 2));
+        return Math.abs(hour - targetHour) <= 2 ||
+          (targetHour === 0 && (hour >= 22 || hour <= 2));
       }).length;
     });
   }
@@ -487,7 +494,7 @@ export class EstadisticasComponent implements OnInit, OnDestroy {
   private generateTypeDistribution(detecciones: any[]): number[] {
     const tipos = ['Valorizable', 'Orgánico', 'No Valorizable', 'Mixto'];
     return tipos.map(tipo => {
-      return detecciones.filter(d => 
+      return detecciones.filter(d =>
         d.tipo && d.tipo.toLowerCase().includes(tipo.toLowerCase())
       ).length || Math.floor(Math.random() * 15) + 5; // Fallback con datos simulados
     });
@@ -495,7 +502,7 @@ export class EstadisticasComponent implements OnInit, OnDestroy {
 
   private generateTiposFromDetections(detecciones: any[]): EstadisticasTipos[] {
     const tiposMap = new Map<string, number>();
-    
+
     detecciones.forEach(d => {
       const tipo = d.tipo || 'No Clasificado';
       tiposMap.set(tipo, (tiposMap.get(tipo) || 0) + 1);
@@ -503,7 +510,7 @@ export class EstadisticasComponent implements OnInit, OnDestroy {
 
     const total = detecciones.length || 1;
     const result: EstadisticasTipos[] = [];
-    
+
     tiposMap.forEach((cantidad, tipo) => {
       result.push({
         tipo: tipo,
@@ -527,7 +534,7 @@ export class EstadisticasComponent implements OnInit, OnDestroy {
 
   private generateZoneStatistics(zonas: any[]) {
     console.log('🗺️ Generando estadísticas de zonas...');
-    
+
     this.estadisticasZonas = zonas.map((zona, index) => ({
       id: zona.id,
       nombre: zona.nombre,
@@ -542,13 +549,13 @@ export class EstadisticasComponent implements OnInit, OnDestroy {
     this.flujoTransporte = this.estadisticasZonas
       .slice(0, 4)
       .map(zona => zona.totalDetecciones);
-      
+
     console.log('✅ Estadísticas de zonas generadas:', this.estadisticasZonas);
   }
 
   private generateUserStatistics(usuarios: any[]) {
     console.log('👥 Generando estadísticas de usuarios...');
-    
+
     const total = usuarios.length;
     // Distribución simulada por tipo de usuario
     this.actividadUsuarios = [
@@ -557,14 +564,14 @@ export class EstadisticasComponent implements OnInit, OnDestroy {
       Math.floor(total * 0.4), // Visualizadores (40%)
       Math.floor(total * 0.2)  // Invitados (20%)
     ];
-    
+
     console.log('✅ Estadísticas de usuarios generadas:', this.actividadUsuarios);
   }
 
   // Generar datos simulados si no hay datos reales (específicos por zona)
   private generateMockStatistics() {
     console.log(`🎭 Generando estadísticas simuladas para ${this.selectedLocation}...`);
-    
+
     // Datos base según la zona seleccionada
     const dataByZone: { [key: string]: any } = {
       'Edificio A': { base: 800, multiplier: 0.8, efficiency: 0.85 },
@@ -574,9 +581,9 @@ export class EstadisticasComponent implements OnInit, OnDestroy {
       'Cafetería': { base: 400, multiplier: 0.4, efficiency: 0.70 },
       'Almacén': { base: 300, multiplier: 0.3, efficiency: 0.65 }
     };
-    
+
     const zoneData = dataByZone[this.selectedLocation] || dataByZone['Edificio D'];
-    
+
     this.estadisticasGenerales = {
       totalDetecciones: Math.floor(zoneData.base * zoneData.multiplier),
       deteccionesHoy: Math.floor(45 * zoneData.multiplier),
@@ -588,26 +595,26 @@ export class EstadisticasComponent implements OnInit, OnDestroy {
     };
 
     this.deteccionesPorHora = [
-      Math.floor(12 * zoneData.multiplier), 
-      Math.floor(28 * zoneData.multiplier), 
-      Math.floor(35 * zoneData.multiplier), 
+      Math.floor(12 * zoneData.multiplier),
+      Math.floor(28 * zoneData.multiplier),
+      Math.floor(35 * zoneData.multiplier),
       Math.floor(18 * zoneData.multiplier)
     ];
-    
+
     this.clasificacionesExitosas = [
-      Math.floor(45 * zoneData.efficiency), 
-      Math.floor(30 * zoneData.efficiency), 
-      Math.floor(20 * zoneData.efficiency), 
+      Math.floor(45 * zoneData.efficiency),
+      Math.floor(30 * zoneData.efficiency),
+      Math.floor(20 * zoneData.efficiency),
       Math.floor(8 * zoneData.efficiency)
     ];
-    
+
     this.flujoTransporte = [
-      Math.floor(25 * zoneData.multiplier), 
-      Math.floor(35 * zoneData.multiplier), 
-      Math.floor(40 * zoneData.multiplier), 
+      Math.floor(25 * zoneData.multiplier),
+      Math.floor(35 * zoneData.multiplier),
+      Math.floor(40 * zoneData.multiplier),
       Math.floor(22 * zoneData.multiplier)
     ];
-    
+
     this.actividadUsuarios = [3, 8, 12, 5];
 
     this.estadisticasTipos = [
@@ -619,8 +626,8 @@ export class EstadisticasComponent implements OnInit, OnDestroy {
 
     // Solo mostrar la zona seleccionada en estadísticas de zonas
     this.estadisticasZonas = [
-      { 
-        id: 1, 
+      {
+        id: 1,
         nombre: this.selectedLocation,
         totalClasificadores: Math.floor(zoneData.multiplier * 5) + 2,
         totalDetecciones: Math.floor(zoneData.base * zoneData.multiplier),
@@ -629,7 +636,7 @@ export class EstadisticasComponent implements OnInit, OnDestroy {
         tipoMasComun: 'Valorizable'
       }
     ];
-    
+
     console.log(`✅ Estadísticas simuladas generadas para ${this.selectedLocation}`);
   }
 
@@ -664,11 +671,9 @@ export class EstadisticasComponent implements OnInit, OnDestroy {
 
   getTipoColor(tipo: string): string {
     const colors: { [key: string]: string } = {
-      'Valorizable': '#2196F3',
-      'Organico': '#4CAF50', 
-      'Orgánico': '#4CAF50',
-      'No Valorizable': '#757575',
-      'NoValorizable': '#757575'
+      'valorizable': '#2196F3',
+      'organico': '#4CAF50',
+      'no_valorizable': '#757575'
     };
     return colors[tipo] || '#9E9E9E';
   }
@@ -728,7 +733,7 @@ export class EstadisticasComponent implements OnInit, OnDestroy {
     // Como no tenemos porcentajePorTipo, usamos una distribución simulada
     const baseValue = zona.totalDetecciones;
     let typeValue = 0;
-    
+
     switch (tipo) {
       case 'valorizable':
         typeValue = Math.floor(baseValue * 0.4); // 40% valorizable
@@ -740,14 +745,14 @@ export class EstadisticasComponent implements OnInit, OnDestroy {
         typeValue = Math.floor(baseValue * 0.25); // 25% no valorizable
         break;
     }
-    
+
     const maxInZona = Math.floor(baseValue * 0.4); // El máximo será valorizable
     return Math.max(5, (typeValue / Math.max(maxInZona, 1)) * 100);
   }
 
   getZonaTypeCount(zona: EstadisticasZonas, tipo: string): number {
     const baseValue = zona.totalDetecciones;
-    
+
     switch (tipo) {
       case 'valorizable':
         return Math.floor(baseValue * 0.4);
@@ -763,19 +768,19 @@ export class EstadisticasComponent implements OnInit, OnDestroy {
   // Simplified Line Chart Methods
   getSimpleTrendPoints(): string {
     if (!this.estadisticasGenerales) return '';
-    
+
     const data = [
       this.estadisticasGenerales.totalDetecciones * 0.3, // Simulación día 1
       this.estadisticasGenerales.deteccionesHoy,          // Hoy
       this.estadisticasGenerales.deteccionesEsteMes * 0.1, // Simulación día 3
       this.estadisticasGenerales.usuariosActivos * 2       // Simulación día 4
     ];
-    
+
     const maxValue = Math.max(...data, 1);
     const width = 600;
     const height = 200;
     const stepX = width / Math.max(data.length - 1, 1);
-    
+
     return data
       .map((value: number, index: number) => {
         const x = index * stepX;
@@ -787,19 +792,19 @@ export class EstadisticasComponent implements OnInit, OnDestroy {
 
   getSimpleDataPoints(): { x: number; y: number; value: number; label: string }[] {
     if (!this.estadisticasGenerales) return [];
-    
+
     const data = [
       { value: this.estadisticasGenerales.totalDetecciones * 0.3, label: 'Simulado 1' },
       { value: this.estadisticasGenerales.deteccionesHoy, label: 'Hoy' },
       { value: this.estadisticasGenerales.deteccionesEsteMes * 0.1, label: 'Simulado 2' },
       { value: this.estadisticasGenerales.usuariosActivos * 2, label: 'Usuarios x2' }
     ];
-    
+
     const maxValue = Math.max(...data.map(d => d.value), 1);
     const width = 600;
     const height = 200;
     const stepX = width / Math.max(data.length - 1, 1);
-    
+
     return data.map((item, index: number) => ({
       x: index * stepX,
       y: height - ((item.value / maxValue) * (height - 20)) - 10,
@@ -811,33 +816,61 @@ export class EstadisticasComponent implements OnInit, OnDestroy {
   getSimpleTrendAreaPoints(): string {
     const linePoints = this.getSimpleTrendPoints();
     if (!linePoints) return '';
-    
+
     const points = linePoints.split(' ');
     const firstPoint = points[0];
     const lastPoint = points[points.length - 1];
-    
+
     if (!firstPoint || !lastPoint) return '';
-    
+
     const startX = firstPoint.split(',')[0];
     const endX = lastPoint.split(',')[0];
-    
+
     return `${startX},200 ${linePoints} ${endX},200`;
   }
 
   // Trend Analysis Methods
   getAverageDetections(): number {
-    if (!this.estadisticasGenerales) return 0;
-    return Math.floor((this.estadisticasGenerales.totalDetecciones + this.estadisticasGenerales.deteccionesHoy) / 2);
+    if (this.classifierPerformance.length === 0) return 0;
+    
+    const total = this.classifierPerformance.reduce((sum, clf) => sum + clf.detecciones, 0);
+    return Math.round(total / this.classifierPerformance.length * 10) / 10; // Redondear a 1 decimal
   }
 
+  // Obtener máximo de detecciones
   getMaxDetections(): number {
-    if (!this.estadisticasGenerales) return 0;
-    return Math.max(this.estadisticasGenerales.totalDetecciones, this.estadisticasGenerales.deteccionesHoy);
+    if (this.classifierPerformance.length === 0) return 0;
+    return Math.max(...this.classifierPerformance.map(clf => clf.detecciones));
   }
 
+  // Obtener dirección de tendencia
   getTrendDirection(): number {
-    if (!this.estadisticasGenerales) return 0;
-    return this.estadisticasGenerales.deteccionesHoy - this.estadisticasGenerales.deteccionesEsteMes / 30;
+    if (this.classifierPerformance.length < 2) return 0;
+    
+    // Comparar primeros vs últimos clasificadores (simulación de tendencia)
+    const firstHalf = this.classifierPerformance.slice(0, Math.floor(this.classifierPerformance.length / 2));
+    const secondHalf = this.classifierPerformance.slice(Math.floor(this.classifierPerformance.length / 2));
+    
+    const avgFirst = firstHalf.reduce((sum, clf) => sum + clf.detecciones, 0) / firstHalf.length;
+    const avgSecond = secondHalf.reduce((sum, clf) => sum + clf.detecciones, 0) / secondHalf.length;
+    
+    if (avgSecond > avgFirst) return 1;  // Tendencia positiva
+    if (avgSecond < avgFirst) return -1; // Tendencia negativa
+    return 0; // Sin cambio
+  }
+
+  // Obtener la hora pico
+  getPeakHour() {
+    if (this.hourlyActivity.length === 0) return null;
+    return this.hourlyActivity.reduce((max, hour) => 
+      hour.detections > max.detections ? hour : max
+    );
+  }
+
+  // Obtener total de detecciones del día
+  getTotalDayDetections(): number {
+    if (this.hourlyActivity.length === 0) return 0;
+    return this.hourlyActivity.reduce((sum, hour) => sum + hour.detections, 0);
   }
 
   // =================== MÉTODOS PARA DATOS REALES DEL BACKEND ===================
@@ -850,8 +883,8 @@ export class EstadisticasComponent implements OnInit, OnDestroy {
         const date = new Date(d.fechaHora); // Usar campo real del backend
         const hour = date.getHours();
         // Contar detecciones en un rango de ±2 horas
-        return Math.abs(hour - targetHour) <= 2 || 
-               (targetHour === 0 && (hour >= 22 || hour <= 2));
+        return Math.abs(hour - targetHour) <= 2 ||
+          (targetHour === 0 && (hour >= 22 || hour <= 2));
       }).length;
     });
   }
@@ -859,7 +892,7 @@ export class EstadisticasComponent implements OnInit, OnDestroy {
   // Generar tipos reales desde detecciones (usando estructura real del backend)
   private generateRealTypesFromDetections(detecciones: any[]): EstadisticasTipos[] {
     const tiposMap = new Map<string, number>();
-    
+
     detecciones.forEach(d => {
       let tipo = d.tipo || 'No Clasificado';
       // Corregir el typo del backend
@@ -871,7 +904,7 @@ export class EstadisticasComponent implements OnInit, OnDestroy {
 
     const total = detecciones.length || 1;
     const result: EstadisticasTipos[] = [];
-    
+
     tiposMap.forEach((cantidad, tipo) => {
       result.push({
         tipo: tipo,
@@ -910,36 +943,36 @@ export class EstadisticasComponent implements OnInit, OnDestroy {
   // Generar estadísticas horarias reales (usando campo real fechaHora)
   private generateRealHourlyStats(detecciones: any[]): EstadisticasHorarios[] {
     const horarios: EstadisticasHorarios[] = [];
-    
+
     for (let hora = 0; hora < 24; hora++) {
       const deteccionesHora = detecciones.filter(d => {
         const date = new Date(d.fechaHora); // Usar campo real del backend
         return date.getHours() === hora;
       }).length;
-      
+
       const totalDetecciones = detecciones.length || 1;
       const porcentaje = Math.round((deteccionesHora / totalDetecciones) * 100);
-      
+
       horarios.push({
         hora: hora,
         cantidad: deteccionesHora,
         porcentaje: porcentaje
       });
     }
-    
+
     return horarios;
   }
 
   // Generar estadísticas de actividad de usuarios
   private generateUserActivityStats(usuarios: any[]) {
     console.log('👥 Generando estadísticas de actividad de usuarios...');
-    
+
     const total = usuarios.length;
     if (total === 0) {
       this.actividadUsuarios = [0, 0, 0, 0];
       return;
     }
-    
+
     // Contar usuarios por rol real
     const roleCount = {
       admin: usuarios.filter(u => u.rol && u.rol.toLowerCase().includes('admin')).length,
@@ -947,16 +980,130 @@ export class EstadisticasComponent implements OnInit, OnDestroy {
       visualizador: usuarios.filter(u => u.rol && u.rol.toLowerCase().includes('visualizador')).length,
       otros: 0
     };
-    
+
     roleCount.otros = total - roleCount.admin - roleCount.operario - roleCount.visualizador;
-    
+
     this.actividadUsuarios = [
       roleCount.admin,
       roleCount.operario,
       roleCount.visualizador,
       roleCount.otros
     ];
-    
+
     console.log('✅ Estadísticas de usuarios generadas:', this.actividadUsuarios);
   }
+
+
+  private getSelectedZoneId(): string | null {
+    const zonaActual = this.allZonas.find(z => z.nombre === this.selectedLocation);
+    return zonaActual ? zonaActual.id.toString() : null;
+  }
+
+  // Método para cargar rendimiento de clasificadores
+  loadClassifierPerformance() {
+    const zonaId = this.getSelectedZoneId();
+    if (!zonaId) return;
+
+    Promise.all([
+      this.backendService.getClasificadoresPorZona(zonaId).toPromise(),
+      this.backendService.getDeteccionesPorZona(zonaId).toPromise()
+    ]).then(([clasificadores, detecciones]) => {
+      if (clasificadores && detecciones) {
+        this.classifierPerformance = this.processClassifierPerformance(clasificadores, detecciones);
+      }
+    }).catch(error => {
+      console.error('Error cargando rendimiento:', error);
+      this.classifierPerformance = [];
+    });
+  }
+
+  // Procesar datos de rendimiento
+  processClassifierPerformance(clasificadores: any[], detecciones: any[]) {
+    const classifierStats = clasificadores.map(clf => {
+      const deteccionesClf = detecciones.filter(det => det.clasificadorId === clf.id).length;
+      return {
+        id: clf.id,
+        nombre: clf.nombre || `Clasificador ${clf.id}`,
+        detecciones: deteccionesClf
+      };
+    });
+
+    const totalDetections = classifierStats.reduce((sum, clf) => sum + clf.detecciones, 0);
+    const average = classifierStats.length > 0 ? totalDetections / classifierStats.length : 0;
+    const maxDetections = Math.max(...classifierStats.map(clf => clf.detecciones), 1);
+
+    return classifierStats.map(clf => ({
+      ...clf,
+      percentage: maxDetections > 0 ? (clf.detecciones / maxDetections) * 100 : 0,
+      isAboveAverage: clf.detecciones >= average
+    }));
+  }
+
+  // Obtener posición del promedio
+  getAveragePosition(): number {
+    if (this.classifierPerformance.length === 0) return 50;
+
+    const total = this.classifierPerformance.reduce((sum, clf) => sum + clf.detecciones, 0);
+    const average = this.classifierPerformance.length > 0 ? total / this.classifierPerformance.length : 0;
+    const max = Math.max(...this.classifierPerformance.map(clf => clf.detecciones), 1);
+
+    return max > 0 ? (average / max) * 100 : 50;
+  }
+
+  // Método para cargar actividad horaria
+  loadHourlyActivity() {
+    const zonaId = this.getSelectedZoneId();
+    if (!zonaId) return;
+
+    this.backendService.getDeteccionesPorZona(zonaId).subscribe(detecciones => {
+      this.hourlyActivity = this.processHourlyData(detecciones);
+    });
+  }
+
+  // Procesar datos por horas
+  processHourlyData(detecciones: any[]) {
+    const hourlyStats = Array.from({ length: 24 }, (_, i) => ({
+      hour: i.toString().padStart(2, '0') + ':00',
+      detections: 0,
+      intensity: 0
+    }));
+
+    detecciones.forEach(det => {
+      if (det.fechaHora) {
+        const date = new Date(det.fechaHora);
+        const hour = date.getHours();
+        if (hour >= 0 && hour < 24) {
+          hourlyStats[hour].detections++;
+        }
+      }
+    });
+
+    const maxDetections = Math.max(...hourlyStats.map(h => h.detections), 1);
+
+    return hourlyStats.map(hour => ({
+      ...hour,
+      intensity: maxDetections > 0 ? hour.detections / maxDetections : 0,
+      label: `${hour.hour} - ${(parseInt(hour.hour) + 1).toString().padStart(2, '0')}:00`
+    }));
+  }
+
+  // Obtener color de intensidad por hora
+  getHourIntensityColor(intensity: number): string {
+    if (intensity === 0) return '#f8f9fa';
+    if (intensity <= 0.2) return '#e3f2fd';
+    if (intensity <= 0.4) return '#bbdefb';
+    if (intensity <= 0.6) return '#64b5f6';
+    if (intensity <= 0.8) return '#2196f3';
+    return '#1976d2';
+  }
+
+  // Actualizar el método refreshStatistics existente (buscar y reemplazar)
+  refreshStatistics() {
+    console.log('🔄 Actualizando estadísticas desde el backend...');
+    this.loadDataForSelectedZone(); // Usar método que ya existe
+    this.loadClassifierPerformance(); // Agregar nueva funcionalidad
+    this.loadHourlyActivity();
+  }
+
+  // ...existing code...
 }

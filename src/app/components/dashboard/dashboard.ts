@@ -11,7 +11,6 @@ import { BackendService, EstadisticasZonas, EstadisticasTipos, EstadisticasHorar
   selector: 'app-dashboard',
   imports: [CommonModule, CardModule, ButtonModule, ChartModule],
   templateUrl: './dashboard.html',
-  styleUrl: './dashboard.css'
 })
 export class Dashboard implements OnInit {
   selectedType: string = '';

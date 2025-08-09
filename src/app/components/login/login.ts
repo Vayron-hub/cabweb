@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { Router, ActivatedRoute } from '@angular/router';
+import { Router, ActivatedRoute, RouterLink } from '@angular/router';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { CardModule } from 'primeng/card';
 import { InputTextModule } from 'primeng/inputtext';
@@ -20,10 +20,10 @@ import { BackendService } from '../../services/backend.service';
     InputTextModule, 
     PasswordModule, 
     ButtonModule, 
-    MessageModule
+    MessageModule,
+    RouterLink
   ],
   templateUrl: './login.html',
-  styleUrl: './login.css'
 })
 export class Login implements OnInit {
   loginForm: FormGroup;

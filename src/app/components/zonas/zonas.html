@@ -1,0 +1,134 @@
+<div class="bg-white p-5 mb-5 rounded-xl shadow-card flex justify-between items-center">
+  <div class="grid grid-cols-1 auto items-center w-full">
+    <div>
+      <h2 class="text-2xl font-semibold text-gray-800 mb-1 flex items-center gap-2">
+        Gestión de Zonas
+        <i class="pi pi-spin pi-spinner text-sm text-gray-600" *ngIf="isLoadingZonas"></i>
+      </h2>
+      <p class="text-sm text-gray-600">
+        Administrar zonas del sistema
+      </p>
+    </div>
+  </div>
+  <button 
+    class="bg-primary-500 text-white border-0 px-4 py-2.5 rounded-lg text-sm font-medium cursor-pointer flex items-center gap-2 transition-all duration-200 hover:bg-primary-600 hover:-translate-y-0.5"
+    (click)="showDialog()">
+    <i class="pi pi-plus"></i>
+    Nueva Zona
+  </button>
+
+  <p-dialog header="Nueva Zona" [(visible)]="visible" [style]="{ width: '30rem', background: 'white', color: 'black' }" [modal]="true" [closable]="false">
+    <div class="flex items-center gap-4 mb-4">
+      <label for="nombre" class="font-semibold text-black w-24">Nombre</label>
+      <input pInputText id="nombre" class="bg-white text-black flex-auto" autocomplete="off" 
+      [(ngModel)]="newZona.nombre"/>
+    </div>
+    <div class="flex justify-end gap-2">
+      <p-button label="Cancelar" severity="secondary" (click)="visible = false" />
+      <p-button label="Guardar" (click)="postZona()" />
+    </div>
+  </p-dialog>
+</div>
+
+<div class="bg-white p-6 mb-6 rounded-xl shadow-sm">
+  <div class="mb-4">
+    <div class="relative w-full">
+      <i class="pi pi-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 z-10"></i>
+      <input 
+        type="text" 
+        placeholder="Buscar zonas por nombre o descripción..."
+        [(ngModel)]="zoneSearchTerm"
+        (input)="filterZones()"
+        class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg text-sm transition-colors duration-200 bg-white text-black focus:border-primary-500">
+    </div>
+  </div>
+</div>
+
+<div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+  <div class="bg-white rounded-xl p-6 shadow-sm flex items-center gap-4 transition-all duration-200 hover:shadow-lg">
+    <div class="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
+      <i class="pi pi-map text-2xl text-green-600"></i>
+    </div>
+    <div>
+      <span class="text-2xl font-bold text-gray-800">{{getActiveZonesCount()}}</span>
+      <div class="text-sm text-gray-600">Zonas Activas</div>
+    </div>
+  </div>
+  <div class="bg-white rounded-xl p-6 shadow-sm flex items-center gap-4 transition-all duration-200 hover:shadow-lg">
+    <div class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
+      <i class="pi pi-desktop text-2xl text-blue-600"></i>
+    </div>
+    <div>
+      <span class="text-2xl font-bold text-gray-800">{{getTotalClassifiersCount()}}</span>
+      <div class="text-sm text-gray-600">Total Clasificadores</div>
+    </div>
+  </div>
+  <div class="bg-white rounded-xl p-6 shadow-sm flex items-center gap-4 transition-all duration-200 hover:shadow-lg">
+    <div class="w-12 h-12 bg-orange-100 rounded-xl flex items-center justify-center">
+      <i class="pi pi-chart-bar text-2xl text-orange-600"></i>
+    </div>
+    <div>
+      <span class="text-2xl font-bold text-gray-800">{{getTotalZonesCount()}}</span>
+      <div class="text-sm text-gray-600">Total Zonas</div>
+    </div>
+  </div>
+</div>
+
+<div class="bg-white rounded-xl shadow-sm overflow-hidden" *ngIf="!isLoadingZonas">
+  <table class="w-full">
+    <thead>
+      <tr class="bg-gray-50 border-b border-gray-200">
+        <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+          <input 
+            type="checkbox" 
+            (change)="selectAllZones($event)"
+            [checked]="allZonesSelected()"
+            class="rounded border-gray-300 text-primary-600 focus:ring-primary-500">
+        </th>
+        <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Zona</th>
+      </tr>
+    </thead>
+    <tbody class="bg-white divide-y divide-gray-200">
+      <tr *ngFor="let zone of getDisplayedZones()" 
+          class="transition-colors duration-200 hover:bg-gray-50"
+          [class.bg-blue-50]="selectedZones.includes(zone.id)">
+        <td class="px-6 py-4 whitespace-nowrap">
+          <input 
+            type="checkbox" 
+            [value]="zone.id"
+            (change)="toggleZoneSelection(zone.id, $event)"
+            [checked]="selectedZones.includes(zone.id)"
+            class="rounded border-gray-300 text-primary-600 focus:ring-primary-500">
+        </td>
+        <td class="px-6 py-4 whitespace-nowrap">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 bg-primary-100 rounded-full flex items-center justify-center">
+              <i class="pi pi-map text-primary-600"></i>
+            </div>
+            <div>
+              <div class="text-sm font-medium text-gray-900">{{zone.nombre}}</div>
+            </div>
+          </div>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  
+  <div class="text-center py-10" *ngIf="getDisplayedZones().length === 0">
+    <div class="w-16 h-16 mx-auto bg-gray-100 rounded-full flex items-center justify-center mb-4">
+      <i class="pi pi-map text-2xl text-gray-400"></i>
+    </div>
+    <h3 class="text-lg font-medium text-gray-900 mb-2">No se encontraron zonas</h3>
+    <p class="text-gray-600" *ngIf="!zoneSearchTerm.trim()">
+      No hay zonas disponibles en el sistema.
+    </p>
+    <p class="text-gray-600" *ngIf="zoneSearchTerm.trim()">
+      No se encontraron zonas que coincidan con "{{zoneSearchTerm}}".
+    </p>
+  </div>
+</div>
+
+<div class="text-center py-10" *ngIf="isLoadingZonas">
+  <i class="pi pi-spin pi-spinner text-4xl text-primary-500 mb-4"></i>
+  <p class="text-gray-600">Cargando zonas del sistema...</p>
+</div>

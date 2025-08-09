@@ -23,7 +23,6 @@ export interface ClasificadorGlobal {
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './admin-dashboard.html',
-  styleUrl: './admin-dashboard.css'
 })
 export class AdminDashboardComponent implements OnInit, OnDestroy {
 
@@ -40,13 +39,14 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
     id: 1,
     nombre: 'root',
     correo: 'admin@utleon.edu.mx',
-    email: 'admin@utleon.edu.mx', 
-    password:'',// Compatibilidad
+    email: 'admin@utleon.edu.mx',
+    rol: 'admin', 
+    password: '',
     activo: true,
     enLinea: false,
     fechaCreacion: '2025-07-26',
     fechaUltimoAcceso: null,
-    ultimoAcceso: new Date() // Compatibilidad con frontend
+    ultimoAcceso: new Date() 
   };
   userMenuOpen = false;
   showAccountModal = false;
@@ -108,19 +108,15 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
     private authService: AuthService,
     private cdr: ChangeDetectorRef
   ) {
-    console.log('🏗️ ADMIN-DASHBOARD - Constructor');
     // Solo inicializar variables básicas en el constructor
   }
 
   ngOnInit() {
-    console.log('🚀 ADMIN-DASHBOARD - Iniciando dashboard con datos REALES del sistema');
 
     // SUSCRIBIRSE AL ZONA SERVICE PARA ESCUCHAR CAMBIOS DESDE LA NAVBAR
     this.zonaSubscription = this.zonaService.selectedZona$.subscribe(zonaInfo => {
-      console.log('🔄 ZONA SERVICE - Cambio detectado:', zonaInfo);
 
       if (zonaInfo && zonaInfo.nombre) {
-        console.log('✅ Actualizando zona seleccionada desde navbar:', zonaInfo.nombre);
         this.selectedLocation = zonaInfo.nombre;
         this.selectedZonaId = zonaInfo.id;
 
@@ -137,7 +133,6 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
   }
 
   loadInitialData() {
-    console.log('🚀 Cargando datos GLOBALES del dashboard administrativo...');
 
     // 1. Cargar usuarios del sistema
     this.loadUsers();
@@ -155,7 +150,6 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
     this.loadGlobalZoneComparison();
 
     // 6. Las detecciones se cargarán cuando se seleccione una zona desde el ZonaService
-    console.log('⏳ Esperando selección de zona desde navbar...');
   }
 
   setActiveTab(tab: string) {
@@ -168,7 +162,6 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
 
     this.backendService.getUsuarios().subscribe({
       next: (usuarios: User[]) => {
-        console.log('👥 Usuarios del backend:', usuarios);
         // Mapear los datos del backend al formato del frontend
         this.allUsers = usuarios.map(user => ({
           ...user,
@@ -208,7 +201,6 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
   }
 
   toggleUserStatus(user: User) {
-    console.log('Cambiando estado de usuario:', user);
     // Cambiar el estado boolean activo
     const newStatus = !user.activo;
 
@@ -365,6 +357,19 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
     });
   }
 
+  getDetectionType(tipo: string): string {
+    switch (tipo) {
+      case 'organico':
+        return 'Orgánico';
+      case 'valorizable':
+        return 'Valorizable';
+      case 'no_valorizable':
+        return 'No valorizable';
+      default:
+        return 'Otro';
+    }
+  }
+
   getCurrentClassifiers(): any[] {
     // Retorna los TOP 3 clasificadores más activos de TODO el sistema
     console.log('🔍 getCurrentClassifiers - TOP 3 clasificadores globales:', this.topClasificadoresGlobales);
@@ -511,11 +516,11 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
       return '#4CAF50'; // Verde para orgánico
     }
     // Valorizable/Reciclable - Azul
-    else if (tipoLower ==='valorizable') {
+    else if (tipoLower === 'valorizable') {
       return '#2196F3'; // Azul para valorizable/reciclable
     }
     // No Valorizable - Naranja/Rojo
-    else if (tipoLower==='no valorizable') {
+    else if (tipoLower === 'no valorizable') {
       return '#FF9800'; // Naranja para no valorizable
     }
     // Otros tipos - Gris
@@ -524,21 +529,20 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
     }
   }
 
-  getDetectionTypeIcon(tipo: string): string {
+  getDetectionTypeImg(tipo: string): string {
     const tipoLower = tipo?.toLowerCase() || '';
 
-    console.log('Tipo de detección:', tipoLower);
     // Orgánico - Ícono de hoja
     if (tipoLower === 'organico') {
-      return 'pi-heart'; // Hoja para orgánico
+      return 'assets/images/organico.png'; // Hoja para orgánico
     }
     // Valorizable/Reciclable - Ícono de reciclaje
     else if (tipoLower === 'valorizable') {
-      return 'pi-refresh'; // Ícono de reciclaje para valorizable
+      return 'assets/images/valorizable.png'; // Ícono de reciclaje para valorizable
     }
     // No Valorizable - Ícono de advertencia
-    else if (tipoLower === 'no valorizable') {
-      return 'pi-exclamation-triangle'; // Triángulo de advertencia para no valorizable
+    else if (tipoLower === 'no_valorizable') {
+      return 'assets/images/no_valorizable.png'; // Ícono de advertencia para no valorizable
     }
     // Otros tipos - Ícono genérico
     else {
@@ -622,8 +626,8 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
 
       if (zonasConDetecciones.length === 0) {
         console.warn('⚠️ No hay zonas con detecciones');
-        this.datosDashboardCentral = [];
-        this.zonasDeteccionesHoy = [];
+        this.datosDashboardCentral = [0, 0, 0, 0];
+        this.zonasDeteccionesHoy = ['Sin datos', 'Sin datos', 'Sin datos', 'Sin datos'];
         return;
       }
 
@@ -633,34 +637,32 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
       // Encontrar el máximo para calcular porcentajes relativos
       const maxDetecciones = zonasOrdenadas[0].totalDetecciones;
 
-      // Extraer datos para el gráfico de barras (porcentajes relativos para la altura)
-      this.datosDashboardCentral = zonasOrdenadas.slice(0, 4).map(zona => {
-        return maxDetecciones > 0 ? Math.round((zona.totalDetecciones / maxDetecciones) * 100) : 0;
-      });
+      // Tomar las primeras 3-4 zonas y asegurar que tenemos al menos 3 elementos
+      const topZonas = zonasOrdenadas.slice(0, 3);
+      
+      // Rellenar con datos vacíos si necesario
+      while (topZonas.length < 3) {
+        topZonas.push({ nombre: 'Sin datos', totalDetecciones: 0 } as EstadisticasZonas);
+      }
 
-      this.zonasDeteccionesHoy = zonasOrdenadas.slice(0, 4).map(zona =>
-        zona.nombre
-      );
+      // Calcular los valores para el gráfico
+      // Usar los valores reales de detecciones directamente (no porcentajes)
+      this.datosDashboardCentral = topZonas.map(zona => zona.totalDetecciones);
+
+      this.zonasDeteccionesHoy = topZonas.map(zona => zona.nombre);
 
       console.log('✅ Gráfico de comparativa de zonas actualizado');
-      console.log('📊 Datos del gráfico (porcentajes):', this.datosDashboardCentral);
+      console.log('📊 Datos del gráfico (detecciones reales):', this.datosDashboardCentral);
       console.log('🏷️ Labels del gráfico:', this.zonasDeteccionesHoy);
-      console.log('🔢 Datos numéricos para verificación:', zonasOrdenadas.map(z => ({
-        nombre: z.nombre,
-        detecciones: z.totalDetecciones,
-        porcentaje: Math.round((z.totalDetecciones / maxDetecciones) * 100)
-      })));
+      console.log('🔢 Max detecciones:', maxDetecciones);
 
-      // DEBUG: Verificar que los datos lleguen al template
-      setTimeout(() => {
-        console.log('🎯 VERIFICACIÓN FINAL - Datos en las variables del componente:');
-        console.log('  datosDashboardCentral:', this.datosDashboardCentral);
-        console.log('  zonasDeteccionesHoy:', this.zonasDeteccionesHoy);
-      }, 100);
+      // Forzar detección de cambios
+      this.cdr.detectChanges();
+
     } else {
       console.warn('⚠️ No hay datos de zonas disponibles');
-      this.datosDashboardCentral = [];
-      this.zonasDeteccionesHoy = [];
+      this.datosDashboardCentral = [0, 0, 0, 0];
+      this.zonasDeteccionesHoy = ['Sin datos', 'Sin datos', 'Sin datos', 'Sin datos'];
     }
   }
 
@@ -757,14 +759,14 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
           let reciclableCount = 0;
           let organicoCount = 0;
           let novalCount = 0;
-          
+
           Object.keys(tiposCounts).forEach(tipo => {
             const count = tiposCounts[tipo];
             if (tipo === 'Valorizable' || tipo === 'valorizable') {
               reciclableCount += count;
             } else if (tipo.includes('organico') || tipo.includes('orgánico') || tipo.includes('Organico')) {
               organicoCount += count;
-            }else if (tipo ==='no valorizable') {
+            } else if (tipo === 'no valorizable') {
               novalCount += count;
             }
           });
@@ -821,7 +823,7 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
           valorizableCount += cantidad;
         } else if (nombreTipo.includes('organico') || nombreTipo.includes('orgánico') || nombreTipo.includes('Organico')) {
           organicoCount += cantidad;
-        } else if(nombreTipo.includes('no valorizable') || nombreTipo.includes('No Valorizable') || nombreTipo.includes('no Valorizable')) {
+        } else if (nombreTipo.includes('no valorizable') || nombreTipo.includes('No Valorizable') || nombreTipo.includes('no Valorizable')) {
           noValorizableCount += cantidad;
         }
       });
@@ -1064,5 +1066,29 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
         zonas: this.estadisticasZonas
       }
     };
+  }
+
+
+  getTopZoneCount(): number {
+    if (!this.estadisticasZonas || this.estadisticasZonas.length === 0) {
+      return 0;
+    }
+
+    // Encontrar la zona con más detecciones totales
+    const maxDetecciones = Math.max(...this.estadisticasZonas.map(zona => zona.totalDetecciones || 0));
+    return maxDetecciones;
+  }
+
+  getTopZoneName(): string {
+    if (!this.estadisticasZonas || this.estadisticasZonas.length === 0) {
+      return 'Sin datos';
+    }
+
+    // Encontrar la zona con más detecciones totales
+    const zonaConMasDetecciones = this.estadisticasZonas.reduce((max, zona) =>
+      (zona.totalDetecciones || 0) > (max.totalDetecciones || 0) ? zona : max
+    );
+
+    return this.formatZoneLabel(zonaConMasDetecciones.nombre);
   }
 }
