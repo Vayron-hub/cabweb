@@ -130,22 +130,22 @@
           <div class="flex gap-3 items-center">
             <div class="flex items-center gap-2" title="Detecciones valorizable: {{classifier.inactiveCount || 0}}">
               <img src="assets/images/valorizable.png" alt="Valorizable" class="w-6 h-6 object-contain">
-              <span class="text-sm font-medium text-blue-700">{{classifier.inactiveCount || 0}}</span>
+              <span class="text-sm font-medium text-blue-700">{{classifier.valorizable || 0}}</span>
             </div>
             <div class="flex items-center gap-2" title="Detecciones orgánico: {{classifier.activeCount || 0}}">
               <img src="assets/images/organico.png" alt="Orgánico" class="w-6 h-6 object-contain">
-              <span class="text-sm font-medium text-green-700">{{classifier.activeCount || 0}}</span>
+              <span class="text-sm font-medium text-green-700">{{classifier.organico || 0}}</span>
             </div>
             <div class="flex items-center gap-2" title="Detecciones no valorizable: {{classifier.pendingCount || 0}}">
               <img src="assets/images/no_valorizable.png" alt="No Valorizable" class="w-6 h-6 object-contain">
-              <span class="text-sm font-medium text-gray-700">{{classifier.pendingCount || 0}}</span>
+              <span class="text-sm font-medium text-gray-700">{{classifier.no_valorizable || 0}}</span>
             </div>
           </div>
         </td>
         <td class="px-6 py-4 whitespace-nowrap">
-          <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
-            <i class="pi pi-check-circle"></i>
-            Activo
+          <div [innerHTML]="classifier.activo ? '<span class=\'text-green-600 font-medium\'>Activo</span>' : '<span class=\'text-red-600 font-medium\'>Inactivo</span>'"></div>
+          <span class="text-xs text-gray-500" *ngIf="classifier.fechaCreacion">
+            (Creado: {{classifier.fechaCreacion | date:'short'}})
           </span>
         </td>
       </tr>

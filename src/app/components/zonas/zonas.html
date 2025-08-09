@@ -74,7 +74,6 @@
   </div>
 </div>
 
-<!-- Zones Table -->
 <div class="bg-white rounded-xl shadow-sm overflow-hidden" *ngIf="!isLoadingZonas">
   <table class="w-full">
     <thead>
@@ -132,31 +131,4 @@
 <div class="text-center py-10" *ngIf="isLoadingZonas">
   <i class="pi pi-spin pi-spinner text-4xl text-primary-500 mb-4"></i>
   <p class="text-gray-600">Cargando zonas del sistema...</p>
-</div>
-
-<!-- Bulk Actions -->
-<div class="fixed bottom-6 left-1/2 transform -translate-x-1/2 bg-white rounded-xl shadow-2xl border border-gray-200 p-4 flex items-center gap-4 animate-slide-up" *ngIf="selectedZones.length > 0">
-  <div class="text-sm font-medium text-gray-700">
-    {{selectedZones.length}} zona(s) seleccionada(s)
-  </div>
-  <div class="flex gap-2">
-    <button 
-      class="bg-green-500 text-white border-0 px-3 py-2 rounded-lg text-sm font-medium cursor-pointer flex items-center gap-2 transition-all duration-200 hover:bg-green-600"
-      (click)="bulkActivateZones()">
-      <i class="pi pi-check"></i>
-      Activar
-    </button>
-    <button 
-      class="bg-yellow-500 text-white border-0 px-3 py-2 rounded-lg text-sm font-medium cursor-pointer flex items-center gap-2 transition-all duration-200 hover:bg-yellow-600"
-      (click)="bulkMaintenanceZones()">
-      <i class="pi pi-wrench"></i>
-      Mantenimiento
-    </button>
-    <button 
-      class="bg-red-500 text-white border-0 px-3 py-2 rounded-lg text-sm font-medium cursor-pointer flex items-center gap-2 transition-all duration-200 hover:bg-red-600"
-      (click)="bulkDeleteZones()">
-      <i class="pi pi-trash"></i>
-      Eliminar
-    </button>
-  </div>
 </div>

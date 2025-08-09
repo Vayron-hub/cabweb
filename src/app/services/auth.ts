@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { Observable, of, BehaviorSubject } from 'rxjs';
 import { BackendService, LoginRequest, User } from './backend.service';
-import { catchError, tap, map } from 'rxjs/operators';
+import { catchError, tap, map, switchMap } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
@@ -21,71 +21,87 @@ export class AuthService {
 
   login(username: string, password: string): Observable<boolean> {
     if (this.useBackend) {
-      // Usar backend real - convertir username a correo si es necesario
       const correo = username.includes('@') ? username : `${username}@utleon.edu.mx`;
-      return this.loginWithBackend(correo, password);
+      const credentials: LoginRequest = { correo, password };
+      return this.backendService.login(credentials).pipe(
+        tap(response => {
+          console.log('Login exitoso:', response.usuario);
+          this.currentUserSubject.next(response.usuario);
+        }),
+        map(() => true),
+        catchError(error => {
+          console.error('Error en login:', error);
+          return of(false);
+        })
+      );
     } else {
-      // Usar datos simulados (comportamiento actual)
-      return of(this.loginWithMockData(username, password));
+      // Modo simulado
+      return of(false);
     }
   }
 
-  private loginWithBackend(correo: string, password: string): Observable<boolean> {
-    const credentials: LoginRequest = { correo, password };
-    
-    return this.backendService.login(credentials).pipe(
-      tap(response => {
-        console.log('Login exitoso:', response.usuario);
-        this.currentUserSubject.next(response.usuario);
-      }),
-      map(() => true),
-      catchError(error => {
-        console.error('Error en login:', error);
-        return of(false);
-      })
-    );
+  register(userData: {nombre: string, correo: string, password: string}): Observable<boolean> {
+    if (this.useBackend) {
+      return this.backendService.registrarUsuario(userData).pipe(
+        tap(response => {
+          console.log('✅ Registro exitoso:', response);
+        }),
+        map(() => true),
+        catchError(error => {
+          console.error('❌ Error en registro:', error);
+          return of(false);
+        })
+      );
+    } else {
+      // Modo simulado
+      console.log('Registro simulado para:', userData);
+      return of(true);
+    }
   }
 
-  private loginWithMockData(username: string, password: string): boolean {
-    // Datos simulados actuales (mantener mientras no esté el backend)
-    const validCredentials = [
-      { username: 'admin', password: '123456', user: { id: 'ADM001', nombre: 'Juan Administrador', rol: 'administrador', email: 'admin@cab.com', estado: 'Activo' }},
-      { username: 'jose', password: '123456', user: { id: 'USR001', nombre: 'José García', rol: 'usuario', email: 'jose@cab.com', estado: 'Activo' }},
-      { username: 'maria', password: '123456', user: { id: 'USR002', nombre: 'María López', rol: 'usuario', email: 'maria@cab.com', estado: 'Activo' }},
-      { username: 'priv', password: '123456', user: { id: 'PRV001', nombre: 'Usuario Privado', rol: 'usuario', email: 'priv@cab.com', estado: 'Activo' }}
-    ];
-
-    const credential = validCredentials.find(cred => 
-      cred.username === username && cred.password === password
-    );
-
-    if (credential) {
-      const user: User = {
-        id: credential.user.id,
-        nombre: credential.user.nombre,
-        password: '',
-        correo: (credential.user as any).correo || (credential.user as any).email, // Convertir email a correo si es necesario
-        estado: credential.user.estado,
-        ultimoAcceso: new Date(),
-      };
-      
-      // Simular el guardado de datos como lo haría el backend
-      localStorage.setItem('authToken', 'mock-jwt-token-' + Date.now());
-      localStorage.setItem('currentUser', JSON.stringify(user));
-      this.currentUserSubject.next(user);
-      return true;
+  registerAndLogin(userData: {nombre: string, correo: string, password: string}): Observable<boolean> {
+    if (this.useBackend) {
+      return this.register(userData).pipe(
+        switchMap(registerSuccess => {
+          if (registerSuccess) {
+            console.log('✅ Registro exitoso, iniciando sesión automática...');
+            // Después del registro exitoso, hacer login automático
+            return this.login(userData.correo, userData.password);
+          } else {
+            console.error('❌ Fallo en el registro');
+            return of(false);
+          }
+        }),
+        catchError(error => {
+          console.error('❌ Error en registro y login:', error);
+          return of(false);
+        })
+      );
+    } else {
+      // Modo simulado
+      return of(true);
     }
-
-    return false;
   }
 
   logout(): void {
     if (this.useBackend && this.isAuthenticated()) {
-      this.backendService.logout();
-      this.clearLocalAuthData();
+      this.backendService.logout().subscribe({
+        next: (response) => {
+          console.log('✅ Logout completado:', response.message);
+          this.clearLocalAuthData();
+          this.router.navigate(['/login']);
+        },
+        error: (error) => {
+          console.error('❌ Error en logout:', error);
+          // Aunque el backend falle, limpiamos los datos locales
+          this.clearLocalAuthData();
+          this.router.navigate(['/login']);
+        }
+      });
     } else {
       // Logout con datos simulados
       this.clearLocalAuthData();
+      this.router.navigate(['/login']);
     }
   }
 

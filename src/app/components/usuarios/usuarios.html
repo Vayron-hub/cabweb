@@ -113,7 +113,6 @@
             </div>
             <div>
               <div class="text-sm font-medium text-gray-900">{{user.nombre}}</div>
-              <div class="text-xs text-gray-500">ID: {{user.id}}</div>
             </div>
           </div>
         </td>
@@ -124,8 +123,8 @@
                 [class.text-green-800]="user.estado === 'activo'"
                 [class.bg-red-100]="user.estado === 'inactivo'"
                 [class.text-red-800]="user.estado === 'inactivo'">
-            <i class="pi" [ngClass]="getStatusIcon(user.estado)"></i>
-            {{user.estado || 'Sin estado'}}
+            <i class="pi text-primary-500"></i>
+            <span [innerHTML]="user.activo ? '<span class=\'text-green-600 font-medium\'>Activo</span>' : user.estado === 'inactivo' ? '<span class=\'text-red-600 font-medium\'>Inactivo</span>' : '<span class=\'text-gray-600 font-medium\'>Sin estado</span>'"></span>
           </span>
         </td>
       </tr>

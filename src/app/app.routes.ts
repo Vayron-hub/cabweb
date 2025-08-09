@@ -1,7 +1,7 @@
 import { Routes } from '@angular/router';
 import { Landing } from './components/landing/landing';
 import { Login } from './components/login/login';
-import { Dashboard } from './components/dashboard/dashboard';
+import { Registro } from './components/registro/registro';
 import { AdminLayoutComponent } from './components/admin-layout/admin-layout';
 import { AdminDashboardComponent } from './components/admin-dashboard/admin-dashboard';
 import { AuthGuard } from './guards/auth.guard';
@@ -10,6 +10,7 @@ export const routes: Routes = [
   { path: '', component: Landing },
   { path: 'login', component: Login },
   { path: 'login/:type', component: Login },
+  { path: 'registro', component: Registro },
   {
     path: 'cotizacion',
     loadComponent: () => import('./components/cotizacion/cotizacion.component').then(m => m.CotizacionComponent)

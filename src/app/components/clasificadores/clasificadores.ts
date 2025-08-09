@@ -12,9 +12,6 @@ interface Classifier {
   id: string;
   name: string;
   count: number;
-  activeCount: number;
-  inactiveCount: number;
-  pendingCount: number;
   detections: number;
 }
 
@@ -55,6 +52,7 @@ export class ClasificadoresComponent implements OnInit, OnDestroy {
 
   // Suscripciones
   private zonaSubscription: Subscription = new Subscription();
+console: any;
 
   constructor(
     private backendService: BackendService,
@@ -177,12 +175,11 @@ export class ClasificadoresComponent implements OnInit, OnDestroy {
                   latitud: clf.latitud,
                   longitud: clf.longitud,
                   fechaCreacion: clf.fechaCreacion,
-                  // Mapear las estadísticas del endpoint específico
-                  detections: stats.valorizable + stats.no_valorizable + stats.organico,
-                  activeCount: stats.organico,           // Orgánico
-                  inactiveCount: stats.valorizable,      // Valorizable
-                  pendingCount: stats.no_valorizable,    // No Valorizable
-                  count: stats.valorizable + stats.no_valorizable + stats.organico
+                  activo: clf.activo,
+                  valorizable: stats.valorizable,
+                  no_valorizable: stats.no_valorizable,
+                  organico: stats.organico,
+                  count: stats.valorizable + stats.no_valorizable + stats.organico,
                 };
               });
 
@@ -197,20 +194,6 @@ export class ClasificadoresComponent implements OnInit, OnDestroy {
             // Si falla, mostrar clasificadores sin estadísticas
             this.clasificadoresPorZona = clasificadores
               .filter(clf => clf.id)
-              .map((clf: any) => ({
-                id: clf.id,
-                name: clf.nombre,
-                zonaId: clf.zonaId,
-                zona: clf.zona?.nombre || `Zona ${clf.zonaId}`,
-                latitud: clf.latitud,
-                longitud: clf.longitud,
-                fechaCreacion: clf.fechaCreacion,
-                detections: 0,
-                activeCount: 0,
-                inactiveCount: 0,
-                pendingCount: 0,
-                count: 0
-              }));
             this.filteredClassifiers = [...this.clasificadoresPorZona];
             this.isLoadingClasificadores = false;
           }
@@ -260,7 +243,7 @@ export class ClasificadoresComponent implements OnInit, OnDestroy {
     }
 
     // Si no hay búsqueda, mostrar todos los de la zona actual
-    console.log('📋 Mostrando todos los clasificadores:', this.clasificadoresPorZona.length);
+    console.log('📋 Mostrando todos los clasificadores:', this.clasificadoresPorZona);
     return this.clasificadoresPorZona;
   }
 
