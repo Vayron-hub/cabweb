@@ -320,7 +320,6 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
   }
 
   loadTopClasificadoresGlobales() {
-    console.log('🔄 Cargando TOP 3 clasificadores más activos desde https://localhost:7286/api/clasificadores/estadisticas...');
     this.isLoadingClasificadores = true;
 
     this.backendService.getEstadisticasClasificadores().subscribe({
@@ -669,8 +668,7 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
   // *** MÉTODO PRINCIPAL PARA CARGAR GRÁFICAS REALES ***
   private loadRealStatistics() {
     this.isLoadingStats = true;
-    console.log('🔄 Cargando estadísticas REALES desde https://localhost:7286/api...');
-
+    
     // 1. Cargar estadísticas generales
     this.backendService.getEstadisticasGenerales().subscribe({
       next: (generales: EstadisticasGenerales) => {

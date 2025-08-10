@@ -72,19 +72,6 @@ export const routes: Routes = [
     ]
   },
   
-  // RUTAS CLIENTE
-  {
-    path: 'guest',
-    canActivate: [AuthGuard, ClienteGuard],
-    children: [
-      { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
-      {
-        path: 'dashboard',
-        component: ClienteDashboard
-      }
-    ]
-  },
-  
   // RUTAS CLIENTE (ruta alternativa)
   { 
     path: 'cliente', 
