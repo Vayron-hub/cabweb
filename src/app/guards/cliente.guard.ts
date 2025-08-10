@@ -36,14 +36,11 @@ const userId = this.backendservice.getCurrentUser()?.id || route.params['id'];
       map((role: string) => {
         console.log('🔍 ClientGuard - Rol obtenido:', role);
         if (role === 'client' || role === 'cliente') {
-          console.log('✅ Usuario es cliente, permitiendo acceso');
           return true;
         } else if (role === 'admin') {
-          console.log('⚠️ Usuario es admin, redirigiendo a dashboard admin');
           this.router.navigate(['/admin/dashboard']);
           return false;
         } else if (role === 'superadmin') {
-          console.log('⚠️ Usuario es superadmin, redirigiendo a dashboard superadmin');
           this.router.navigate(['/superadmin/dashboard']);
           return false;
         } else {

@@ -33,21 +33,20 @@ export class SuperAdminGuard implements CanActivate {
 
     return this.backendservice.getRole(userId).pipe(
       map((role: string) => {
-        console.log('🔍 SuperAdminGuard - Rol obtenido:', role);
         
         if (role === 'superadmin') {
-          console.log('✅ Usuario es superadmin, permitiendo acceso');
           return true;
         } else if (role === 'admin') {
-          console.log('⚠️ Usuario es admin, redirigiendo a dashboard admin');
           this.router.navigate(['/admin/dashboard']);
           return false;
         } else if (role === 'client' || role === 'cliente') {
-          console.log('⚠️ Usuario es cliente, redirigiendo a dashboard cliente');
-          this.router.navigate(['/guest/dashboard']);
+          this.router.navigate(['/cliente/dashboard']);
           return false;
         } else {
+<<<<<<< HEAD
           console.log('❌ Rol desconocido, denegando acceso:', role);
+=======
+>>>>>>> 1602787d58f7ddca97b8d3a7cf38a466b1fe5f66
           this.router.navigate(['/login']);
           return false;
         }
