@@ -48,7 +48,7 @@ export class SuperAdminGuard implements CanActivate {
           return false;
         } else {
           console.log('❌ Rol desconocido, denegando acceso:', role);
-          this.router.navigate(['/guest/dashboard']);
+          this.router.navigate(['/login']);
           return false;
         }
       }),

@@ -10,6 +10,8 @@ import { ClienteLayout } from './components/cliente-layout/cliente-layout';
 import { ClienteGuard } from './guards/cliente.guard';
 import { AdminGuard } from './guards/admin.guard';
 import { SuperAdminGuard } from './guards/superadmin.guard';
+import { SuperadminLayout } from './components/superadmin-layout/superadmin-layout';
+import { SuperadminDashboard } from './components/superadmin-dashboard/superadmin-dashboard';
 
 export const routes: Routes = [
   { path: '', component: Landing },
@@ -97,13 +99,13 @@ export const routes: Routes = [
   // RUTAS SUPERADMIN
   {
     path: 'superadmin',
-    component: AdminLayoutComponent, // o crear un SuperAdminLayoutComponent
+    component: SuperadminLayout, // o crear un SuperAdminLayoutComponent
     canActivate: [AuthGuard, SuperAdminGuard],
     children: [
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
       {
         path: 'dashboard',
-        component: AdminDashboardComponent // o crear SuperAdminDashboardComponent
+        component: SuperadminDashboard // o crear SuperAdminDashboardComponent
       },
       // Rutas específicas de superadmin
       {

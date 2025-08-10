@@ -89,42 +89,6 @@ export class Registro implements OnInit {
 
       console.log('📝 Iniciando registro para:', { nombre, correo });
 
-      // Usar el nuevo método de registro y login automático
-      this.authService.registerAndLogin(userData).subscribe({
-        next: (success) => {
-          this.isLoading = false;
-          
-          if (success) {
-            console.log('✅ Registro y login exitosos');
-            this.successMessage = '¡Registro exitoso! Bienvenido al sistema.';
-            
-            // Esperar un momento para mostrar el mensaje de éxito
-            setTimeout(() => {
-              // Navegación exitosa
-              if (this.queryType) {
-                this.router.navigate([this.returnUrl], { queryParams: { type: this.queryType } });
-              } else {
-                this.router.navigate([this.returnUrl]);
-              }
-            }, 1500);
-            
-          } else {
-            this.errorMessage = 'Error al registrar usuario. Verifica que el correo no esté ya registrado.';
-          }
-        },
-        error: (error) => {
-          console.error('❌ Error en registro:', error);
-          this.isLoading = false;
-          
-          if (error.status === 409) {
-            this.errorMessage = 'Este correo electrónico ya está registrado. Intenta con otro correo.';
-          } else if (error.status === 400) {
-            this.errorMessage = 'Datos inválidos. Verifica la información ingresada.';
-          } else {
-            this.errorMessage = 'Error al conectar con el servidor. Intenta nuevamente.';
-          }
-        }
-      });
     } else {
       // Marcar todos los campos como tocados para mostrar errores
       Object.keys(this.registroForm.controls).forEach(key => {
