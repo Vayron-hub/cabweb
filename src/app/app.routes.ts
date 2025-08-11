@@ -7,9 +7,8 @@ import { AdminDashboardComponent } from './components/admin-dashboard/admin-dash
 import { AuthGuard } from './guards/auth.guard';
 import { ClienteDashboard } from './components/cliente-dashboard/cliente-dashboard';
 import { ClienteLayout } from './components/cliente-layout/cliente-layout';
-import { ClienteGuard } from './guards/cliente.guard';
-import { AdminGuard } from './guards/admin.guard';
-import { SuperAdminGuard } from './guards/superadmin.guard';
+import { SuperadminLayout } from './components/superadmin-layout/superadmin-layout';
+import { SuperadminDashboard } from './components/superadmin-dashboard/superadmin-dashboard';
 
 export const routes: Routes = [
   { path: '', component: Landing },
@@ -21,7 +20,6 @@ export const routes: Routes = [
     loadComponent: () => import('./components/cotizacion/cotizacion.component').then(m => m.CotizacionComponent)
   },
   
-  // Redirecciones de rutas antiguas
   { 
     path: 'dashboard', 
     redirectTo: '/admin/dashboard',
@@ -29,7 +27,7 @@ export const routes: Routes = [
   },
   { 
     path: 'clientedashboard', 
-    redirectTo: '/guest/dashboard',
+    redirectTo: '/cliente/dashboard',
     pathMatch: 'full',
   },
   { 
@@ -43,11 +41,11 @@ export const routes: Routes = [
     pathMatch: 'full'
   },
   
-  // RUTAS ADMIN
   { 
     path: 'admin', 
     component: AdminLayoutComponent,
-    canActivate: [AuthGuard, AdminGuard],
+    canActivate: [AuthGuard],
+    data: { role: 'Admin' }, // Especificar rol requerido
     children: [
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
       { path: 'dashboard', component: AdminDashboardComponent },
@@ -70,40 +68,27 @@ export const routes: Routes = [
     ]
   },
   
-  // RUTAS CLIENTE
-  {
-    path: 'guest',
-    canActivate: [AuthGuard, ClienteGuard],
-    children: [
-      { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
-      {
-        path: 'dashboard',
-        component: ClienteDashboard
-      }
-    ]
-  },
-  
-  // RUTAS CLIENTE (ruta alternativa)
   { 
     path: 'cliente', 
     component: ClienteLayout, 
-    canActivate: [AuthGuard, ClienteGuard],
+    canActivate: [AuthGuard],
+    data: { role: 'Cliente' }, // Especificar rol requerido
     children: [
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
       { path: 'dashboard', component: ClienteDashboard }
     ]
   },
   
-  // RUTAS SUPERADMIN
   {
     path: 'superadmin',
-    component: AdminLayoutComponent, // o crear un SuperAdminLayoutComponent
-    canActivate: [AuthGuard, SuperAdminGuard],
+    component: SuperadminLayout,
+    canActivate: [AuthGuard],
+    data: { role: 'SuperAdmin' },
     children: [
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
       {
         path: 'dashboard',
-        component: AdminDashboardComponent // o crear SuperAdminDashboardComponent
+        component: SuperadminDashboard // o crear SuperAdminDashboardComponent
       },
       // Rutas específicas de superadmin
       {

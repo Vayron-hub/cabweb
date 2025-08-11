@@ -255,10 +255,9 @@ export class BackendService {
   }
 
   getRole(id: number): Observable<string>{
-    
     return this.http.get<User>(`${this.apiUrl}/usuarios/${id}`)
     .pipe(
-      map(usuario => usuario.rol || 'client'),
+      map(usuario => usuario.rol),
       catchError(this.handleError));
   }
 

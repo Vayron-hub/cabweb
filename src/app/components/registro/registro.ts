@@ -89,7 +89,6 @@ export class Registro implements OnInit {
 
       console.log('📝 Iniciando registro para:', { nombre, correo });
 
-      // Usar el método de registro con login automático
       this.authService.register(userData).subscribe({
         next: (success) => {
           this.isLoading = false;
