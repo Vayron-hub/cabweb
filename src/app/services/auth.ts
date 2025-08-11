@@ -42,7 +42,16 @@ export class AuthService {
     );
   }
 
-
+  register(userData: {nombre: string, correo: string, password: string}): Observable<boolean> {
+    return this.backendService.registrarUsuario(userData).pipe(
+      switchMap((registeredUser) => {
+        return this.loginWithBackend(userData.correo, userData.password);
+      }),
+      catchError(error => {
+        return of(false);
+      })
+    );
+  }
 
   logout(): void {
     if (this.useBackend && this.isAuthenticated()) {
