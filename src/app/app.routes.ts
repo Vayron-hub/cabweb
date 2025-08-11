@@ -31,7 +31,7 @@ export const routes: Routes = [
   },
   { 
     path: 'clientedashboard', 
-    redirectTo: '/guest/dashboard',
+    redirectTo: '/cliente/dashboard',
     pathMatch: 'full',
   },
   { 
