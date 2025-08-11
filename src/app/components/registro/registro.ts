@@ -89,8 +89,8 @@ export class Registro implements OnInit {
 
       console.log('📝 Iniciando registro para:', { nombre, correo });
 
-      // Usar el nuevo método de registro y login automático
-      this.authService.registerAndLogin(userData).subscribe({
+      // Usar el método de registro con login automático
+      this.authService.register(userData).subscribe({
         next: (success) => {
           this.isLoading = false;
           
@@ -100,11 +100,17 @@ export class Registro implements OnInit {
             
             // Esperar un momento para mostrar el mensaje de éxito
             setTimeout(() => {
-              // Navegación exitosa
-              if (this.queryType) {
-                this.router.navigate([this.returnUrl], { queryParams: { type: this.queryType } });
+              // Redirigir basándose en el rol del usuario
+              const currentUser = this.authService.getCurrentUser();
+              if (currentUser?.rol === 'Cliente') {
+                this.router.navigate(['/cliente']);
+              } else if (currentUser?.rol === 'Admin') {
+                this.router.navigate(['/admin']);
+              } else if (currentUser?.rol === 'SuperAdmin') {
+                this.router.navigate(['/superadmin']);
               } else {
-                this.router.navigate([this.returnUrl]);
+                // Fallback a cliente por defecto
+                this.router.navigate(['/cliente']);
               }
             }, 1500);
             
