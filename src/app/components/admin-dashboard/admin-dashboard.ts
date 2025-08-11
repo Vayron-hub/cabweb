@@ -36,17 +36,17 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
   isLoadingZonas = false;
 
   currentUser: User = {
-    id: 1,
-    nombre: 'root',
-    correo: 'admin@utleon.edu.mx',
-    email: 'admin@utleon.edu.mx',
-    rol: 'admin', 
+    id: 0,
+    nombre: '',
+    correo: '',
+    email: '',
     password: '',
-    activo: true,
+    rol: '',
+    activo: false,
     enLinea: false,
-    fechaCreacion: '2025-07-26',
+    fechaCreacion: '',
     fechaUltimoAcceso: null,
-    ultimoAcceso: new Date() 
+    ultimoAcceso: new Date(),
   };
   userMenuOpen = false;
   showAccountModal = false;
@@ -68,9 +68,9 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
   selectedRoles: string[] = [];
   selectedUsers: (string | number)[] = [];
   roleOptions = [
-    { label: 'Administrador', value: 'administrador' },
-    { label: 'Usuario', value: 'usuario' },
-    { label: 'Operador', value: 'operador' }
+    { label: 'Cliente', value: 'Cliente' },
+    { label: 'Administrador', value: 'Admin' },
+    { label: 'Super Administrador', value: 'SuperAdmin' }
   ];
 
   // ESTADÍSTICAS REALES DEL BACKEND
@@ -275,17 +275,6 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
     this.filterUsers();
   }
 
-  getRoleClass(rol: string | undefined): string {
-    if (!rol) return 'user';
-    const roleStr = String(rol).toLowerCase();
-    switch (roleStr) {
-      case 'administrador': return 'admin';
-      case 'usuario': return 'user';
-      case 'operador': return 'operator';
-      default: return 'user';
-    }
-  }
-
   getStatusClass(activo: boolean | undefined): string {
     return activo === true ? 'active' : 'inactive';
   }
@@ -320,7 +309,7 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
   }
 
   loadTopClasificadoresGlobales() {
-    console.log('🔄 Cargando TOP 3 clasificadores más activos desde https://localhost:7286/api/clasificadores/estadisticas...');
+    console.log('🔄 Cargando TOP 3 clasificadores más activos desde https://localhost:8080/api/clasificadores/estadisticas...');
     this.isLoadingClasificadores = true;
 
     this.backendService.getEstadisticasClasificadores().subscribe({
@@ -359,14 +348,14 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
 
   getDetectionType(tipo: string): string {
     switch (tipo) {
-      case 'organico':
+      case 'Organico':
         return 'Orgánico';
-      case 'valorizable':
+      case 'Valorizable':
         return 'Valorizable';
-      case 'no_valorizable':
+      case 'NoValorizable':
         return 'No valorizable';
       default:
-        return 'Otro';
+        return 'Error';
     }
   }
 
@@ -512,15 +501,15 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
     const tipoLower = tipo?.toLowerCase() || '';
 
     // Orgánico - Verde
-    if (tipoLower.includes('orgánico') || tipoLower.includes('organico')) {
+    if (tipoLower.includes('Organico')) {
       return '#4CAF50'; // Verde para orgánico
     }
     // Valorizable/Reciclable - Azul
-    else if (tipoLower === 'valorizable') {
+    else if (tipoLower === 'Valorizable') {
       return '#2196F3'; // Azul para valorizable/reciclable
     }
     // No Valorizable - Naranja/Rojo
-    else if (tipoLower === 'no valorizable') {
+    else if (tipoLower === 'NoValorizable') {
       return '#FF9800'; // Naranja para no valorizable
     }
     // Otros tipos - Gris
@@ -533,15 +522,15 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
     const tipoLower = tipo?.toLowerCase() || '';
 
     // Orgánico - Ícono de hoja
-    if (tipoLower === 'organico') {
+    if (tipo === 'Organico') {
       return 'assets/images/organico.png'; // Hoja para orgánico
     }
     // Valorizable/Reciclable - Ícono de reciclaje
-    else if (tipoLower === 'valorizable') {
+    else if (tipo === 'Valorizable') {
       return 'assets/images/valorizable.png'; // Ícono de reciclaje para valorizable
     }
     // No Valorizable - Ícono de advertencia
-    else if (tipoLower === 'no_valorizable') {
+    else if (tipo === 'NoValorizable') {
       return 'assets/images/no_valorizable.png'; // Ícono de advertencia para no valorizable
     }
     // Otros tipos - Ícono genérico
@@ -762,11 +751,11 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
 
           Object.keys(tiposCounts).forEach(tipo => {
             const count = tiposCounts[tipo];
-            if (tipo === 'Valorizable' || tipo === 'valorizable') {
+            if (tipo === 'Valorizable') {
               reciclableCount += count;
-            } else if (tipo.includes('organico') || tipo.includes('orgánico') || tipo.includes('Organico')) {
+            } else if (tipo === 'Organico') {
               organicoCount += count;
-            } else if (tipo === 'no valorizable') {
+            } else if (tipo === 'NoValorizable') {
               novalCount += count;
             }
           });
@@ -819,11 +808,11 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
         const nombreTipo = (tipo.tipo || '').toLowerCase();
         const cantidad = tipo.cantidad || 0;
 
-        if (nombreTipo.includes('valorizable') || nombreTipo.includes('Valorizable') || nombreTipo.includes('plastico')) {
+        if (nombreTipo === 'Valorizable') {
           valorizableCount += cantidad;
-        } else if (nombreTipo.includes('organico') || nombreTipo.includes('orgánico') || nombreTipo.includes('Organico')) {
+        } else if (nombreTipo === 'Organico') {
           organicoCount += cantidad;
-        } else if (nombreTipo.includes('no valorizable') || nombreTipo.includes('No Valorizable') || nombreTipo.includes('no Valorizable')) {
+        } else if (nombreTipo === 'NoValorizable') {
           noValorizableCount += cantidad;
         }
       });
