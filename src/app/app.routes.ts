@@ -5,7 +5,7 @@ import { Registro } from './components/registro/registro';
 import { AdminLayoutComponent } from './components/admin-layout/admin-layout';
 import { AdminDashboardComponent } from './components/admin-dashboard/admin-dashboard';
 import { AuthGuard } from './guards/auth.guard';
-import { ClienteDashboard } from './components/cliente-dashboard/cliente-dashboard';
+import { ClienteComentarios } from './components/cliente-comentarios/cliente-comentarios';
 import { ClienteLayout } from './components/cliente-layout/cliente-layout';
 import { ClienteGuard } from './guards/cliente.guard';
 import { AdminGuard } from './guards/admin.guard';
@@ -30,8 +30,8 @@ export const routes: Routes = [
     pathMatch: 'full',
   },
   { 
-    path: 'clientedashboard', 
-    redirectTo: '/cliente/dashboard',
+    path: 'comentarios', 
+    redirectTo: '/cliente/comentarios',
     pathMatch: 'full',
   },
   { 
@@ -55,19 +55,19 @@ export const routes: Routes = [
       { path: 'dashboard', component: AdminDashboardComponent },
       {
         path: 'estadisticas',
-        loadComponent: () => import('./components/estadisticas/estadisticas.js').then(m => m.EstadisticasComponent)
+        loadComponent: () => import('./components/estadisticas/estadisticas').then(m => m.EstadisticasComponent)
       },
       {
         path: 'usuarios',
-        loadComponent: () => import('./components/usuarios/usuarios.js').then(m => m.UsuariosComponent)
+        loadComponent: () => import('./components/usuarios/usuarios').then(m => m.UsuariosComponent)
       },
       {
         path: 'zonas',
-        loadComponent: () => import('./components/zonas/zonas.js').then(m => m.ZonasComponent)
+        loadComponent: () => import('./components/zonas/zonas').then(m => m.ZonasComponent)
       },
       {
         path: 'clasificadores',
-        loadComponent: () => import('./components/clasificadores/clasificadores.js').then(m => m.ClasificadoresComponent)
+        loadComponent: () => import('./components/clasificadores/clasificadores').then(m => m.ClasificadoresComponent)
       }
     ]
   },
@@ -78,8 +78,16 @@ export const routes: Routes = [
     component: ClienteLayout, 
     canActivate: [AuthGuard, ClienteGuard],
     children: [
-      { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
-      { path: 'dashboard', component: ClienteDashboard }
+      { path: '', redirectTo: 'comentarios', pathMatch: 'full' },
+      { path: 'comentarios', component: ClienteComentarios },
+      {
+        path: 'comprar',
+        loadComponent: () => import('./components/cliente-comprar/comprar').then(m => m.ClienteComprar)
+      },
+      {
+        path: 'inventario',
+        loadComponent: () => import('./components/cliente-inventario/inventario').then(m => m.ClienteInventario)
+      },
     ]
   },
   
@@ -97,7 +105,7 @@ export const routes: Routes = [
       // Rutas específicas de superadmin
       {
         path: 'usuarios',
-        loadComponent: () => import('./components/usuarios/usuarios.js').then(m => m.UsuariosComponent)
+        loadComponent: () => import('./components/usuarios/usuarios').then(m => m.UsuariosComponent)
       },
     ]
   },

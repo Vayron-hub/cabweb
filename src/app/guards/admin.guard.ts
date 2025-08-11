@@ -41,7 +41,7 @@ export class AdminGuard implements CanActivate {
           this.router.navigate(['/superadmin/dashboard']);
           return false;
         } else if (role === 'client' || role === 'cliente') {
-          this.router.navigate(['/cliente/dashboard']);
+          this.router.navigate(['/cliente/comentarios']);
           return false;
         } else {
           this.router.navigate(['/login']);
