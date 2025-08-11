@@ -27,7 +27,7 @@ export class NavbarComponent {
     nombre: '',
     email: '',
     rol: '',
-    ultimoAcceso: new Date()
+    ultimoAcceso: new Date(),
   };
 
   @Output() locationChange = new EventEmitter<string>();
@@ -36,30 +36,24 @@ export class NavbarComponent {
 
   userMenuOpen = false;
 
-  constructor(
-    private backendService: BackendService,
-  ) { }
+  constructor(private backendService: BackendService) {}
 
   toggleUserMenu() {
     this.userMenuOpen = !this.userMenuOpen;
   }
 
-
   getCurrentUser() {
     const user = this.backendService.getCurrentUser();
     if (user) {
-      // Ensure all required fields are present and have the correct types
       this.currentUser = {
         id: user.id || '',
         nombre: user.nombre || '',
-        email: user.correo || '', // Handle undefined email
-        rol:  'Admin',
-        ultimoAcceso: this.convertToDate(user.fechaUltimoAcceso)
+        email: (user as any).correo || (user as any).email || '',
+        rol: (user as any).rol || '',
+        ultimoAcceso: this.convertToDate(user.fechaUltimoAcceso),
       };
     } else {
-      // Handle the case when user is null
       console.warn('Usuario no encontrado');
-      // Keep the existing default user or redirect to login
     }
   }
 
@@ -72,18 +66,15 @@ export class NavbarComponent {
       return dateValue;
     }
 
-    // If it's a string, try to parse it
     if (typeof dateValue === 'string') {
       const parsedDate = new Date(dateValue);
       return isNaN(parsedDate.getTime()) ? new Date() : parsedDate;
     }
 
-    // Fallback to current date
     return new Date();
   }
 
   onLocationChange() {
-    console.log('🔄 Navbar - Cambio de ubicación a:', this.selectedLocation);
     this.locationChange.emit(this.selectedLocation);
   }
 
@@ -100,7 +91,7 @@ export class NavbarComponent {
     return new Date(date).toLocaleDateString('es-ES', {
       year: 'numeric',
       month: 'long',
-      day: 'numeric'
+      day: 'numeric',
     });
   }
 }

@@ -30,28 +30,8 @@ export class AuthGuard implements CanActivate {
       return of(false);
     }
 
-    const requiredRole = route.data['role'] as string;
-    
-    if (!requiredRole) {
-      console.log('✅ Usuario autenticado - sin restricciones de rol');
-      return of(true);
-    }
-
-    const userId = currentUser.id;
-    return this.backendService.getRole(Number(userId)).pipe(
-      map((userRole: string) => {
-        if (userRole === requiredRole) {
-          return true;
-        }
-
-        this.redirectByRole(userRole);
-        return false;
-      }),
-      catchError(error => {
-        this.router.navigate(['/login']);
-        return of(false);
-      })
-    );
+  // En el nuevo esquema permitimos acceso si está logueado; el filtrado de vistas se hace en el frontend
+  return of(true);
   }
 
   /**
@@ -65,18 +45,7 @@ export class AuthGuard implements CanActivate {
    * Redirige al usuario a su dashboard correspondiente según su rol
    */
   private redirectByRole(userRole: string): void {
-    switch (userRole) {
-      case 'Cliente':
-        this.router.navigate(['/cliente/dashboard']);
-        break;
-      case 'Admin':
-        this.router.navigate(['/admin/dashboard']);
-        break;
-      case 'SuperAdmin':
-        this.router.navigate(['/superadmin/dashboard']);
-        break;
-      default:
-        this.router.navigate(['/login']);
-    }
+  // Todos los roles usan ahora el mismo dashboard
+  this.router.navigate(['/app/dashboard']);
   }
 }

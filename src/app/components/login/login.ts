@@ -50,7 +50,7 @@ export class Login implements OnInit {
   }
 
   ngOnInit() {
-    this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/admin';
+    this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/app';
     this.queryType = this.route.snapshot.queryParams['type'] || '';
     
     // Cargar credenciales recordadas si existen
@@ -64,20 +64,15 @@ export class Login implements OnInit {
       
       const { username, password } = this.loginForm.value;
       
-      // Usar el nuevo sistema de autenticación con backend
       this.authService.login(username, password).subscribe({
         next: (success) => {
           if (success) {
-            console.log('✅ Login exitoso');
-            
-            // Guardar credenciales si el usuario quiere recordarlas
             if (this.rememberMe) {
               this.saveCredentials(username, password);
             } else {
               this.clearSavedCredentials();
             }
             
-            // Navegación exitosa
             if (this.queryType) {
               this.router.navigate([this.returnUrl], { queryParams: { type: this.queryType } });
             } else {
@@ -89,15 +84,12 @@ export class Login implements OnInit {
           }
         },
         error: (error) => {
-          console.error('❌ Error en login:', error);
           this.errorMessage = 'Error al conectar con el servidor. Intenta nuevamente.';
           this.isLoading = false;
         }
       });
     }
   }
-
-  // === MÉTODOS PARA MEJORAR UX ===
   
   togglePasswordVisibility(): void {
     this.showPassword = !this.showPassword;
@@ -114,8 +106,6 @@ export class Login implements OnInit {
   closeHelpModal(): void {
     this.showHelpModal = false;
   }
-
-  // === MÉTODOS PARA RECORDAR CREDENCIALES ===
   
   private loadRememberedCredentials(): void {
     const savedCredentials = localStorage.getItem('rememberedCredentials');

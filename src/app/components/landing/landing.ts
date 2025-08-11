@@ -14,22 +14,21 @@ export class Landing {
   
   constructor(
     private router: Router,
-    private authService: AuthService
+    public authService: AuthService
   ) {}
 
   onCardClick(cardType: string) {
     if (cardType === 'login') {
-      // Si es el botón de login, ir al login
       this.router.navigate(['/login']);
     } else if (cardType === 'cotizacion') {
-      // Si es el botón de cotización, ir a la página de cotización
       this.router.navigate(['/cotizacion']);
+    } else if (cardType === 'app') {
+      this.router.navigate(['/app/dashboard']);
     } else {
-      // Para cualquier otra tarjeta, ir directamente al admin dashboard
       if (this.authService.isLoggedIn()) {
-        this.router.navigate(['/admin'], { queryParams: { type: cardType } });
+        this.router.navigate(['/app/dashboard'], { queryParams: { type: cardType } });
       } else {
-        this.router.navigate(['/login'], { queryParams: { returnUrl: '/admin', type: cardType } });
+        this.router.navigate(['/login'], { queryParams: { returnUrl: '/app/dashboard', type: cardType } });
       }
     }
   }
