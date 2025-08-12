@@ -96,6 +96,7 @@
 <div class="bg-primary-600 px-5">
   <div class="flex gap-4 h-16">
     <button
+    *ngIf="currentUser.rol!=='Cliente'"
       class="flex items-center gap-2 px-4 py-2 font-medium transition-all duration-200 text-primary-100 hover:bg-primary-700 hover:text-white border-b-2 border-transparent"
       routerLink="/app/dashboard"
       routerLinkActive="text-white border-b-primary-100"

@@ -50,7 +50,7 @@ export class LayoutComponent implements OnInit, OnDestroy {
     private backendService: BackendService,
     private zonaService: ZonaService,
     private router: Router
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.getCurrentUser();
@@ -61,7 +61,7 @@ export class LayoutComponent implements OnInit, OnDestroy {
     });
     this.loadZonas();
   }
-  ngOnDestroy(): void {}
+  ngOnDestroy(): void { }
 
   private getCurrentUser(): void {
     const user = this.backendService.getCurrentUser();
@@ -237,39 +237,65 @@ export class LayoutComponent implements OnInit, OnDestroy {
   savePasswordChanges(): void {
     if (!this.canSavePassword()) return;
     this.isSavingPassword = true;
+    
+    console.log('Verificando contraseña para:', this.currentUser.email);
+    
     this.backendService
       .verifyCurrentPassword(
-        this.currentUser.id,
+        this.currentUser.email,
         this.changePasswordData.currentPassword
       )
       .subscribe({
-        next: (res: any) => {
-          if (!res.isValid) {
+        next: (isValid: boolean) => {
+          if (!isValid) {
             this.isSavingPassword = false;
             alert('Contraseña actual incorrecta');
             return;
           }
+          
+          // Usar el nuevo método específico para cambio de contraseña
+          const userData = {
+            nombre: this.currentUser.nombre,
+            correo: this.currentUser.email,
+            rol: this.currentUser.rol
+          };
+          
           this.backendService
-            .updateUsuario(this.currentUser.id, {
-              nombre: this.currentUser.nombre,
-              email: this.currentUser.email,
-              password: this.changePasswordData.newPassword,
-            })
+            .updateUsuarioPassword(
+              this.currentUser.id, 
+              this.changePasswordData.newPassword,
+              userData
+            )
             .subscribe({
               next: () => {
                 this.isSavingPassword = false;
                 this.isChangingPassword = false;
-                alert('Contraseña cambiada');
+                alert('Contraseña cambiada exitosamente');
+                this.changePasswordData = {
+                  currentPassword: '',
+                  newPassword: '',
+                  confirmPassword: '',
+                };
               },
-              error: () => {
+              error: (error) => {
+                console.error('Error al cambiar contraseña:', error);
                 this.isSavingPassword = false;
-                alert('Error al cambiar contraseña');
+                
+                // Manejar errores específicos
+                if (error.status === 400) {
+                  alert('Error: Datos inválidos. Verifica que todos los campos estén correctos.');
+                } else if (error.status === 403) {
+                  alert('Error: No tienes permisos para realizar esta acción.');
+                } else {
+                  alert('Error al cambiar contraseña. Intenta nuevamente.');
+                }
               },
             });
         },
-        error: () => {
+        error: (error) => {
+          console.error('Error al verificar contraseña:', error);
           this.isSavingPassword = false;
-          alert('Error verificación contraseña');
+          alert('Error al verificar la contraseña actual');
         },
       });
   }
