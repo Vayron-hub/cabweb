@@ -32,12 +32,22 @@
           styleClass="p-button-lg p-button-success text-lg px-8 py-4"
           (click)="onCardClick('cotizacion')">
         </p-button>
-        <p-button 
-          label="Iniciar Sesión" 
-          icon="pi pi-sign-in" 
-          styleClass="p-button-lg p-button-outlined p-button-secondary text-lg px-8 py-4"
-          (click)="onCardClick('login')">
-        </p-button>
+        <ng-container *ngIf="authService.isLoggedIn(); else loginBtn">
+          <p-button 
+            label="¡Ir a la app!" 
+            icon="pi pi-arrow-right" 
+            styleClass="p-button-lg p-button-primary text-lg px-8 py-4"
+            (click)="onCardClick('app')">
+          </p-button>
+        </ng-container>
+        <ng-template #loginBtn>
+          <p-button 
+            label="Iniciar Sesión" 
+            icon="pi pi-sign-in" 
+            styleClass="p-button-lg p-button-outlined p-button-secondary text-lg px-8 py-4"
+            (click)="onCardClick('login')">
+          </p-button>
+        </ng-template>
       </div>
 
     </div>

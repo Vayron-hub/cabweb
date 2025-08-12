@@ -142,6 +142,50 @@ export interface DashboardData {
   horariosRecurrentes: EstadisticasHorarios[];
 }
 
+//CLIENTES //////////////////////////////////////////////////////////////
+export interface Compras { }
+
+
+export interface Comentarios {
+  id: number;
+  fechaHora: Date;
+  texto: string;
+  usuarioId: number;
+  calificacion: number;
+  activo: boolean; // Cambiar de 'Activo' a 'activo' para consistencia
+  productoId?: number; // Agregar referencia al producto
+  usuario?: string; // Para mostrar el nombre del usuario
+}
+
+export interface newComent {
+  texto: string;
+  fechaHora: Date | string;
+  usuarioId: number;
+  calificacion: number;
+  activo: boolean;
+  productoId?: number;
+}
+
+export interface Producto{
+  id:number;
+  nombre: string;
+  descripcion: string;
+  precio:string;
+  activo: boolean;
+  stock: number;
+}
+
+export interface Venta{
+  uusarioId: number;
+  ProductoId: number;
+  Cantidad: number;
+  Total: number;
+  Estatus: string;
+  DireccionEnvio: string;
+  Observaciones: string;
+}
+///////////////////////////////////////////////////////////////////////////
+
 // Interfaces para contenido
 export interface Tip {
   id: string | number;
@@ -620,15 +664,8 @@ export class BackendService {
 
   // === REGISTRO PÚBLICO ===
 
-  registrarUsuario(usuario: {
-    nombre: string;
-    correo: string;
-    password: string;
-  }): Observable<User> {
-    console.log('📝 REGISTRANDO NUEVO USUARIO:', {
-      nombre: usuario.nombre,
-      correo: usuario.correo,
-    });
+  registrarUsuario(usuario: { nombre: string, correo: string, password: string }): Observable<User> {
+    console.log('📝 REGISTRANDO NUEVO USUARIO:', { nombre: usuario.nombre, correo: usuario.correo });
 
     const registroData = {
       nombre: usuario.nombre,
@@ -655,11 +692,11 @@ export class BackendService {
     );
   }
 
-  getRole(id: number): Observable<string> {
-    return this.http.get<User>(`${this.apiUrl}/usuarios/${id}`).pipe(
-      map((usuario) => usuario.rol || 'client'),
-      catchError(this.handleError)
-    );
+  getRole(id: number): Observable<string>{
+    return this.http.get<User>(`${this.apiUrl}/usuarios/${id}`)
+    .pipe(
+      map(usuario => usuario.rol),
+      catchError(this.handleError));
   }
 
   // Método helper para transformar usuarios del backend al formato del frontend
@@ -1158,4 +1195,27 @@ export class BackendService {
       )
       .pipe(catchError(this.handleError));
   }
+
+  ////////////////////////////////////////////////////////////////////
+
+  // CLIENTES ENDPOINTS
+  getComentarios(): Observable<Comentarios[]> {
+    return this.http
+      .get<Comentarios[]>(`${this.apiUrl}/comentarios`)
+      .pipe(catchError(this.handleError));
+  }
+
+  // Nuevo método para obtener comentarios por producto
+  getComentariosByProducto(productoId: number): Observable<Comentarios[]> {
+    return this.http
+      .get<Comentarios[]>(`${this.apiUrl}/comentarios/producto/${productoId}`)
+      .pipe(catchError(this.handleError));
+  }
+
+  createComentario(comentario: Partial<newComent>): Observable<newComent> {
+    return this.http
+      .post<newComent>(`${this.apiUrl}/comentarios`, comentario)
+      .pipe(catchError(this.handleError));
+  }
+  //////////////////////////////////////////////////////////////////////7
 }

@@ -5,7 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { CheckboxModule } from 'primeng/checkbox';
 import { ToastModule } from 'primeng/toast';
 import { MessageService } from 'primeng/api';
-import { EmailService, QuoteEmailData } from './../../services/email.service';
+import { EmailService, QuoteEmailData } from '../../services/email.service';
 
 interface SelectedComponents {
   esp32: string;
@@ -27,7 +27,7 @@ interface CustomerInfo {
   selector: 'app-cotizacion',
   imports: [CommonModule, FormsModule, CheckboxModule, ToastModule],
   providers: [MessageService],
-  templateUrl: './cotizacion.component.html',
+  templateUrl: './cotizacion.html',
 })
 export class CotizacionComponent {
   selectedComponents: SelectedComponents = {

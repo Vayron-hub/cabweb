@@ -17,10 +17,15 @@ export interface Proveedor {
 
 @Component({
   selector: 'app-proveedores',
+<<<<<<< HEAD:src/app/components/proveedores/proveedores.component.ts
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './proveedores.component.html',
   styleUrls: ['./proveedores.component.css']
+=======
+  imports: [],
+  templateUrl: './proveedores.html',
+>>>>>>> 29b1ac3c0f58f9d3a6e992f40fb82a1942426678:src/app/components/proveedores/proveedores.ts
 })
 export class ProveedoresComponent implements OnInit {
   

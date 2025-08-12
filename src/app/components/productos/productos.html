@@ -1,0 +1,168 @@
+<div class="w-full bg-gray-50 min-h-screen">
+    <!-- Header -->
+    <div *ngIf="currentUser.rol === 'Cliente'" class="bg-white shadow-sm border-b">
+        <div class="max-w-7xl mx-auto px-4 py-6">
+            <h1 class="text-3xl font-bold text-gray-900">Productos CAB</h1>
+            <p class="text-gray-600 mt-1">Descubre nuestros sistemas de clasificación automática</p>
+        </div>
+    </div>
+
+    <!-- Productos Grid -->
+    <div class="max-w-7xl mx-auto px-4 py-8">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div *ngFor="let prod of productos"
+                class="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 overflow-hidden border border-gray-100">
+
+                <!-- Header de la card -->
+                <div class="bg-primary-600 py-4 px-2">
+                    <h3 class="text-xl font-bold ml-2 text-white truncate">{{ prod.nombre }}</h3>
+                </div>
+
+                <!-- Contenido principal -->
+                <div class="p-6">
+                    <!-- Descripción -->
+                    <div class="mb-4">
+                        <p class="text-gray-600 text-sm leading-relaxed line-clamp-3">
+                            {{ prod.descripcion | slice:0:120 }}{{ prod.descripcion.length > 120 ? '...' : '' }}
+                        </p>
+                    </div>
+
+                    <!-- Información del producto -->
+                    <div class="space-y-3 mb-6">
+                        <!-- Precio -->
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm font-medium text-gray-500">Precio:</span>
+                            <span class="text-2xl font-bold text-green-600">${{ prod.precio | number:'1.0-0' }}</span>
+                        </div>
+
+                        <!-- Stock -->
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm font-medium text-gray-500">Stock disponible:</span>
+                            <div class="flex items-center">
+                                <span class="text-lg font-semibold text-gray-800">{{ prod.stock }}</span>
+                                <div class="ml-2 w-2 h-2 rounded-full"
+                                    [class]="prod.stock > 10 ? 'bg-green-500' : prod.stock > 5 ? 'bg-yellow-500' : 'bg-red-500'">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Botones de acción -->
+                    <div class="flex flex-col gap-3">
+                        <button
+                            class="w-full bg-accent-500 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-lg transition-colors duration-200 flex items-center justify-center gap-2"
+                            (click)="showComentariosDialog(prod.id)">
+                            <i class="pi pi-comment text-sm"></i>
+                            Mostrar Comentarios
+                        </button>
+
+                        <button
+                            class="w-full bg-accent-600 hover:bg-green-700 text-white font-semibold py-3 px-4 rounded-lg transition-colors duration-200 flex items-center justify-center gap-2"
+                            [disabled]="prod.stock === 0">
+                            <i class="pi pi-shopping-cart text-sm"></i>
+                            {{ prod.stock > 0 ? 'Agregar al Carrito' : 'Sin Stock' }}
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Badge de disponibilidad -->
+                <div class="absolute top-4 right-4">
+                    <span class="px-3 py-1 text-xs font-semibold rounded-full"
+                        [class]="prod.stock > 0 ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'">
+                        {{ prod.stock > 0 ? 'Disponible' : 'Agotado' }}
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mensaje cuando no hay productos -->
+        <div *ngIf="productos.length === 0" class="text-center py-16">
+            <div class="text-gray-400 text-6xl mb-4">
+                <i class="pi pi-box"></i>
+            </div>
+            <h3 class="text-xl font-semibold text-gray-600 mb-2">No hay productos disponibles</h3>
+            <p class="text-gray-500">Los productos aparecerán aquí cuando estén disponibles.</p>
+        </div>
+    </div>
+
+    <!-- Modal para ver comentarios -->
+    <p-dialog header="Comentarios del Producto" [(visible)]="visibleComentarios"
+        [style]="{ width: '40rem', background: 'white', color: 'black' }" [modal]="true"
+        [closable]="true" [dismissableMask]="false" [blockScroll]="true">
+        
+        <div class="mb-4">
+            <button 
+                class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors duration-200 flex items-center gap-2"
+                (click)="showAgregarComentarioDialog()">
+                <i class="pi pi-plus text-sm"></i>
+                Agregar Comentario
+            </button>
+        </div>
+
+        <div *ngIf="comentarios.length === 0" class="text-center py-8">
+            <p class="text-gray-500">No hay comentarios disponibles para este producto.</p>
+        </div>
+
+        <div *ngFor="let com of comentarios" class="p-4 border rounded-lg bg-gray-50 shadow-sm mb-3">
+            <div class="flex justify-between items-start mb-2">
+                <span class="text-sm font-medium text-gray-700">{{ com.usuarioId}}</span>
+                <span class="text-xs text-gray-500">{{ com.fechaHora | date:'short' }}</span>
+            </div>
+            <p class="text-sm text-gray-800 mb-2">{{ com.texto }}</p>
+            <div class="flex items-center">
+                <div class="flex">
+                    <i *ngFor="let star of [1,2,3,4,5]" 
+                       class="pi text-sm"
+                       [class.pi-star-fill]="star <= com.calificacion"
+                       [class.pi-star]="star > com.calificacion"
+                       [class.text-yellow-500]="star <= com.calificacion"
+                       [class.text-gray-300]="star > com.calificacion">
+                    </i>
+                </div>
+                <span class="text-xs text-gray-600 ml-2">({{ com.calificacion }}/5)</span>
+            </div>
+        </div>
+    </p-dialog>
+
+    <!-- Modal para agregar comentario -->
+    <p-dialog header="Nuevo Comentario" [(visible)]="visibleAgregarComentario"
+        [style]="{ width: '35rem', background: 'white', color: 'black' }" [modal]="true"
+        [closable]="true" [dismissableMask]="false" [blockScroll]="true">
+
+        <!-- Campo de comentario -->
+        <div class="flex flex-col gap-2 mb-4">
+            <label for="comentario" class="font-semibold text-black">Comentario</label>
+            <textarea id="comentario" rows="4"
+                class="w-full p-3 border border-gray-300 rounded-lg bg-white text-black resize-none"
+                placeholder="Escribe tu comentario aquí..." [(ngModel)]="newComentario.texto">
+            </textarea>
+        </div>
+
+        <!-- Sistema de estrellas -->
+        <div class="flex flex-col gap-2 mb-4">
+            <label class="font-semibold text-black">Calificación</label>
+            <div class="flex gap-1">
+                <i *ngFor="let star of [1,2,3,4,5]; let i = index"
+                    class="pi cursor-pointer text-xl transition-colors duration-200"
+                    [class.pi-star-fill]="(i + 1) <= newComentario.calificacion"
+                    [class.pi-star]="(i + 1) > newComentario.calificacion"
+                    [class.text-yellow-500]="(i + 1) <= newComentario.calificacion"
+                    [class.text-gray-300]="(i + 1) > newComentario.calificacion"
+                    [class.hover:text-yellow-400]="true" 
+                    (click)="setCalificacion(i + 1)"
+                    (mouseenter)="hoverCalificacion = i + 1" 
+                    (mouseleave)="hoverCalificacion = 0">
+                </i>
+            </div>
+            <span class="text-sm text-gray-600">
+                {{ newComentario.calificacion > 0 ? newComentario.calificacion + ' de 5 estrellas' : 'Selecciona una calificación' }}
+            </span>
+        </div>
+
+        <div class="flex justify-end gap-2">
+            <p-button label="Volver a Comentarios" severity="secondary" (click)="volverAComentarios()" />
+            <p-button label="Guardar" (click)="postComentario()"
+                [disabled]="!newComentario.texto || newComentario.calificacion === 0" />
+        </div>
+    </p-dialog>
+</div>
