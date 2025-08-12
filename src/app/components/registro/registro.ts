@@ -89,9 +89,6 @@ export class Registro implements OnInit {
 
       console.log('📝 Iniciando registro para:', { nombre, correo });
 
-<<<<<<< HEAD
-
-=======
       this.authService.register(userData).subscribe({
         next: (success) => {
           this.isLoading = false;
@@ -133,7 +130,6 @@ export class Registro implements OnInit {
           }
         }
       });
->>>>>>> 29b1ac3c0f58f9d3a6e992f40fb82a1942426678
     } else {
       // Marcar todos los campos como tocados para mostrar errores
       Object.keys(this.registroForm.controls).forEach(key => {

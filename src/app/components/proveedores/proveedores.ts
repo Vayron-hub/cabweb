@@ -6,30 +6,20 @@ import { BackendService } from '../../services/backend.service';
 export interface Proveedor {
   id: number;
   nombre: string;
-  telefono: string;
-  email?: string;
-  rfc?: string;
-  direccion?: string;
-  productos?: string;
+  contacto?: string[];
+  producto?: string;
   activo: boolean;
   fechaRegistro: Date | string;
+  estado?: string;
 }
 
 @Component({
   selector: 'app-proveedores',
-<<<<<<< HEAD:src/app/components/proveedores/proveedores.component.ts
   standalone: true,
   imports: [CommonModule, FormsModule],
-  templateUrl: './proveedores.component.html',
-  styleUrls: ['./proveedores.component.css']
-=======
-  imports: [],
-  templateUrl: './proveedores.html',
->>>>>>> 29b1ac3c0f58f9d3a6e992f40fb82a1942426678:src/app/components/proveedores/proveedores.ts
+  templateUrl: './proveedores.component.html'
 })
 export class ProveedoresComponent implements OnInit {
-  
-  // === VARIABLES PRINCIPALES ===
   proveedores: Proveedor[] = [];
   filteredProveedores: Proveedor[] = [];
   isLoadingProveedores = false;
@@ -61,50 +51,86 @@ export class ProveedoresComponent implements OnInit {
   
   loadProveedores() {
     this.isLoadingProveedores = true;
-    
     this.backendService.getProveedores().subscribe({
       next: (proveedores: Proveedor[]) => {
-        console.log('✅ Proveedores obtenidos:', proveedores);
-        this.proveedores = proveedores.map(proveedor => ({
-          ...proveedor,
-          fechaRegistro: proveedor.fechaRegistro || new Date()
+        this.proveedores = proveedores.map(p => ({
+          ...p,
+          fechaRegistro: p.fechaRegistro || new Date()
         }));
         this.applyFilters();
         this.isLoadingProveedores = false;
       },
-      error: (error) => {
-        console.error('❌ Error cargando proveedores:', error);
+      error: (err) => {
         this.proveedores = [];
         this.filteredProveedores = [];
         this.isLoadingProveedores = false;
       }
     });
   }
-  
-  // === FILTROS Y BÚSQUEDA ===
-  
+
   applyFilters() {
     let filtered = [...this.proveedores];
-    
-    // Filtro de búsqueda
+
     if (this.searchTerm.trim()) {
       const term = this.searchTerm.toLowerCase().trim();
-      filtered = filtered.filter(proveedor =>
-        proveedor.nombre.toLowerCase().includes(term) ||
-        (proveedor.direccion && proveedor.direccion.toLowerCase().includes(term)) ||
-        (proveedor.productos && proveedor.productos.toLowerCase().includes(term))
+      filtered = filtered.filter(p =>
+        p.nombre.toLowerCase().includes(term) ||
+        (p.producto && p.producto.toLowerCase().includes(term)) ||
+        (Array.isArray(p.contacto) && p.contacto.some(c => c.toLowerCase().includes(term)))
       );
     }
-    
-    // Filtro de estado
+
     if (this.selectedStatusFilter !== 'all') {
-      filtered = filtered.filter(proveedor =>
-        this.selectedStatusFilter === 'active' ? proveedor.activo : !proveedor.activo
+      filtered = filtered.filter(p =>
+        this.selectedStatusFilter === 'active' ? p.activo : !p.activo
       );
     }
-    
+
     this.filteredProveedores = filtered;
     this.updatePagination();
+  }
+
+  // Cuando abras el modal para crear o editar, inicializa el contacto así:
+  getEmptySupplierForm(): Proveedor {
+    return {
+      id: 0,
+      nombre: '',
+      contacto: [],  // array vacío para contactos
+      producto: '',
+      activo: true,
+      fechaRegistro: new Date()
+    };
+  }
+
+  // Guardar proveedor ajusta para enviar contactos como array
+  saveSupplier() {
+    // Prepara el payload para el backend SIN el campo id
+    const proveedorPayload: any = {
+      Nombre: this.supplierFormData.nombre,
+      Contacto: this.supplierFormData.contacto,
+      Producto: this.supplierFormData.producto,
+      Activo: this.supplierFormData.activo
+    };
+
+    if (this.editingSupplier) {
+      // Editar proveedor
+      this.backendService.updateProveedor(this.editingSupplier.id, proveedorPayload).subscribe({
+        next: () => {
+          this.closeSupplierModal();
+          this.loadProveedores();
+        },
+        error: () => alert('Error al actualizar el proveedor')
+      });
+    } else {
+      // Crear proveedor
+      this.backendService.createProveedor(proveedorPayload).subscribe({
+        next: () => {
+          this.closeSupplierModal();
+          this.loadProveedores();
+        },
+        error: () => alert('Error al crear el proveedor')
+      });
+    }
   }
   
   clearFilters() {
@@ -153,68 +179,33 @@ export class ProveedoresComponent implements OnInit {
     this.supplierFormData = this.getEmptySupplierForm();
   }
   
-  saveSupplier() {
-    if (this.editingSupplier) {
-      // Actualizar proveedor
-      this.backendService.updateProveedor(this.editingSupplier.id, this.supplierFormData).subscribe({
-        next: (updatedProveedor: Proveedor) => {
-          console.log('✅ Proveedor actualizado:', updatedProveedor);
-          const index = this.proveedores.findIndex(p => p.id === updatedProveedor.id);
-          if (index !== -1) {
-            this.proveedores[index] = updatedProveedor;
-            this.applyFilters();
-          }
-          this.closeSupplierModal();
-        },
-        error: (error) => {
-          console.error('❌ Error actualizando proveedor:', error);
-          alert('Error al actualizar el proveedor');
-        }
-      });
-    } else {
-      // Crear nuevo proveedor
-      this.backendService.createProveedor(this.supplierFormData).subscribe({
-        next: (newProveedor: Proveedor) => {
-          console.log('✅ Proveedor creado:', newProveedor);
-          this.proveedores.unshift(newProveedor);
-          this.applyFilters();
-          this.closeSupplierModal();
-        },
-        error: (error) => {
-          console.error('❌ Error creando proveedor:', error);
-          alert('Error al crear el proveedor');
-        }
-      });
-    }
-  }
-  
   deleteSupplier(proveedor: Proveedor) {
     if (!confirm(`¿Está seguro de eliminar el proveedor "${proveedor.nombre}"?`)) {
       return;
     }
-    
     this.backendService.deleteProveedor(proveedor.id).subscribe({
       next: () => {
-        console.log('✅ Proveedor eliminado:', proveedor.id);
-        this.proveedores = this.proveedores.filter(p => p.id !== proveedor.id);
-        this.applyFilters();
+        this.loadProveedores(); // <-- recarga la lista
       },
       error: (error) => {
-        console.error('❌ Error eliminando proveedor:', error);
         alert('Error al eliminar el proveedor');
       }
     });
   }
   
   toggleSupplierStatus(proveedor: Proveedor) {
-    const newStatus = !proveedor.activo;
-    
-    this.backendService.updateProveedor(proveedor.id, { ...proveedor, activo: newStatus }).subscribe({
-      next: (updatedProveedor: Proveedor) => {
-        console.log('✅ Estado actualizado:', updatedProveedor);
+    const proveedorPayload: any = {
+      Nombre: proveedor.nombre,
+      Contacto: proveedor.contacto,
+      Producto: proveedor.producto,
+      Activo: !proveedor.activo
+    };
+
+    this.backendService.updateProveedor(proveedor.id, proveedorPayload).subscribe({
+      next: () => {
         const index = this.proveedores.findIndex(p => p.id === proveedor.id);
         if (index !== -1) {
-          this.proveedores[index] = updatedProveedor;
+          this.proveedores[index] = { ...this.proveedores[index], activo: !proveedor.activo };
           this.applyFilters();
         }
       },
@@ -274,22 +265,6 @@ export class ProveedoresComponent implements OnInit {
     // Implementar eliminación masiva
     console.log('Eliminando proveedores:', this.selectedProveedores);
     this.selectedProveedores = [];
-  }
-  
-  // === MÉTODOS AUXILIARES ===
-  
-  getEmptySupplierForm(): Proveedor {
-    return {
-      id: 0,
-      nombre: '',
-      telefono: '',
-      email: '',
-      rfc: '',
-      direccion: '',
-      productos: '',
-      activo: true,
-      fechaRegistro: new Date()
-    };
   }
   
   // === MÉTODOS DE FORMATO ===

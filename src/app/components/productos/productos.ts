@@ -87,7 +87,10 @@ export class ProductosComponent implements OnInit {
     this.backendService.getProductos().subscribe({
       next: (productos) => {
         console.log('Productos obtenidos:', productos);
-        this.productos = productos;
+        this.productos = productos.map(p => ({
+          ...p,
+          precio: String(p.precio)
+        }));
       },
       error: (error) => {
         console.error('Error al obtener productos:', error);

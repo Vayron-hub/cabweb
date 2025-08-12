@@ -553,11 +553,11 @@
                 </td>
                 <td>
                   <div class="contact-info">
-                    ✉️ {{ proveedor.email }}
+                    ✉️ {{ proveedor.contacto }}
                   </div>
                 </td>
                 <td>
-                  {{ proveedor.productos }}
+                  {{ proveedor.producto }}
                 </td>
                 <td>
                   <span class="status-badge" [ngClass]="getStatusClass(proveedor.activo)">
@@ -646,7 +646,7 @@
                   type="email"
                   class="form-input"
                   name="email"
-                  [(ngModel)]="supplierFormData.email"
+                  [(ngModel)]="supplierFormData.contacto"
                   required
                   placeholder="contacto@empresa.com"
                 />
@@ -656,7 +656,7 @@
                 <textarea
                   class="form-input form-textarea"
                   name="productos"
-                  [(ngModel)]="supplierFormData.productos"
+                  [(ngModel)]="supplierFormData.producto"
                   placeholder="Lista de productos principales..."
                 ></textarea>
               </div>
