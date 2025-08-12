@@ -141,6 +141,40 @@ export interface DashboardData {
   horariosRecurrentes: EstadisticasHorarios[];
 }
 
+//CLIENTES //////////////////////////////////////////////////////////////
+export interface Compras { }
+
+
+export interface Comentarios {
+  id: number;
+  fechaHora: Date;
+  texto: string;
+  usuarioId: number;
+  calificacion: number;
+  Activo: boolean;
+
+}
+
+export interface newComent {
+  texto: string;
+  fechaHora: Date | string;
+  usuarioId: number;
+  calificacion: number;
+  activo: boolean;
+}
+
+export interface inventario {
+  FechaVenta: Date | string;
+  UsuarioId: number;
+  ProductoId: number
+  Cantidad: number;
+  Total: number
+  Estado:string; 
+  DireccionEnvio: string
+  Observaciones: string
+ }
+///////////////////////////////////////////////////////////////////////////
+
 // Interfaces para contenido
 export interface Tip {
   id: string | number;
@@ -196,9 +230,9 @@ export class BackendService {
       );
   }
 
-  logout(): Observable<{message: string}> {
+  logout(): Observable<{ message: string }> {
     return this.http
-      .post<{message: string}>(`${this.apiUrl}/usuarios/salir`, {})
+      .post<{ message: string }>(`${this.apiUrl}/usuarios/salir`, {})
       .pipe(
         tap((response) => {
           console.log('✅ Logout exitoso:', response.message);
@@ -225,9 +259,9 @@ export class BackendService {
 
   // === REGISTRO PÚBLICO ===
 
-  registrarUsuario(usuario: {nombre: string, correo: string, password: string}): Observable<User> {
+  registrarUsuario(usuario: { nombre: string, correo: string, password: string }): Observable<User> {
     console.log('📝 REGISTRANDO NUEVO USUARIO:', { nombre: usuario.nombre, correo: usuario.correo });
-    
+
     const registroData = {
       nombre: usuario.nombre,
       correo: usuario.correo,
@@ -757,6 +791,19 @@ export class BackendService {
         `${this.apiUrl}/usuarios/${id}/verify-password`,
         verifyData
       )
+      .pipe(catchError(this.handleError));
+  }
+
+  // CLIENTES ENDPOINTS
+  getComentarios(): Observable<Comentarios[]> {
+    return this.http
+      .get<Comentarios[]>(`${this.apiUrl}/comentarios`)
+      .pipe(catchError(this.handleError));
+  }
+
+  createComentario(comentario: Partial<newComent>): Observable<newComent> {
+    return this.http
+      .post<newComent>(`${this.apiUrl}/comentarios`, comentario)
       .pipe(catchError(this.handleError));
   }
 }
