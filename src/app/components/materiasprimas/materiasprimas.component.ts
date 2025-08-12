@@ -229,7 +229,8 @@ export class MateriasPrimasComponent implements OnInit, OnDestroy {
       alert('Por favor complete todos los campos requeridos correctamente');
       return;
     }
-
+    
+    // Preparar datos para envío (sin el ID si es nuevo)
     const materialData = {
       nombre: this.materialForm.nombre.trim(),
       descripcion: this.materialForm.descripcion.trim(),
@@ -237,7 +238,7 @@ export class MateriasPrimasComponent implements OnInit, OnDestroy {
       stock: Number(this.materialForm.stock) || 0,
       activo: this.materialForm.activo
     };
-
+    
     if (this.editingMaterial) {
       // Actualizar materia prima existente
       const subscription = this.backendService.updateMateriaPrima(this.editingMaterial.id, {
@@ -245,11 +246,21 @@ export class MateriasPrimasComponent implements OnInit, OnDestroy {
         id: this.editingMaterial.id,
         fechaCreacion: this.editingMaterial.fechaCreacion
       }).subscribe({
-        next: () => {
+        next: (updatedMaterial: MateriaPrima) => {
+          console.log('✅ Materia prima actualizada:', updatedMaterial);
+          const index = this.materiasPrimas.findIndex(m => m.id === updatedMaterial.id);
+          if (index !== -1) {
+            this.materiasPrimas[index] = {
+              ...updatedMaterial,
+              fechaCreacion: new Date(updatedMaterial.fechaCreacion)
+            };
+            this.applyFilters();
+          }
           this.closeMaterialModal();
-          this.loadMateriasPrimas(); // <-- recarga desde la API
+          this.cdr.detectChanges();
         },
         error: (error) => {
+          console.error('❌ Error actualizando materia prima:', error);
           alert('Error al actualizar la materia prima. Por favor, inténtelo de nuevo.');
         }
       });
@@ -257,11 +268,18 @@ export class MateriasPrimasComponent implements OnInit, OnDestroy {
     } else {
       // Crear nueva materia prima
       const subscription = this.backendService.createMateriaPrima(materialData).subscribe({
-        next: () => {
+        next: (newMaterial: MateriaPrima) => {
+          console.log('✅ Materia prima creada:', newMaterial);
+          this.materiasPrimas.unshift({
+            ...newMaterial,
+            fechaCreacion: new Date(newMaterial.fechaCreacion || new Date())
+          });
+          this.applyFilters();
           this.closeMaterialModal();
-          this.loadMateriasPrimas(); // <-- recarga desde la API
+          this.cdr.detectChanges();
         },
         error: (error) => {
+          console.error('❌ Error creando materia prima:', error);
           alert('Error al crear la materia prima. Por favor, inténtelo de nuevo.');
         }
       });
@@ -273,87 +291,48 @@ export class MateriasPrimasComponent implements OnInit, OnDestroy {
     if (!confirm(`¿Está seguro de eliminar la materia prima "${material.nombre}"?`)) {
       return;
     }
-
+    
     const subscription = this.backendService.deleteMateriaPrima(material.id).subscribe({
       next: () => {
-        this.loadMateriasPrimas(); // <-- recarga desde la API
+        console.log('✅ Materia prima eliminada:', material.id);
+        this.materiasPrimas = this.materiasPrimas.filter(m => m.id !== material.id);
+        this.selectedMaterials = this.selectedMaterials.filter(id => id !== material.id);
+        this.applyFilters();
+        this.cdr.detectChanges();
       },
       error: (error) => {
+        console.error('❌ Error eliminando materia prima:', error);
         alert('Error al eliminar la materia prima. Por favor, inténtelo de nuevo.');
       }
     });
     this.subscriptions.add(subscription);
   }
-
+  
   toggleMaterialStatus(material: MateriaPrima) {
     const newStatus = !material.activo;
-
+    
     const subscription = this.backendService.updateMateriaPrima(material.id, { 
       ...material, 
       activo: newStatus 
     }).subscribe({
-      next: () => {
-        this.loadMateriasPrimas(); // <-- recarga desde la API
+      next: (updatedMaterial: MateriaPrima) => {
+        console.log('✅ Estado actualizado:', updatedMaterial);
+        const index = this.materiasPrimas.findIndex(m => m.id === material.id);
+        if (index !== -1) {
+          this.materiasPrimas[index] = {
+            ...updatedMaterial,
+            fechaCreacion: new Date(updatedMaterial.fechaCreacion)
+          };
+          this.applyFilters();
+        }
+        this.cdr.detectChanges();
       },
       error: (error) => {
+        console.error('❌ Error actualizando estado:', error);
         alert('Error al actualizar el estado de la materia prima');
       }
     });
     this.subscriptions.add(subscription);
-  }
-  
-  // Lo mismo para las operaciones masivas:
-  bulkActivateMaterials() {
-    if (this.selectedMaterials.length === 0) return;
-    const updates = this.selectedMaterials.map(id => {
-      const material = this.materiasPrimas.find(m => m.id === id);
-      if (material && !material.activo) {
-        return this.backendService.updateMateriaPrima(id, { ...material, activo: true }).toPromise();
-      }
-      return Promise.resolve(null);
-    }).filter(promise => promise !== null);
-
-    Promise.all(updates).then(() => {
-      this.selectedMaterials = [];
-      this.loadMateriasPrimas(); // <-- recarga desde la API
-    }).catch(error => {
-      alert('Error al activar algunas materias primas');
-    });
-  }
-
-  bulkDeactivateMaterials() {
-    if (this.selectedMaterials.length === 0) return;
-    const updates = this.selectedMaterials.map(id => {
-      const material = this.materiasPrimas.find(m => m.id === id);
-      if (material && material.activo) {
-        return this.backendService.updateMateriaPrima(id, { ...material, activo: false }).toPromise();
-      }
-      return Promise.resolve(null);
-    }).filter(promise => promise !== null);
-
-    Promise.all(updates).then(() => {
-      this.selectedMaterials = [];
-      this.loadMateriasPrimas(); // <-- recarga desde la API
-    }).catch(error => {
-      alert('Error al desactivar algunas materias primas');
-    });
-  }
-
-  bulkDeleteMaterials() {
-    if (this.selectedMaterials.length === 0) return;
-    if (!confirm(`¿Está seguro de eliminar ${this.selectedMaterials.length} materias primas?`)) {
-      return;
-    }
-    const deletions = this.selectedMaterials.map(id => 
-      this.backendService.deleteMateriaPrima(id).toPromise()
-    );
-
-    Promise.all(deletions).then(() => {
-      this.selectedMaterials = [];
-      this.loadMateriasPrimas(); // <-- recarga desde la API
-    }).catch(error => {
-      alert('Error al eliminar algunas materias primas');
-    });
   }
   
   // === SELECCIÓN MASIVA ===
@@ -387,6 +366,76 @@ export class MateriasPrimasComponent implements OnInit, OnDestroy {
     if (paginatedMaterials.length === 0) return false;
     
     return paginatedMaterials.every(material => this.selectedMaterials.includes(material.id));
+  }
+  
+  bulkActivateMaterials() {
+    if (this.selectedMaterials.length === 0) return;
+    
+    console.log('🔄 Activando materias primas masivamente...', this.selectedMaterials);
+    
+    // Aquí implementarías la activación masiva usando Promise.all
+    const updates = this.selectedMaterials.map(id => {
+      const material = this.materiasPrimas.find(m => m.id === id);
+      if (material && !material.activo) {
+        return this.backendService.updateMateriaPrima(id, { ...material, activo: true }).toPromise();
+      }
+      return Promise.resolve(null);
+    }).filter(promise => promise !== null);
+    
+    Promise.all(updates).then(() => {
+      this.selectedMaterials = [];
+      this.loadMateriasPrimas(); // Recargar datos
+      console.log('✅ Activación masiva completada');
+    }).catch(error => {
+      console.error('❌ Error en activación masiva:', error);
+      alert('Error al activar algunas materias primas');
+    });
+  }
+  
+  bulkDeactivateMaterials() {
+    if (this.selectedMaterials.length === 0) return;
+    
+    console.log('🔄 Desactivando materias primas masivamente...', this.selectedMaterials);
+    
+    const updates = this.selectedMaterials.map(id => {
+      const material = this.materiasPrimas.find(m => m.id === id);
+      if (material && material.activo) {
+        return this.backendService.updateMateriaPrima(id, { ...material, activo: false }).toPromise();
+      }
+      return Promise.resolve(null);
+    }).filter(promise => promise !== null);
+    
+    Promise.all(updates).then(() => {
+      this.selectedMaterials = [];
+      this.loadMateriasPrimas();
+      console.log('✅ Desactivación masiva completada');
+    }).catch(error => {
+      console.error('❌ Error en desactivación masiva:', error);
+      alert('Error al desactivar algunas materias primas');
+    });
+  }
+  
+  bulkDeleteMaterials() {
+    if (this.selectedMaterials.length === 0) return;
+    
+    if (!confirm(`¿Está seguro de eliminar ${this.selectedMaterials.length} materias primas?`)) {
+      return;
+    }
+    
+    console.log('🔄 Eliminando materias primas masivamente...', this.selectedMaterials);
+    
+    const deletions = this.selectedMaterials.map(id => 
+      this.backendService.deleteMateriaPrima(id).toPromise()
+    );
+    
+    Promise.all(deletions).then(() => {
+      this.selectedMaterials = [];
+      this.loadMateriasPrimas();
+      console.log('✅ Eliminación masiva completada');
+    }).catch(error => {
+      console.error('❌ Error en eliminación masiva:', error);
+      alert('Error al eliminar algunas materias primas');
+    });
   }
   
   // === MÉTODOS AUXILIARES ===
