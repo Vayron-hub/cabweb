@@ -11,10 +11,36 @@
     </div>
 
     <div class="flex-1 flex justify-end gap-2.5">
-      <div class="flex items-center bg-white rounded-lg px-3 py-2 min-w-50" *ngIf="currentUser.rol !== 'Cliente'">
-        
+      <div
+        class="flex items-center bg-white rounded-lg px-3 py-2 min-w-50 gap-2"
+        *ngIf="currentUser.rol !== 'Cliente'"
+      >
+        <ng-container
+          *ngIf="!isLoadingZonas && (locations?.length || 0) > 0; else zonasEstado"
+        >
+          <i class="pi pi-map-marker text-primary-600"></i>
+          <select
+            class="bg-transparent outline-none text-sm text-primary-800 w-full cursor-pointer"
+            [(ngModel)]="selectedLocation"
+            (ngModelChange)="onLocationChange()"
+            title="Seleccionar zona"
+          >
+            <option *ngFor="let loc of locations" [ngValue]="loc">
+              {{ loc }}
+            </option>
+          </select>
+        </ng-container>
+        <ng-template #zonasEstado>
+          <div class="flex items-center gap-2 text-xs text-gray-500">
+            <i *ngIf="isLoadingZonas" class="pi pi-spin pi-spinner"></i>
+            <span *ngIf="isLoadingZonas">Cargando zonas...</span>
+            <span
+              *ngIf="!isLoadingZonas && (!locations || locations.length === 0)"
+              >Sin zonas</span
+            >
+          </div>
+        </ng-template>
       </div>
-      
       <div class="relative">
         <button
           class="size-10 border-0 bg-white bg-opacity-20 rounded-full text-primary-500 cursor-pointer flex items-center justify-center transition-all duration-200 hover:bg-primary-800 hover:text-white"
@@ -69,66 +95,107 @@
 
 <div class="bg-primary-600 px-5">
   <div class="flex gap-4 h-16">
-    <button class="flex items-center gap-2 px-4 py-2 font-medium transition-all duration-200 text-primary-100 hover:bg-primary-700 hover:text-white border-b-2 border-transparent"
-            routerLink="/app/dashboard" routerLinkActive="text-white border-b-primary-100">
+    <button
+      class="flex items-center gap-2 px-4 py-2 font-medium transition-all duration-200 text-primary-100 hover:bg-primary-700 hover:text-white border-b-2 border-transparent"
+      routerLink="/app/dashboard"
+      routerLinkActive="text-white border-b-primary-100"
+    >
       <i class="pi pi-chart-bar"></i><span>Dashboard</span>
     </button>
-    <button *ngIf="currentUser.rol==='Cliente'" class="flex items-center gap-2 px-4 py-2 font-medium transition-all duration-200 text-primary-100 hover:bg-primary-700 hover:text-white border-b-2 border-transparent"
-            routerLink="/app/comentarios" routerLinkActive="text-white border-b-primary-100">
+    <button
+      *ngIf="currentUser.rol==='Cliente'"
+      class="flex items-center gap-2 px-4 py-2 font-medium transition-all duration-200 text-primary-100 hover:bg-primary-700 hover:text-white border-b-2 border-transparent"
+      routerLink="/app/comentarios"
+      routerLinkActive="text-white border-b-primary-100"
+    >
       <i class="pi pi-chart-bar"></i><span>Comentarios</span>
     </button>
-    <button *ngIf="currentUser.rol==='Cliente'" class="flex items-center gap-2 px-4 py-2 font-medium transition-all duration-200 text-primary-100 hover:bg-primary-700 hover:text-white border-b-2 border-transparent"
-            routerLink="/app/productos" routerLinkActive="text-white border-b-primary-100">
+    <button
+      *ngIf="currentUser.rol==='Cliente'"
+      class="flex items-center gap-2 px-4 py-2 font-medium transition-all duration-200 text-primary-100 hover:bg-primary-700 hover:text-white border-b-2 border-transparent"
+      routerLink="/app/productos"
+      routerLinkActive="text-white border-b-primary-100"
+    >
       <i class="pi pi-chart-bar"></i><span>Productos</span>
     </button>
-    <button *ngIf="currentUser.rol==='Admin' || currentUser.rol==='SuperAdmin'"
-            class="flex items-center gap-2 px-4 py-2 font-medium transition-all duration-200 text-primary-100 hover:bg-primary-700 hover:text-white border-b-2 border-transparent"
-            routerLink="/app/estadisticas" routerLinkActive="text-white border-b-primary-100">
+    <button
+      *ngIf="currentUser.rol==='Admin' || currentUser.rol==='SuperAdmin'"
+      class="flex items-center gap-2 px-4 py-2 font-medium transition-all duration-200 text-primary-100 hover:bg-primary-700 hover:text-white border-b-2 border-transparent"
+      routerLink="/app/estadisticas"
+      routerLinkActive="text-white border-b-primary-100"
+    >
       <i class="pi pi-chart-line"></i><span>Estadísticas</span>
     </button>
-    <button *ngIf="currentUser.rol==='Admin' || currentUser.rol==='SuperAdmin'"
-            class="flex items-center gap-2 px-4 py-2 font-medium transition-all duration-200 text-primary-100 hover:bg-primary-700 hover:text-white border-b-2 border-transparent"
-            routerLink="/app/productos" routerLinkActive="text-white border-b-primary-100">
+    <button
+      *ngIf="currentUser.rol==='Admin' || currentUser.rol==='SuperAdmin'"
+      class="flex items-center gap-2 px-4 py-2 font-medium transition-all duration-200 text-primary-100 hover:bg-primary-700 hover:text-white border-b-2 border-transparent"
+      routerLink="/app/productos"
+      routerLinkActive="text-white border-b-primary-100"
+    >
       <i class="pi pi-microchip"></i><span>Productos</span>
     </button>
-    <button *ngIf="currentUser.rol==='Admin' || currentUser.rol==='SuperAdmin'"
-            class="flex items-center gap-2 px-4 py-2 font-medium transition-all duration-200 text-primary-100 hover:bg-primary-700 hover:text-white border-b-2 border-transparent"
-            routerLink="/app/proveedores" routerLinkActive="text-white border-b-primary-100">
+    <button
+      *ngIf="currentUser.rol==='Admin' || currentUser.rol==='SuperAdmin'"
+      class="flex items-center gap-2 px-4 py-2 font-medium transition-all duration-200 text-primary-100 hover:bg-primary-700 hover:text-white border-b-2 border-transparent"
+      routerLink="/app/proveedores"
+      routerLinkActive="text-white border-b-primary-100"
+    >
       <i class="pi pi-truck"></i><span>Proveedores</span>
     </button>
-    <button *ngIf="currentUser.rol==='Admin' || currentUser.rol==='SuperAdmin'"
-            class="flex items-center gap-2 px-4 py-2 font-medium transition-all duration-200 text-primary-100 hover:bg-primary-700 hover:text-white border-b-2 border-transparent"
-            routerLink="/app/materiasprimas" routerLinkActive="text-white border-b-primary-100">
+    <button
+      *ngIf="currentUser.rol==='Admin' || currentUser.rol==='SuperAdmin'"
+      class="flex items-center gap-2 px-4 py-2 font-medium transition-all duration-200 text-primary-100 hover:bg-primary-700 hover:text-white border-b-2 border-transparent"
+      routerLink="/app/materiasprimas"
+      routerLinkActive="text-white border-b-primary-100"
+    >
       <i class="pi pi-cog"></i><span>Materias Primas</span>
     </button>
-    <button *ngIf="currentUser.rol==='Admin' || currentUser.rol==='SuperAdmin'"
-            class="flex items-center gap-2 px-4 py-2 font-medium transition-all duration-200 text-primary-100 hover:bg-primary-700 hover:text-white border-b-2 border-transparent"
-            routerLink="/app/compras" routerLinkActive="text-white border-b-primary-100">
+    <button
+      *ngIf="currentUser.rol==='Admin' || currentUser.rol==='SuperAdmin'"
+      class="flex items-center gap-2 px-4 py-2 font-medium transition-all duration-200 text-primary-100 hover:bg-primary-700 hover:text-white border-b-2 border-transparent"
+      routerLink="/app/compras"
+      routerLinkActive="text-white border-b-primary-100"
+    >
       <i class="pi pi-shopping-cart"></i><span>Compras</span>
     </button>
-    <button *ngIf="currentUser.rol==='Admin' || currentUser.rol==='SuperAdmin'"
-            class="flex items-center gap-2 px-4 py-2 font-medium transition-all duration-200 text-primary-100 hover:bg-primary-700 hover:text-white border-b-2 border-transparent"
-            routerLink="/app/cotizaciones" routerLinkActive="text-white border-b-primary-100">
+    <button
+      *ngIf="currentUser.rol==='Admin' || currentUser.rol==='SuperAdmin'"
+      class="flex items-center gap-2 px-4 py-2 font-medium transition-all duration-200 text-primary-100 hover:bg-primary-700 hover:text-white border-b-2 border-transparent"
+      routerLink="/app/cotizaciones"
+      routerLinkActive="text-white border-b-primary-100"
+    >
       <i class="pi pi-file"></i><span>Cotizaciones</span>
     </button>
-    <button *ngIf="currentUser.rol==='Admin' || currentUser.rol==='SuperAdmin'"
-            class="flex items-center gap-2 px-4 py-2 font-medium transition-all duration-200 text-primary-100 hover:bg-primary-700 hover:text-white border-b-2 border-transparent"
-            routerLink="/app/inventario" routerLinkActive="text-white border-b-primary-100">
+    <button
+      *ngIf="currentUser.rol==='Admin' || currentUser.rol==='SuperAdmin'"
+      class="flex items-center gap-2 px-4 py-2 font-medium transition-all duration-200 text-primary-100 hover:bg-primary-700 hover:text-white border-b-2 border-transparent"
+      routerLink="/app/inventario"
+      routerLinkActive="text-white border-b-primary-100"
+    >
       <i class="pi pi-box"></i><span>Inventario</span>
     </button>
-    <button *ngIf="currentUser.rol==='Admin' || currentUser.rol==='SuperAdmin'"
-            class="flex items-center gap-2 px-4 py-2 font-medium transition-all duration-200 text-primary-100 hover:bg-primary-700 hover:text-white border-b-2 border-transparent"
-            routerLink="/app/zonas" routerLinkActive="text-white border-b-primary-100">
+    <button
+      *ngIf="currentUser.rol==='Admin' || currentUser.rol==='SuperAdmin'"
+      class="flex items-center gap-2 px-4 py-2 font-medium transition-all duration-200 text-primary-100 hover:bg-primary-700 hover:text-white border-b-2 border-transparent"
+      routerLink="/app/zonas"
+      routerLinkActive="text-white border-b-primary-100"
+    >
       <i class="pi pi-map"></i><span>Zonas</span>
     </button>
-    <button *ngIf="currentUser.rol==='Admin' || currentUser.rol==='SuperAdmin'"
-            class="flex items-center gap-2 px-4 py-2 font-medium transition-all duration-200 text-primary-100 hover:bg-primary-700 hover:text-white border-b-2 border-transparent"
-            routerLink="/app/clasificadores" routerLinkActive="text-white border-b-primary-100">
+    <button
+      *ngIf="currentUser.rol==='Admin' || currentUser.rol==='SuperAdmin'"
+      class="flex items-center gap-2 px-4 py-2 font-medium transition-all duration-200 text-primary-100 hover:bg-primary-700 hover:text-white border-b-2 border-transparent"
+      routerLink="/app/clasificadores"
+      routerLinkActive="text-white border-b-primary-100"
+    >
       <i class="pi pi-microchip-ai"></i><span>Clasificadores</span>
     </button>
-    <button *ngIf="currentUser.rol==='SuperAdmin'"
-            class="flex items-center gap-2 px-4 py-2 font-medium transition-all duration-200 text-primary-100 hover:bg-primary-700 hover:text-white border-b-2 border-transparent"
-            routerLink="/app/usuarios" routerLinkActive="text-white border-b-primary-100">
+    <button
+      *ngIf="currentUser.rol==='SuperAdmin'"
+      class="flex items-center gap-2 px-4 py-2 font-medium transition-all duration-200 text-primary-100 hover:bg-primary-700 hover:text-white border-b-2 border-transparent"
+      routerLink="/app/usuarios"
+      routerLinkActive="text-white border-b-primary-100"
+    >
       <i class="pi pi-users"></i><span>Usuarios</span>
     </button>
   </div>

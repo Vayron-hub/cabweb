@@ -49,12 +49,16 @@ export class LayoutComponent implements OnInit, OnDestroy {
   constructor(
     private backendService: BackendService,
     private zonaService: ZonaService,
-    private authService: AuthService,
     private router: Router
   ) {}
 
   ngOnInit(): void {
     this.getCurrentUser();
+    this.zonaService.selectedZona$.subscribe((z) => {
+      if (z && z.nombre && z.nombre !== this.selectedLocation) {
+        this.selectedLocation = z.nombre;
+      }
+    });
     this.loadZonas();
   }
   ngOnDestroy(): void {}
@@ -86,15 +90,28 @@ export class LayoutComponent implements OnInit, OnDestroy {
     this.isLoadingZonas = true;
     this.backendService.getZonas().subscribe({
       next: (zonas) => {
+        console.log(zonas);
         this.zonas = zonas;
         this.locations = zonas.map((z) => z.nombre);
         if (zonas.length > 0) {
-          const primera = zonas[0];
-          this.selectedLocation = primera.nombre;
+          // Intentar restaurar zona persistida
+          const stored = this.zonaService.getCurrentZona();
+          let zonaAUsar = zonas[0];
+          if (stored && stored.id) {
+            const match = zonas.find(
+              (z) => z.id == stored.id || z.nombre === stored.nombre
+            );
+            if (match) zonaAUsar = match;
+          }
+          this.selectedLocation = zonaAUsar.nombre;
           this.zonaService.setSelectedZona({
-            id: primera.id,
-            nombre: primera.nombre,
+            id: zonaAUsar.id,
+            nombre: zonaAUsar.nombre,
           });
+          console.log('Zona seleccionada (restaurada o primera):', zonaAUsar);
+        } else {
+          // Si no hay zonas limpiar selección
+          this.zonaService.clearSelectedZona();
         }
         this.isLoadingZonas = false;
       },
