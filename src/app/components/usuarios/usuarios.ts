@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
@@ -16,6 +16,7 @@ import {
 import { ZonaService, ZonaInfo } from '../../services/zona.service';
 import { AuthService } from '../../services/auth';
 import { DialogModule } from 'primeng/dialog';
+import { User as us } from '../productos/productos';
 import { lastValueFrom } from 'rxjs';
 
 @Component({
@@ -34,6 +35,13 @@ import { lastValueFrom } from 'rxjs';
   templateUrl: './usuarios.html',
 })
 export class UsuariosComponent implements OnInit, OnDestroy {
+  @Input() currentUser: us = {
+    id: '',
+    nombre: '',
+    email: '',
+    rol: '',
+    ultimoAcceso: new Date(),
+  };
   // Ubicación actual (sincronizada con ZonaService)
   selectedLocation = '';
   selectedZonaId: string | number = '';
@@ -74,14 +82,45 @@ export class UsuariosComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    console.log('🚀 USUARIOS COMPONENT - ngOnInit iniciado');
     this.subscribeToZonaChanges();
     this.loadUsers();
-    console.log('🚀 USUARIOS COMPONENT - ngOnInit completado');
+    this.getCurrentUser();
   }
 
   ngOnDestroy() {
     this.zonaSubscription.unsubscribe();
+  }
+
+  getCurrentUser() {
+    const user = this.backendService.getCurrentUser();
+    if (user) {
+      this.currentUser = {
+        id: user.id || '',
+        nombre: user.nombre || '',
+        email: (user as any).correo || (user as any).email || '',
+        rol: (user as any).rol || '',
+        ultimoAcceso: this.convertToDate(user.fechaUltimoAcceso),
+      };
+    } else {
+      console.warn('Usuario no encontrado');
+    }
+  }
+
+  private convertToDate(dateValue: any): Date {
+    if (!dateValue) {
+      return new Date();
+    }
+
+    if (dateValue instanceof Date) {
+      return dateValue;
+    }
+
+    if (typeof dateValue === 'string') {
+      const parsedDate = new Date(dateValue);
+      return isNaN(parsedDate.getTime()) ? new Date() : parsedDate;
+    }
+
+    return new Date();
   }
 
   subscribeToZonaChanges() {

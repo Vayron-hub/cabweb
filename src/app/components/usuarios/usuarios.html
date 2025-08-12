@@ -11,6 +11,7 @@
     <i class="pi pi-plus"></i>
     Nuevo Usuario
   </button>
+  <!-- Modal para agregar hdp usuario -->
   <p-dialog header="Edit Profile" [(visible)]="visible" [style]="{ width: '25rem', background: 'white', color: 'black' }" [modal]="true" [closable]="false">
     <div class="flex items-center gap-4 mb-4">
       <label for="username" class="font-semibold text-black w-24">Username</label>
@@ -21,6 +22,15 @@
       <label for="email" class="font-semibold text-black w-24">Email</label>
       <input pInputText id="email" type="email" class="bg-white text-black flex-auto" autocomplete="off"
        [(ngModel)]="newUser.correo"/>
+    </div>
+    <div class="flex items-center gap-4 mb-8">
+      <label for="email" class="font-semibold text-black w-24">Rol</label>
+      <select pInputText id="email" class="bg-white text-black flex-auto" autocomplete="off"
+       [(ngModel)]="newUser.rol">
+       <option value="Admin">Admin</option>
+       <option value="Cliente">Cliente</option>
+       <option *ngIf="currentUser.rol === 'SuperAdmin'" value="SuperAdmin">SuperAdmin</option>
+      </select>
     </div>
     <div class="flex text-black items-center gap-4 mb-8">
       <label for="password" class="font-semibold w-24">Password</label>

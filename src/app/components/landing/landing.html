@@ -1,5 +1,5 @@
 <div class="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100">
-  
+
   <nav class="px-6 py-4 md:px-12">
     <div class="flex justify-between items-center">
       <div class="text-2xl font-bold text-gray-900">CAB</div>
@@ -11,7 +11,7 @@
 
   <div class="px-6 py-16 md:px-12 lg:px-24 xl:px-32">
     <div class="max-w-6xl mx-auto">
-      
+
       <div class="text-center mb-20">
         <h1 class="text-5xl md:text-7xl lg:text-8xl font-bold text-gray-900 leading-none mb-8">
           Transformando la
@@ -20,30 +20,22 @@
           </span>
         </h1>
         <p class="text-xl md:text-2xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-          Plataforma integral que combina tecnología avanzada, datos precisos y automatización 
+          Plataforma integral que combina tecnología avanzada, datos precisos y automatización
           inteligente para revolucionar la gestión de residuos urbanos.
         </p>
       </div>
 
       <div class="flex flex-col md:flex-row gap-4 justify-center items-center mb-32">
-        <p-button 
-          label="Solicitar Cotización" 
-          icon="pi pi-calculator" 
-          styleClass="p-button-lg p-button-success text-lg px-8 py-4"
-          (click)="onCardClick('cotizacion')">
+        <p-button label="Solicitar Cotización" icon="pi pi-calculator"
+          styleClass="p-button-lg p-button-success text-lg px-8 py-4" (click)="onCardClick('cotizacion')">
         </p-button>
         <ng-container *ngIf="authService.isLoggedIn(); else loginBtn">
-          <p-button 
-            label="¡Ir a la app!" 
-            icon="pi pi-arrow-right" 
-            styleClass="p-button-lg p-button-primary text-lg px-8 py-4"
-            (click)="onCardClick('app')">
+          <p-button label="¡Ir a la app!" icon="pi pi-arrow-right"
+            styleClass="p-button-lg p-button-primary text-lg px-8 py-4" (click)="onCardClick('app')">
           </p-button>
         </ng-container>
         <ng-template #loginBtn>
-          <p-button 
-            label="Iniciar Sesión" 
-            icon="pi pi-sign-in" 
+          <p-button label="Iniciar Sesión" icon="pi pi-sign-in"
             styleClass="p-button-lg p-button-outlined p-button-secondary text-lg px-8 py-4"
             (click)="onCardClick('login')">
           </p-button>
@@ -56,7 +48,7 @@
 
 <div class="bg-white py-24">
   <div class="container mx-auto px-6 md:px-12 lg:px-24 xl:px-32">
-    
+
     <div class="text-center mb-20">
       <h2 class="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
         Información en tiempo real
@@ -67,12 +59,14 @@
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-32">
-      
+
       <div class="group cursor-pointer" (click)="onCardClick('zona')">
-        <div class="bg-white border border-gray-200 rounded-2xl p-8 h-full transition-all duration-300 hover:shadow-2xl hover:shadow-emerald-100 hover:-translate-y-2">
+        <div
+          class="bg-white border border-gray-200 rounded-2xl p-8 h-full transition-all duration-300 hover:shadow-2xl hover:shadow-emerald-100 hover:-translate-y-2">
           <div class="text-center">
             <div class="mb-8">
-              <div class="w-20 h-20 mx-auto bg-gradient-to-br from-emerald-100 to-emerald-200 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+              <div
+                class="w-20 h-20 mx-auto bg-gradient-to-br from-emerald-100 to-emerald-200 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
                 <i class="pi pi-map-marker text-3xl text-emerald-600"></i>
               </div>
             </div>
@@ -80,7 +74,8 @@
             <p class="text-gray-600 text-base leading-relaxed mb-8">
               Información detallada sobre las zonas más populares para la gestión eficiente de residuos urbanos
             </p>
-            <div class="inline-flex items-center text-emerald-600 font-medium group-hover:translate-x-2 transition-transform duration-300">
+            <div
+              class="inline-flex items-center text-emerald-600 font-medium group-hover:translate-x-2 transition-transform duration-300">
               <span class="mr-2">Explorar datos</span>
               <i class="pi pi-arrow-right"></i>
             </div>
@@ -89,10 +84,12 @@
       </div>
 
       <div class="group cursor-pointer" (click)="onCardClick('basura')">
-        <div class="bg-white border border-gray-200 rounded-2xl p-8 h-full transition-all duration-300 hover:shadow-2xl hover:shadow-teal-100 hover:-translate-y-2">
+        <div
+          class="bg-white border border-gray-200 rounded-2xl p-8 h-full transition-all duration-300 hover:shadow-2xl hover:shadow-teal-100 hover:-translate-y-2">
           <div class="text-center">
             <div class="mb-8">
-              <div class="w-20 h-20 mx-auto bg-gradient-to-br from-teal-100 to-teal-200 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+              <div
+                class="w-20 h-20 mx-auto bg-gradient-to-br from-teal-100 to-teal-200 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
                 <i class="pi pi-trash text-3xl text-teal-600"></i>
               </div>
             </div>
@@ -100,7 +97,8 @@
             <p class="text-gray-600 text-base leading-relaxed mb-8">
               Estadísticas completas sobre los tipos de residuos más comunes y patrones de generación
             </p>
-            <div class="inline-flex items-center text-teal-600 font-medium group-hover:translate-x-2 transition-transform duration-300">
+            <div
+              class="inline-flex items-center text-teal-600 font-medium group-hover:translate-x-2 transition-transform duration-300">
               <span class="mr-2">Ver estadísticas</span>
               <i class="pi pi-arrow-right"></i>
             </div>
@@ -109,10 +107,12 @@
       </div>
 
       <div class="group cursor-pointer" (click)="onCardClick('horario')">
-        <div class="bg-white border border-gray-200 rounded-2xl p-8 h-full transition-all duration-300 hover:shadow-2xl hover:shadow-blue-100 hover:-translate-y-2">
+        <div
+          class="bg-white border border-gray-200 rounded-2xl p-8 h-full transition-all duration-300 hover:shadow-2xl hover:shadow-blue-100 hover:-translate-y-2">
           <div class="text-center">
             <div class="mb-8">
-              <div class="w-20 h-20 mx-auto bg-gradient-to-br from-blue-100 to-blue-200 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+              <div
+                class="w-20 h-20 mx-auto bg-gradient-to-br from-blue-100 to-blue-200 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
                 <i class="pi pi-clock text-3xl text-blue-600"></i>
               </div>
             </div>
@@ -120,7 +120,8 @@
             <p class="text-gray-600 text-base leading-relaxed mb-8">
               Horarios optimizados de recolección y gestión basados en análisis de datos históricos
             </p>
-            <div class="inline-flex items-center text-blue-600 font-medium group-hover:translate-x-2 transition-transform duration-300">
+            <div
+              class="inline-flex items-center text-blue-600 font-medium group-hover:translate-x-2 transition-transform duration-300">
               <span class="mr-2">Consultar horarios</span>
               <i class="pi pi-arrow-right"></i>
             </div>
@@ -128,6 +129,29 @@
         </div>
       </div>
 
+    </div>
+    <div class="grid grid-cols-1 max-h-min gap-8 mb-32 overflow-y-auto w-full">
+      <div class="group cursor-pointer">
+        <h2 class=" text-3xl mb-4 font-bold">Comentarios de los Clientes</h2>
+        <div
+          class="bg-white border border-gray-200 rounded-2xl p-8 w-full transition-all duration-300 hover:shadow-2xl hover:shadow-emerald-100 hover:-translate-y-2">
+            <div *ngFor="let com of comentarios" class="p-4 border rounded-lg bg-gray-50 shadow-sm mb-3">
+              <div class="flex justify-between items-start mb-2">
+                <span class="text-xs text-gray-500">{{ com.fechaHora | date:'short' }}</span>
+              </div>
+              <p class="text-sm text-gray-800 mb-2">{{ com.texto }}</p>
+              <div class="flex items-center">
+                <div class="flex">
+                  <i *ngFor="let star of [1,2,3,4,5]" class="pi text-sm" [class.pi-star-fill]="star <= com.calificacion"
+                    [class.pi-star]="star > com.calificacion" [class.text-yellow-500]="star <= com.calificacion"
+                    [class.text-gray-300]="star > com.calificacion">
+                  </i>
+                </div>
+                <span class="text-xs text-gray-600 ml-2">({{ com.calificacion }}/5)</span>
+              </div>
+          </div>
+        </div>
+      </div>
     </div>
 
   </div>
@@ -140,16 +164,13 @@
         ¿Listo para transformar tu gestión ambiental?
       </h3>
       <p class="text-xl text-gray-600 mb-12 max-w-3xl mx-auto leading-relaxed">
-        Únete a organizaciones que ya están revolucionando su enfoque hacia la sostenibilidad 
+        Únete a organizaciones que ya están revolucionando su enfoque hacia la sostenibilidad
         con nuestra plataforma integral de gestión ambiental
       </p>
-      
+
       <div class="mb-16">
-        <p-button 
-          label="Solicitar Cotización Personalizada" 
-          icon="pi pi-calculator" 
-          styleClass="p-button-success p-button-lg text-xl px-12 py-5"
-          (click)="onCardClick('cotizacion')">
+        <p-button label="Solicitar Cotización Personalizada" icon="pi pi-calculator"
+          styleClass="p-button-success p-button-lg text-xl px-12 py-5" (click)="onCardClick('cotizacion')">
         </p-button>
       </div>
 
@@ -161,7 +182,7 @@
           <h4 class="text-lg font-semibold text-gray-900 mb-2">Análisis Inteligente</h4>
           <p class="text-gray-600 text-sm">Datos en tiempo real para decisiones informadas</p>
         </div>
-        
+
         <div class="text-center">
           <div class="w-16 h-16 mx-auto bg-teal-100 rounded-xl flex items-center justify-center mb-4">
             <i class="pi pi-shield text-2xl text-teal-600"></i>
@@ -169,13 +190,94 @@
           <h4 class="text-lg font-semibold text-gray-900 mb-2">Seguridad Garantizada</h4>
           <p class="text-gray-600 text-sm">Protección de datos con estándares internacionales</p>
         </div>
-        
+
         <div class="text-center">
           <div class="w-16 h-16 mx-auto bg-blue-100 rounded-xl flex items-center justify-center mb-4">
             <i class="pi pi-cog text-2xl text-blue-600"></i>
           </div>
           <h4 class="text-lg font-semibold text-gray-900 mb-2">Fácil Integración</h4>
           <p class="text-gray-600 text-sm">Implementación rápida sin interrupciones</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<div class="bg-gray-50 py-24">
+  <div class="container mx-auto px-6 md:px-12 lg:px-24 xl:px-32">
+    <div class="text-center mb-16">
+      <h2 class="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+        Preguntas Frecuentes
+      </h2>
+      <p class="text-xl text-gray-600 max-w-2xl mx-auto">
+        Encuentra respuestas a las dudas más comunes sobre nuestro sistema
+      </p>
+    </div>
+
+    <div class="max-w-4xl mx-auto space-y-6">
+      
+      <!-- Pregunta 1 -->
+      <div class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+        <button 
+          class="w-full px-8 py-6 text-left focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 transition-all duration-200 hover:bg-gray-50"
+          onclick="this.nextElementSibling.classList.toggle('hidden'); this.querySelector('.arrow').classList.toggle('rotate-180')">
+          <div class="flex justify-between items-center">
+            <h3 class="text-xl font-semibold text-gray-900">
+              ¿Cómo funciona el sistema de gestión ambiental CAB?
+            </h3>
+            <i class="pi pi-chevron-down text-gray-500 transition-transform duration-200 arrow"></i>
+          </div>
+        </button>
+        <div class="hidden px-8 pb-6">
+          <p class="text-gray-600 leading-relaxed">
+            Nuestro sistema utiliza tecnología avanzada de detección y análisis para monitorear la gestión de residuos en tiempo real. 
+            Combina sensores IoT, inteligencia artificial y análisis de datos para optimizar rutas de recolección, 
+            identificar patrones de generación de residuos y mejorar la eficiencia operativa de tu organización.
+          </p>
+        </div>
+      </div>
+
+      <!-- Pregunta 2 -->
+      <div class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+        <button 
+          class="w-full px-8 py-6 text-left focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 transition-all duration-200 hover:bg-gray-50"
+          onclick="this.nextElementSibling.classList.toggle('hidden'); this.querySelector('.arrow').classList.toggle('rotate-180')">
+          <div class="flex justify-between items-center">
+            <h3 class="text-xl font-semibold text-gray-900">
+              ¿Qué incluye una cotización personalizada?
+            </h3>
+            <i class="pi pi-chevron-down text-gray-500 transition-transform duration-200 arrow"></i>
+          </div>
+        </button>
+        <div class="hidden px-8 pb-6">
+          <p class="text-gray-600 leading-relaxed">
+            La cotización personalizada incluye análisis de tus necesidades específicas, configuración del sistema 
+            adaptada a tu organización, actualizaciones del software 
+            y mantenimiento de los equipos. También incluimos un plan de implementación gradual para minimizar interrupciones.
+          </p>
+        </div>
+      </div>
+
+      <!-- Pregunta 3 -->
+      <div class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+        <button 
+          class="w-full px-8 py-6 text-left focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 transition-all duration-200 hover:bg-gray-50"
+          onclick="this.nextElementSibling.classList.toggle('hidden'); this.querySelector('.arrow').classList.toggle('rotate-180')">
+          <div class="flex justify-between items-center">
+            <h3 class="text-xl font-semibold text-gray-900">
+              ¿Cuánto tiempo toma implementar el sistema?
+            </h3>
+            <i class="pi pi-chevron-down text-gray-500 transition-transform duration-200 arrow"></i>
+          </div>
+        </button>
+        <div class="hidden px-8 pb-6">
+          <p class="text-gray-600 leading-relaxed">
+            El tiempo de implementación varía según el tamaño y complejidad de tu organización. 
+            Generalmente, el proceso toma entre 2 a 6 semanas, incluyendo instalación de equipos, 
+            configuración del software, migración de datos, capacitación del personal y pruebas del sistema. 
+            Nuestro equipo trabaja contigo para minimizar el impacto en tus operaciones diarias.
+          </p>
         </div>
       </div>
 

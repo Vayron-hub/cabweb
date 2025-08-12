@@ -10,7 +10,7 @@ import { Subscription } from 'rxjs';
 import { CreateProductoDto, UpdateProductoDto, BulkProductoOperationDto, ProductoFilterDto, PagedProductoResponseDto } from '../../services/backend.service';
 
 
-interface Comentario {
+export interface Comentario {
   id: number;
   fechaHora: Date;
   texto: string;
