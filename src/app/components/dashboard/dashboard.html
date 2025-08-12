@@ -256,8 +256,7 @@
       </div>
       <div class="flex gap-3">
         <button
-          class="flex items-center gap-2 px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-lg font-medium transition-colors"
-          (click)="exportStatisticsData()">
+          class="flex items-center gap-2 px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-lg font-medium transition-colors">
           <i class="pi pi-download"></i>
           Exportar
         </button>
@@ -410,7 +409,7 @@
         <p>Administrar usuarios del sistema para {{selectedLocation}}</p>
       </div>
       <div class="users-actions">
-        <button class="btn-primary" (click)="exportUsersData()">
+        <button class="btn-primary">
           <i class="pi pi-download"></i>
           Exportar
         </button>
@@ -419,7 +418,7 @@
             [class.pi-spinner]="isLoadingUsers"></i>
           {{isLoadingUsers ? 'Actualizando...' : 'Actualizar'}}
         </button>
-        <button class="btn-success" (click)="addNewUser()">
+        <button class="btn-success">
           <i class="pi pi-plus"></i>
           Nuevo Usuario
         </button>
@@ -507,10 +506,10 @@
             </td>
             <td class="last-access">{{formatDate(user.ultimoAcceso)}}</td>
             <td class="actions">
-              <button class="action-btn edit" (click)="editUser(user)" title="Editar usuario">
+              <button class="action-btn edit" title="Editar usuario">
                 <i class="pi pi-pencil"></i>
               </button>
-              <button class="action-btn delete" (click)="deleteUser(user)" [disabled]="!canDeleteUser()"
+              <button class="action-btn delete" [disabled]="!canDeleteUser()"
                 title="Eliminar usuario">
                 <i class="pi pi-trash"></i>
               </button>
@@ -543,15 +542,15 @@
         {{selectedUsers.length}} usuario(s) seleccionado(s)
       </div>
       <div class="bulk-buttons">
-        <button class="btn-warning" (click)="bulkDeactivateUsers()">
+        <button class="btn-warning">
           <i class="pi pi-eye-slash"></i>
           Desactivar
         </button>
-        <button class="btn-success" (click)="bulkActivateUsers()">
+        <button class="btn-success">
           <i class="pi pi-eye"></i>
           Activar
         </button>
-        <button class="btn-danger" (click)="bulkDeleteUsers()" [disabled]="!canDeleteUser()">
+        <button class="btn-danger" [disabled]="!canDeleteUser()">
           <i class="pi pi-trash"></i>
           Eliminar
         </button>
@@ -563,8 +562,7 @@
     <div class="classifiers-search-section">
       <h2>Filtro de búsqueda</h2>
       <div class="search-input-wrapper">
-        <input type="text" placeholder="Buscar clasificadores por nombre..." [(ngModel)]="classifierSearchTerm"
-          (input)="filterClassifiers()" class="classifier-search-input" />
+        <input type="text" placeholder="Buscar clasificadores por nombre..." [(ngModel)]="classifierSearchTerm" class="classifier-search-input" />
         <button class="search-button">
           <i class="pi pi-search"></i>
         </button>
@@ -670,11 +668,11 @@
         </div>
 
         <div class="account-actions">
-          <button class="btn-secondary" (click)="editProfile()">
+          <button class="btn-secondary">
             <i class="pi pi-pencil"></i>
             Editar Perfil
           </button>
-          <button class="btn-warning" (click)="changePassword()">
+          <button class="btn-warning">
             <i class="pi pi-key"></i>
             Cambiar Contraseña
           </button>

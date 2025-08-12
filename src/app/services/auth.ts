@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { Observable, of, BehaviorSubject } from 'rxjs';
 import { BackendService, LoginRequest, User } from './backend.service';
 import { catchError, tap, map, switchMap } from 'rxjs/operators';
+import { ZonaService } from './zona.service';
 
 @Injectable({
   providedIn: 'root'
@@ -16,7 +17,7 @@ export class AuthService {
 
   constructor(
     private router: Router,
-    private backendService: BackendService
+    private backendService: BackendService,
   ) { }
 
   login(username: string, password: string): Observable<boolean> {
@@ -31,7 +32,6 @@ export class AuthService {
 
     return this.backendService.login(credentials).pipe(
       tap(response => {
-        console.log('Login exitoso:', response.usuario);
         this.currentUserSubject.next(response.usuario);
       }),
       map(() => true),
@@ -79,6 +79,7 @@ export class AuthService {
     localStorage.removeItem('authToken');
     localStorage.removeItem('currentUser');
     localStorage.removeItem('rememberedCredentials');
+    localStorage.removeItem('selectedZona');
     this.currentUserSubject.next(null);
   }
 

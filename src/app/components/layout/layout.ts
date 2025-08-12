@@ -49,15 +49,19 @@ export class LayoutComponent implements OnInit, OnDestroy {
   constructor(
     private backendService: BackendService,
     private zonaService: ZonaService,
-    private authService: AuthService,
     private router: Router
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.getCurrentUser();
+    this.zonaService.selectedZona$.subscribe((z) => {
+      if (z && z.nombre && z.nombre !== this.selectedLocation) {
+        this.selectedLocation = z.nombre;
+      }
+    });
     this.loadZonas();
   }
-  ngOnDestroy(): void {}
+  ngOnDestroy(): void { }
 
   private getCurrentUser(): void {
     const user = this.backendService.getCurrentUser();
@@ -86,15 +90,28 @@ export class LayoutComponent implements OnInit, OnDestroy {
     this.isLoadingZonas = true;
     this.backendService.getZonas().subscribe({
       next: (zonas) => {
+        console.log(zonas);
         this.zonas = zonas;
         this.locations = zonas.map((z) => z.nombre);
         if (zonas.length > 0) {
-          const primera = zonas[0];
-          this.selectedLocation = primera.nombre;
+          // Intentar restaurar zona persistida
+          const stored = this.zonaService.getCurrentZona();
+          let zonaAUsar = zonas[0];
+          if (stored && stored.id) {
+            const match = zonas.find(
+              (z) => z.id == stored.id || z.nombre === stored.nombre
+            );
+            if (match) zonaAUsar = match;
+          }
+          this.selectedLocation = zonaAUsar.nombre;
           this.zonaService.setSelectedZona({
-            id: primera.id,
-            nombre: primera.nombre,
+            id: zonaAUsar.id,
+            nombre: zonaAUsar.nombre,
           });
+          console.log('Zona seleccionada (restaurada o primera):', zonaAUsar);
+        } else {
+          // Si no hay zonas limpiar selección
+          this.zonaService.clearSelectedZona();
         }
         this.isLoadingZonas = false;
       },
@@ -220,39 +237,65 @@ export class LayoutComponent implements OnInit, OnDestroy {
   savePasswordChanges(): void {
     if (!this.canSavePassword()) return;
     this.isSavingPassword = true;
+    
+    console.log('Verificando contraseña para:', this.currentUser.email);
+    
     this.backendService
       .verifyCurrentPassword(
-        this.currentUser.id,
+        this.currentUser.email,
         this.changePasswordData.currentPassword
       )
       .subscribe({
-        next: (res: any) => {
-          if (!res.isValid) {
+        next: (isValid: boolean) => {
+          if (!isValid) {
             this.isSavingPassword = false;
             alert('Contraseña actual incorrecta');
             return;
           }
+          
+          // Usar el nuevo método específico para cambio de contraseña
+          const userData = {
+            nombre: this.currentUser.nombre,
+            correo: this.currentUser.email,
+            rol: this.currentUser.rol
+          };
+          
           this.backendService
-            .updateUsuario(this.currentUser.id, {
-              nombre: this.currentUser.nombre,
-              email: this.currentUser.email,
-              password: this.changePasswordData.newPassword,
-            })
+            .updateUsuarioPassword(
+              this.currentUser.id, 
+              this.changePasswordData.newPassword,
+              userData
+            )
             .subscribe({
               next: () => {
                 this.isSavingPassword = false;
                 this.isChangingPassword = false;
-                alert('Contraseña cambiada');
+                alert('Contraseña cambiada exitosamente');
+                this.changePasswordData = {
+                  currentPassword: '',
+                  newPassword: '',
+                  confirmPassword: '',
+                };
               },
-              error: () => {
+              error: (error) => {
+                console.error('Error al cambiar contraseña:', error);
                 this.isSavingPassword = false;
-                alert('Error al cambiar contraseña');
+                
+                // Manejar errores específicos
+                if (error.status === 400) {
+                  alert('Error: Datos inválidos. Verifica que todos los campos estén correctos.');
+                } else if (error.status === 403) {
+                  alert('Error: No tienes permisos para realizar esta acción.');
+                } else {
+                  alert('Error al cambiar contraseña. Intenta nuevamente.');
+                }
               },
             });
         },
-        error: () => {
+        error: (error) => {
+          console.error('Error al verificar contraseña:', error);
           this.isSavingPassword = false;
-          alert('Error verificación contraseña');
+          alert('Error al verificar la contraseña actual');
         },
       });
   }

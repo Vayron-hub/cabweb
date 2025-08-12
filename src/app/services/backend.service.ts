@@ -143,9 +143,6 @@ export interface DashboardData {
 }
 
 //CLIENTES //////////////////////////////////////////////////////////////
-export interface Compras { }
-
-
 export interface Comentarios {
   id: number;
   fechaHora: Date;
@@ -175,14 +172,28 @@ export interface Producto{
   stock: number;
 }
 
-export interface Venta{
-  uusarioId: number;
-  ProductoId: number;
-  Cantidad: number;
-  Total: number;
-  Estatus: string;
-  DireccionEnvio: string;
-  Observaciones: string;
+export interface VentaDetalle {
+  id?: number;
+  ventaId?: number;
+  productoId: number;
+  cantidad: number;
+  precioUnitario: number;
+  subTotal: number;
+}
+
+export interface Venta {
+  id?: number;
+  numeroVenta: string;
+  fechaVenta: Date;
+  usuarioId: number;
+  cantidad: number;
+  precioUnitario: number;
+  subTotal: number;
+  total: number;
+  estatus?: string;
+  direccionEnvio?: string;
+  observaciones?: string;
+  detalles?: VentaDetalle[];
 }
 ///////////////////////////////////////////////////////////////////////////
 
@@ -1179,21 +1190,28 @@ export class BackendService {
   }
 
   verifyCurrentPassword(
-    id: string | number,
+    correo: string,
     currentPassword: string
-  ): Observable<{ isValid: boolean }> {
-    const verifyData = {
-      Password: currentPassword,
+  ): Observable<boolean> {
+    const loginData: LoginRequest = {
+      correo: correo,
+      password: currentPassword
     };
 
-    console.log('🔍 Verificando contraseña actual para usuario ID:', id);
+    console.log('🔍 Verificando contraseña actual para:', correo);
 
     return this.http
-      .post<{ isValid: boolean }>(
-        `${this.apiUrl}/usuarios/${id}/verify-password`,
-        verifyData
-      )
-      .pipe(catchError(this.handleError));
+      .post<LoginResponse>(`${this.apiUrl}/usuarios/ingresar`, loginData)
+      .pipe(
+        map(response => {
+          console.log('✅ Contraseña verificada correctamente');
+          return !!response.token; // Si hay token, la contraseña es correcta
+        }),
+        catchError((error) => {
+          console.log('❌ Contraseña incorrecta');
+          return of(false); // Si hay error, la contraseña es incorrecta
+        })
+      );
   }
 
   ////////////////////////////////////////////////////////////////////
@@ -1217,5 +1235,46 @@ export class BackendService {
       .post<newComent>(`${this.apiUrl}/comentarios`, comentario)
       .pipe(catchError(this.handleError));
   }
+  crearVenta(venta: Partial<Venta>): Observable<Venta> {
+    return this.http
+      .post<Venta>(`${this.apiUrl}/ventas`, venta)
+      .pipe(catchError(this.handleError));
+  }
+
+
+  getVentasByUsuario(usuarioId: number): Observable<Venta[]> {
+    return this.http
+      .get<Venta[]>(`${this.apiUrl}/ventas/usuario/${usuarioId}`)
+      .pipe(catchError(this.handleError));
+  }
   //////////////////////////////////////////////////////////////////////7
+
+  // Nuevo método específico para cambio de contraseña
+  updateUsuarioPassword(id: string | number, nuevaPassword: string, userData: { nombre: string, correo: string, rol: string }): Observable<User> {
+    // Crear objeto específico para cambio de contraseña
+    const passwordUpdateData = {
+      nombre: userData.nombre,     // Incluir datos actuales requeridos
+      correo: userData.correo,     // Incluir correo actual  
+      rol: userData.rol,           // Incluir rol actual
+      password: nuevaPassword      // Nueva contraseña
+    };
+
+    console.log('🔄 Enviando datos para cambio de contraseña:', passwordUpdateData);
+    console.log('🔄 Para usuario ID:', id);
+
+    return this.http
+      .put<User>(`${this.apiUrl}/usuarios/${id}`, passwordUpdateData)
+      .pipe(
+        tap((response) => {
+          console.log('✅ Contraseña actualizada exitosamente:', response);
+        }),
+        catchError((error) => {
+          console.error('❌ Error al actualizar contraseña:', error);
+          if (error.status === 400) {
+            console.error('Datos enviados que causaron el error 400:', passwordUpdateData);
+          }
+          return throwError(() => error);
+        })
+      );
+  }
 }
