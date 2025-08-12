@@ -1,168 +1,636 @@
 <div class="w-full bg-gray-50 min-h-screen">
     <!-- Header -->
-    <div *ngIf="currentUser.rol === 'Cliente'" class="bg-white shadow-sm border-b">
-        <div class="max-w-7xl mx-auto px-4 py-6">
-            <h1 class="text-3xl font-bold text-gray-900">Productos CAB</h1>
-            <p class="text-gray-600 mt-1">Descubre nuestros sistemas de clasificación automática</p>
+    <div *ngIf="currentUser.rol === 'Cliente'">
+        <div class="bg-white shadow-sm border-b">
+            <div class="max-w-7xl mx-auto px-4 py-6">
+                <h1 class="text-3xl font-bold text-gray-900">Productos CAB</h1>
+                <p class="text-gray-600 mt-1">Descubre nuestros sistemas de clasificación automática</p>
+            </div>
         </div>
-    </div>
 
-    <!-- Productos Grid -->
-    <div class="max-w-7xl mx-auto px-4 py-8">
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            <div *ngFor="let prod of productos"
-                class="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 overflow-hidden border border-gray-100">
+        <!-- Productos Grid -->
+        <div class="max-w-7xl mx-auto px-4 py-8">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div *ngFor="let prod of productos"
+                    class="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 overflow-hidden border border-gray-100">
 
-                <!-- Header de la card -->
-                <div class="bg-primary-600 py-4 px-2">
-                    <h3 class="text-xl font-bold ml-2 text-white truncate">{{ prod.nombre }}</h3>
-                </div>
-
-                <!-- Contenido principal -->
-                <div class="p-6">
-                    <!-- Descripción -->
-                    <div class="mb-4">
-                        <p class="text-gray-600 text-sm leading-relaxed line-clamp-3">
-                            {{ prod.descripcion | slice:0:120 }}{{ prod.descripcion.length > 120 ? '...' : '' }}
-                        </p>
+                    <!-- Header de la card -->
+                    <div class="bg-primary-600 py-4 px-2">
+                        <h3 class="text-xl font-bold ml-2 text-white truncate">{{ prod.nombre }}</h3>
                     </div>
 
-                    <!-- Información del producto -->
-                    <div class="space-y-3 mb-6">
-                        <!-- Precio -->
-                        <div class="flex items-center justify-between">
-                            <span class="text-sm font-medium text-gray-500">Precio:</span>
-                            <span class="text-2xl font-bold text-green-600">${{ prod.precio | number:'1.0-0' }}</span>
+                    <!-- Contenido principal -->
+                    <div class="p-6">
+                        <!-- Descripción -->
+                        <div class="mb-4">
+                            <p class="text-gray-600 text-sm leading-relaxed line-clamp-3">
+                                {{ prod.descripcion | slice:0:120 }}{{ prod.descripcion.length > 120 ? '...' : '' }}
+                            </p>
                         </div>
 
-                        <!-- Stock -->
-                        <div class="flex items-center justify-between">
-                            <span class="text-sm font-medium text-gray-500">Stock disponible:</span>
-                            <div class="flex items-center">
-                                <span class="text-lg font-semibold text-gray-800">{{ prod.stock }}</span>
-                                <div class="ml-2 w-2 h-2 rounded-full"
-                                    [class]="prod.stock > 10 ? 'bg-green-500' : prod.stock > 5 ? 'bg-yellow-500' : 'bg-red-500'">
+                        <!-- Información del producto -->
+                        <div class="space-y-3 mb-6">
+                            <!-- Precio -->
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm font-medium text-gray-500">Precio:</span>
+                                <span class="text-2xl font-bold text-green-600">${{ prod.precio | number:'1.0-0'
+                                    }}</span>
+                            </div>
+
+                            <!-- Stock -->
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm font-medium text-gray-500">Stock disponible:</span>
+                                <div class="flex items-center">
+                                    <span class="text-lg font-semibold text-gray-800">{{ prod.stock }}</span>
+                                    <div class="ml-2 w-2 h-2 rounded-full"
+                                        [class]="prod.stock > 10 ? 'bg-green-500' : prod.stock > 5 ? 'bg-yellow-500' : 'bg-red-500'">
+                                    </div>
                                 </div>
                             </div>
                         </div>
+
+                        <!-- Botones de acción -->
+                        <div class="flex flex-col gap-3">
+                            <button
+                                class="w-full bg-accent-500 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-lg transition-colors duration-200 flex items-center justify-center gap-2"
+                                (click)="showComentariosDialog(prod.id)">
+                                <i class="pi pi-comment text-sm"></i>
+                                Mostrar Comentarios
+                            </button>
+
+                            <button
+                                class="w-full bg-accent-600 hover:bg-green-700 text-white font-semibold py-3 px-4 rounded-lg transition-colors duration-200 flex items-center justify-center gap-2"
+                                [disabled]="prod.stock === 0">
+                                <i class="pi pi-shopping-cart text-sm"></i>
+                                {{ prod.stock > 0 ? 'Agregar al Carrito' : 'Sin Stock' }}
+                            </button>
+                        </div>
                     </div>
 
-                    <!-- Botones de acción -->
-                    <div class="flex flex-col gap-3">
-                        <button
-                            class="w-full bg-accent-500 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-lg transition-colors duration-200 flex items-center justify-center gap-2"
-                            (click)="showComentariosDialog(prod.id)">
-                            <i class="pi pi-comment text-sm"></i>
-                            Mostrar Comentarios
-                        </button>
-
-                        <button
-                            class="w-full bg-accent-600 hover:bg-green-700 text-white font-semibold py-3 px-4 rounded-lg transition-colors duration-200 flex items-center justify-center gap-2"
-                            [disabled]="prod.stock === 0">
-                            <i class="pi pi-shopping-cart text-sm"></i>
-                            {{ prod.stock > 0 ? 'Agregar al Carrito' : 'Sin Stock' }}
-                        </button>
+                    <!-- Badge de disponibilidad -->
+                    <div class="absolute top-4 right-4">
+                        <span class="px-3 py-1 text-xs font-semibold rounded-full"
+                            [class]="prod.stock > 0 ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'">
+                            {{ prod.stock > 0 ? 'Disponible' : 'Agotado' }}
+                        </span>
                     </div>
                 </div>
+            </div>
 
-                <!-- Badge de disponibilidad -->
-                <div class="absolute top-4 right-4">
-                    <span class="px-3 py-1 text-xs font-semibold rounded-full"
-                        [class]="prod.stock > 0 ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'">
-                        {{ prod.stock > 0 ? 'Disponible' : 'Agotado' }}
-                    </span>
+            <!-- Mensaje cuando no hay productos -->
+            <div *ngIf="productos.length === 0" class="text-center py-16">
+                <div class="text-gray-400 text-6xl mb-4">
+                    <i class="pi pi-box"></i>
+                </div>
+                <h3 class="text-xl font-semibold text-gray-600 mb-2">No hay productos disponibles</h3>
+                <p class="text-gray-500">Los productos aparecerán aquí cuando estén disponibles.</p>
+            </div>
+        </div>
+
+        <!-- Modal para ver comentarios -->
+        <p-dialog header="Comentarios del Producto" [(visible)]="visibleComentarios"
+            [style]="{ width: '40rem', background: 'white', color: 'black' }" [modal]="true" [closable]="true"
+            [dismissableMask]="false" [blockScroll]="true">
+
+            <div class="mb-4">
+                <button
+                    class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors duration-200 flex items-center gap-2"
+                    (click)="showAgregarComentarioDialog()">
+                    <i class="pi pi-plus text-sm"></i>
+                    Agregar Comentario
+                </button>
+            </div>
+
+            <div *ngIf="comentarios.length === 0" class="text-center py-8">
+                <p class="text-gray-500">No hay comentarios disponibles para este producto.</p>
+            </div>
+
+            <div *ngFor="let com of comentarios" class="p-4 border rounded-lg bg-gray-50 shadow-sm mb-3">
+                <div class="flex justify-between items-start mb-2">
+                    <span class="text-sm font-medium text-gray-700">{{ com.usuarioId}}</span>
+                    <span class="text-xs text-gray-500">{{ com.fechaHora | date:'short' }}</span>
+                </div>
+                <p class="text-sm text-gray-800 mb-2">{{ com.texto }}</p>
+                <div class="flex items-center">
+                    <div class="flex">
+                        <i *ngFor="let star of [1,2,3,4,5]" class="pi text-sm"
+                            [class.pi-star-fill]="star <= com.calificacion" [class.pi-star]="star > com.calificacion"
+                            [class.text-yellow-500]="star <= com.calificacion"
+                            [class.text-gray-300]="star > com.calificacion">
+                        </i>
+                    </div>
+                    <span class="text-xs text-gray-600 ml-2">({{ com.calificacion }}/5)</span>
                 </div>
             </div>
-        </div>
+        </p-dialog>
 
-        <!-- Mensaje cuando no hay productos -->
-        <div *ngIf="productos.length === 0" class="text-center py-16">
-            <div class="text-gray-400 text-6xl mb-4">
-                <i class="pi pi-box"></i>
+        <!-- Modal para agregar comentario -->
+        <p-dialog header="Nuevo Comentario" [(visible)]="visibleAgregarComentario"
+            [style]="{ width: '35rem', background: 'white', color: 'black' }" [modal]="true" [closable]="true"
+            [dismissableMask]="false" [blockScroll]="true">
+
+            <!-- Campo de comentario -->
+            <div class="flex flex-col gap-2 mb-4">
+                <label for="comentario" class="font-semibold text-black">Comentario</label>
+                <textarea id="comentario" rows="4"
+                    class="w-full p-3 border border-gray-300 rounded-lg bg-white text-black resize-none"
+                    placeholder="Escribe tu comentario aquí..." [(ngModel)]="newComentario.texto">
+            </textarea>
             </div>
-            <h3 class="text-xl font-semibold text-gray-600 mb-2">No hay productos disponibles</h3>
-            <p class="text-gray-500">Los productos aparecerán aquí cuando estén disponibles.</p>
-        </div>
-    </div>
 
-    <!-- Modal para ver comentarios -->
-    <p-dialog header="Comentarios del Producto" [(visible)]="visibleComentarios"
-        [style]="{ width: '40rem', background: 'white', color: 'black' }" [modal]="true"
-        [closable]="true" [dismissableMask]="false" [blockScroll]="true">
-        
-        <div class="mb-4">
-            <button 
-                class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors duration-200 flex items-center gap-2"
-                (click)="showAgregarComentarioDialog()">
-                <i class="pi pi-plus text-sm"></i>
-                Agregar Comentario
-            </button>
-        </div>
-
-        <div *ngIf="comentarios.length === 0" class="text-center py-8">
-            <p class="text-gray-500">No hay comentarios disponibles para este producto.</p>
-        </div>
-
-        <div *ngFor="let com of comentarios" class="p-4 border rounded-lg bg-gray-50 shadow-sm mb-3">
-            <div class="flex justify-between items-start mb-2">
-                <span class="text-sm font-medium text-gray-700">{{ com.usuarioId}}</span>
-                <span class="text-xs text-gray-500">{{ com.fechaHora | date:'short' }}</span>
-            </div>
-            <p class="text-sm text-gray-800 mb-2">{{ com.texto }}</p>
-            <div class="flex items-center">
-                <div class="flex">
-                    <i *ngFor="let star of [1,2,3,4,5]" 
-                       class="pi text-sm"
-                       [class.pi-star-fill]="star <= com.calificacion"
-                       [class.pi-star]="star > com.calificacion"
-                       [class.text-yellow-500]="star <= com.calificacion"
-                       [class.text-gray-300]="star > com.calificacion">
+            <!-- Sistema de estrellas -->
+            <div class="flex flex-col gap-2 mb-4">
+                <label class="font-semibold text-black">Calificación</label>
+                <div class="flex gap-1">
+                    <i *ngFor="let star of [1,2,3,4,5]; let i = index"
+                        class="pi cursor-pointer text-xl transition-colors duration-200"
+                        [class.pi-star-fill]="(i + 1) <= newComentario.calificacion"
+                        [class.pi-star]="(i + 1) > newComentario.calificacion"
+                        [class.text-yellow-500]="(i + 1) <= newComentario.calificacion"
+                        [class.text-gray-300]="(i + 1) > newComentario.calificacion"
+                        [class.hover:text-yellow-400]="true" (click)="setCalificacion(i + 1)"
+                        (mouseenter)="hoverCalificacion = i + 1" (mouseleave)="hoverCalificacion = 0">
                     </i>
                 </div>
-                <span class="text-xs text-gray-600 ml-2">({{ com.calificacion }}/5)</span>
+                <span class="text-sm text-gray-600">
+                    {{ newComentario.calificacion > 0 ? newComentario.calificacion + ' de 5 estrellas' : 'Selecciona una
+                    calificación' }}
+                </span>
+            </div>
+
+            <div class="flex justify-end gap-2">
+                <p-button label="Volver a Comentarios" severity="secondary" (click)="volverAComentarios()" />
+                <p-button label="Guardar" (click)="postComentario()"
+                    [disabled]="!newComentario.texto || newComentario.calificacion === 0" />
+            </div>
+        </p-dialog>
+    </div>
+
+
+
+
+    <!-- SUPERADMIN ----------------------------------------------------------------- -->
+    <!-- SUPERADMIN ----------------------------------------------------------------- -->
+    <div *ngIf="currentUser.rol === 'SuperAdmin'">
+
+        <div class="max-w-7xl mx-auto px-4">
+            <!-- Header -->
+            <div class="bg-white p-8 rounded-2xl shadow-lg mb-8 border-l-4 border-indigo-600">
+                <h1 class="text-gray-800 text-4xl font-bold mb-3 mt-0">Gestión de Productos</h1>
+                <p class="text-gray-500 text-lg m-0">Administre el catálogo de productos del sistema CAB</p>
+            </div>
+
+            <!-- Products Section -->
+            <div class="bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-200">
+                <!-- Section Header -->
+                <div class="p-8 border-b border-gray-200 flex justify-between items-center flex-wrap gap-5">
+                    <h2 class="text-gray-800 text-3xl font-semibold flex items-center gap-3 m-0">
+                        <span>📦</span>
+                        Productos
+                        <span *ngIf="pagedResponse" class="text-sm text-gray-500">
+                            ({{ pagedResponse.totalRecords }} total)
+                        </span>
+                    </h2>
+                    <div class="flex gap-4 flex-wrap items-center">
+                        <button
+                            class="px-6 py-3 bg-gray-100 text-gray-700 border-2 border-gray-200 rounded-xl font-semibold cursor-pointer transition-all duration-300 text-sm"
+                            (click)="refreshProducts()">
+                            🔄 Actualizar
+                        </button>
+                        <button
+                            class="px-6 py-3 bg-gray-100 text-gray-700 border-2 border-gray-200 rounded-xl font-semibold cursor-pointer transition-all duration-300 text-sm"
+                            (click)="exportProductsData()">
+                            📁 Exportar
+                        </button>
+                        <button
+                            class="px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white border-2 border-transparent rounded-xl font-semibold cursor-pointer transition-all duration-300 text-sm hover:-translate-y-0.5 hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                            (click)="openAddProductModal()">
+                            ➕ Agregar Producto
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Filters Section -->
+                <div class="p-8 border-b border-gray-200 bg-gray-50">
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-5 items-end">
+                        <div class="flex flex-col gap-2">
+                            <label class="font-semibold text-gray-700 text-sm m-0">Buscar productos</label>
+                            <input type="text"
+                                class="p-3 border-2 border-gray-200 rounded-xl text-sm transition-all duration-300 focus:outline-none focus:border-indigo-600"
+                                placeholder="Buscar por nombre o descripción..." [(ngModel)]="filtros.searchTerm"
+                                (keyup.enter)="onSearchChange()" (blur)="onSearchChange()" />
+                        </div>
+
+                        <div class="flex flex-col gap-2">
+                            <label class="font-semibold text-gray-700 text-sm m-0">Estado</label>
+                            <select
+                                class="p-3 border-2 border-gray-200 rounded-xl text-sm transition-all duration-300 focus:outline-none focus:border-indigo-600"
+                                [(ngModel)]="filtros.statusFilter" (change)="onStatusFilterChange($event)">
+                                <option value="all">Todos los estados</option>
+                                <option value="active">Activos</option>
+                                <option value="inactive">Inactivos</option>
+                            </select>
+                        </div>
+
+                        <div class="flex flex-col gap-2">
+                            <label class="font-semibold text-gray-700 text-sm m-0">Stock</label>
+                            <select
+                                class="p-3 border-2 border-gray-200 rounded-xl text-sm transition-all duration-300 focus:outline-none focus:border-indigo-600"
+                                [(ngModel)]="filtros.stockFilter" (change)="onStockFilterChange($event)">
+                                <option value="all">Todo el stock</option>
+                                <option value="in-stock">En stock</option>
+                                <option value="low-stock">Stock bajo</option>
+                                <option value="out-of-stock">Sin stock</option>
+                            </select>
+                        </div>
+
+                        <div class="flex flex-col gap-2">
+                            <label class="font-semibold text-gray-700 text-sm m-0">Por página</label>
+                            <select
+                                class="p-3 border-2 border-gray-200 rounded-xl text-sm transition-all duration-300 focus:outline-none focus:border-indigo-600"
+                                [(ngModel)]="filtros.pageSize" (change)="onPageSizeChange($event)">
+                                <option value="5">5 productos</option>
+                                <option value="10">10 productos</option>
+                                <option value="25">25 productos</option>
+                                <option value="50">50 productos</option>
+                            </select>
+                        </div>
+
+                        <div class="flex flex-col gap-2">
+                            <button
+                                class="px-6 py-3 bg-gray-100 text-gray-700 border-2 border-gray-200 rounded-xl font-semibold cursor-pointer transition-all duration-300 text-sm"
+                                (click)="resetFilters()">
+                                🔄 Limpiar Filtros
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bulk Actions -->
+                <div class="p-5 bg-slate-50 border-b border-gray-200 flex gap-4 items-center flex-wrap"
+                    *ngIf="selectedProductos.length > 0">
+                    <span class="text-gray-500 font-medium">
+                        {{ selectedProductos.length }} producto(s) seleccionado(s)
+                    </span>
+                    <button
+                        class="px-6 py-3 bg-gray-100 text-gray-700 border-2 border-gray-200 rounded-xl font-semibold cursor-pointer transition-all duration-300 text-sm"
+                        (click)="bulkActivateProducts()">
+                        ✅ Activar
+                    </button>
+                    <button
+                        class="px-6 py-3 bg-gray-100 text-gray-700 border-2 border-gray-200 rounded-xl font-semibold cursor-pointer transition-all duration-300 text-sm"
+                        (click)="bulkDeactivateProducts()">
+                        ❌ Desactivar
+                    </button>
+                    <button
+                        class="px-6 py-3 bg-gradient-to-r from-red-500 to-red-600 text-white border-2 border-transparent rounded-xl font-semibold cursor-pointer transition-all duration-300 text-sm hover:-translate-y-0.5 hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                        (click)="bulkDeleteProducts()">
+                        🗑️ Eliminar
+                    </button>
+                </div>
+
+                <!-- Loading State -->
+                <div class="flex flex-col items-center justify-center py-16" *ngIf="isLoadingProductos">
+                    <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
+                    <p class="mt-4 text-gray-600 font-medium">Cargando productos...</p>
+                </div>
+
+                <!-- Products Table -->
+                <div class="overflow-x-auto" *ngIf="!isLoadingProductos && productos.length > 0">
+                    <table class="w-full border-collapse">
+                        <thead>
+                            <tr>
+                                <th
+                                    class="bg-gray-50 p-5 text-left font-semibold text-gray-700 border-b-2 border-gray-200">
+                                    <input type="checkbox" [checked]="allProductsSelected()"
+                                        [indeterminate]="someProductsSelected()" (change)="selectAllProducts($event)" />
+                                </th>
+                                <th class="bg-gray-50 p-5 text-left font-semibold text-gray-700 border-b-2 border-gray-200 cursor-pointer"
+                                    (click)="onSortChange('nombre')">
+                                    Producto
+                                    <i class="fas {{ getSortIcon('nombre') }}"></i>
+                                </th>
+                                <th class="bg-gray-50 p-5 text-left font-semibold text-gray-700 border-b-2 border-gray-200 cursor-pointer"
+                                    (click)="onSortChange('precio')">
+                                    Precio
+                                    <i class="fas {{ getSortIcon('precio') }}"></i>
+                                </th>
+                                <th
+                                    class="bg-gray-50 p-5 text-left font-semibold text-gray-700 border-b-2 border-gray-200">
+                                    Costo</th>
+                                <th class="bg-gray-50 p-5 text-left font-semibold text-gray-700 border-b-2 border-gray-200 cursor-pointer"
+                                    (click)="onSortChange('stock')">
+                                    Stock
+                                    <i class="fas {{ getSortIcon('stock') }}"></i>
+                                </th>
+                                <th
+                                    class="bg-gray-50 p-5 text-left font-semibold text-gray-700 border-b-2 border-gray-200">
+                                    Estado</th>
+                                <th class="bg-gray-50 p-5 text-left font-semibold text-gray-700 border-b-2 border-gray-200 cursor-pointer"
+                                    (click)="onSortChange('fechaCreacion')">
+                                    Fecha Creación
+                                    <i class="fas {{ getSortIcon('fechaCreacion') }}"></i>
+                                </th>
+                                <th
+                                    class="bg-gray-50 p-5 text-left font-semibold text-gray-700 border-b-2 border-gray-200">
+                                    Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="hover:bg-gray-50 transition-colors duration-200"
+                                *ngFor="let producto of productos; trackBy: trackByProductId">
+                                <td class="p-5 border-b border-gray-100 align-middle">
+                                    <input type="checkbox" [checked]="selectedProductos.includes(producto.id)"
+                                        (change)="toggleProductSelection(producto.id, $event)" />
+                                </td>
+
+                                <td class="p-5 border-b border-gray-100 align-middle">
+                                    <div class="flex items-center gap-4">
+                                        <div
+                                            class="w-15 h-15 rounded-xl bg-gray-100 flex items-center justify-center flex-shrink-0 overflow-hidden">
+                                            <img *ngIf="producto.imagen" [src]="producto.imagen" [alt]="producto.nombre"
+                                                class="w-15 h-15 object-cover rounded-lg" />
+                                            <span *ngIf="!producto.imagen" class="text-2xl">📦</span>
+                                        </div>
+                                        <div class="min-w-0 flex-1">
+                                            <h4 class="text-gray-800 font-semibold m-0 mb-1 text-base">{{
+                                                producto.nombre }}</h4>
+                                            <p class="text-gray-500 text-sm max-w-xs overflow-hidden text-ellipsis m-0"
+                                                [title]="producto.descripcion">{{ producto.descripcion }}</p>
+                                        </div>
+                                    </div>
+                                </td>
+
+                                <td class="p-5 border-b border-gray-100 align-middle">
+                                    <div class="flex flex-col">
+                                        <span class="font-bold text-green-600 text-lg">{{ formatPrice(producto.precio)
+                                            }}</span>
+                                        <span class="text-gray-500 text-sm" *ngIf="producto.margen">
+                                            Margen: {{ producto.margen | number:'1.1-1' }}%
+                                        </span>
+                                    </div>
+                                </td>
+
+                                <td class="p-5 border-b border-gray-100 align-middle">
+                                    <span class="text-gray-600">{{ formatPrice(producto.costo) }}</span>
+                                </td>
+
+                                <td class="p-5 border-b border-gray-100 align-middle">
+                                    <div class="flex flex-col gap-1">
+                                        <span
+                                            class="px-3 py-1.5 rounded-2xl text-xs font-semibold text-center inline-block min-w-15"
+                                            [ngClass]="getStockStatusClass(producto.stock)">
+                                            {{ producto.stock }}
+                                        </span>
+                                        <small class="text-gray-500 text-xs">{{ producto.estadoStock ||
+                                            getStockStatusText(producto.stock) }}</small>
+                                    </div>
+                                </td>
+
+                                <td class="p-5 border-b border-gray-100 align-middle">
+                                    <span
+                                        class="px-3 py-1.5 rounded-2xl text-xs font-semibold uppercase tracking-wide inline-block"
+                                        [ngClass]="getStatusClass(producto.activo)">
+                                        {{ producto.estado || getStatusText(producto.activo) }}
+                                    </span>
+                                </td>
+
+                                <td class="p-5 border-b border-gray-100 align-middle">{{
+                                    formatDate(producto.fechaCreacion) }}</td>
+
+                                <td class="p-5 border-b border-gray-100 align-middle">
+                                    <div class="flex gap-2 flex-wrap">
+                                        <button
+                                            class="px-3 py-2 text-xs rounded-lg border-none cursor-pointer transition-all duration-300 bg-blue-100 text-blue-800 hover:bg-blue-200"
+                                            (click)="openEditProductModal(producto)" title="Editar producto">
+                                            ✏️
+                                        </button>
+                                        <button
+                                            class="px-3 py-2 text-xs rounded-lg border-none cursor-pointer transition-all duration-300 bg-blue-100 text-blue-800 hover:bg-blue-200"
+                                            (click)="duplicateProduct(producto)" title="Duplicar producto">
+                                            📋
+                                        </button>
+                                        <button
+                                            class="px-3 py-2 text-xs rounded-lg border-none cursor-pointer transition-all duration-300 bg-yellow-100 text-yellow-800 hover:bg-yellow-200"
+                                            (click)="toggleProductStatus(producto)"
+                                            [title]="producto.activo ? 'Desactivar producto' : 'Activar producto'">
+                                            {{ producto.activo ? "❌" : "✅" }}
+                                        </button>
+                                        <button
+                                            class="px-3 py-2 text-xs rounded-lg border-none cursor-pointer transition-all duration-300 bg-red-100 text-red-600 hover:bg-red-200"
+                                            (click)="deleteProduct(producto)" title="Eliminar producto">
+                                            🗑️
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Empty State -->
+                <div class="text-center py-16" *ngIf="!isLoadingProductos && productos.length === 0">
+                    <div class="text-6xl mb-4">📦</div>
+                    <h3 class="text-xl font-semibold text-gray-600 mb-2">
+                        {{ filtros.searchTerm || filtros.statusFilter !== 'all' || filtros.stockFilter !== 'all'
+                        ? 'No se encontraron productos'
+                        : 'No hay productos registrados' }}
+                    </h3>
+                    <p class="text-gray-500 mb-4">
+                        {{ filtros.searchTerm || filtros.statusFilter !== 'all' || filtros.stockFilter !== 'all'
+                        ? 'Intente ajustar los filtros de búsqueda'
+                        : 'Comience agregando su primer producto al sistema' }}
+                    </p>
+                    <button
+                        *ngIf="!filtros.searchTerm && filtros.statusFilter === 'all' && filtros.stockFilter === 'all'"
+                        class="px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white border-2 border-transparent rounded-xl font-semibold cursor-pointer transition-all duration-300 text-sm hover:-translate-y-0.5 hover:shadow-lg"
+                        (click)="openAddProductModal()">
+                        ➕ Agregar Primer Producto
+                    </button>
+                    <button
+                        *ngIf="filtros.searchTerm || filtros.statusFilter !== 'all' || filtros.stockFilter !== 'all'"
+                        class="px-6 py-3 bg-gray-100 text-gray-700 border-2 border-gray-200 rounded-xl font-semibold cursor-pointer transition-all duration-300 text-sm"
+                        (click)="resetFilters()">
+                        🔄 Limpiar Filtros
+                    </button>
+                </div>
+
+                <!-- Pagination -->
+                <div class="p-6 border-t border-gray-200" *ngIf="pagedResponse && pagedResponse.totalPages > 1">
+                    <div class="flex flex-wrap items-center justify-center gap-2">
+                        <button
+                            class="px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                            [disabled]="!pagedResponse.hasPreviousPage"
+                            (click)="goToPage(pagedResponse.currentPage - 1)">
+                            ⬅️ Anterior
+                        </button>
+
+                        <button *ngFor="let page of getPaginationPages()"
+                            class="px-4 py-2 border text-gray-700 rounded-lg hover:bg-gray-50 transition-colors duration-200"
+                            [class.bg-indigo-600]="page === pagedResponse.currentPage"
+                            [class.text-white]="page === pagedResponse.currentPage"
+                            [class.border-indigo-600]="page === pagedResponse.currentPage"
+                            [class.bg-white]="page !== pagedResponse.currentPage"
+                            [class.border-gray-300]="page !== pagedResponse.currentPage" (click)="goToPage(page)">
+                            {{ page }}
+                        </button>
+
+                        <span class="text-sm px-4 py-2 text-gray-600">
+                            {{ pagedResponse.currentPage }} de {{ pagedResponse.totalPages }}
+                            ({{ pagedResponse.totalRecords }} total)
+                        </span>
+
+                        <button
+                            class="px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                            [disabled]="!pagedResponse.hasNextPage" (click)="goToPage(pagedResponse.currentPage + 1)">
+                            Siguiente ➡️
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
-    </p-dialog>
 
-    <!-- Modal para agregar comentario -->
-    <p-dialog header="Nuevo Comentario" [(visible)]="visibleAgregarComentario"
-        [style]="{ width: '35rem', background: 'white', color: 'black' }" [modal]="true"
-        [closable]="true" [dismissableMask]="false" [blockScroll]="true">
+        <!-- Modal para agregar/editar producto -->
+        <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" *ngIf="showProductModal"
+            (click)="closeProductModal()">
+            <div class="bg-white rounded-2xl max-w-4xl w-full mx-4 max-h-screen overflow-y-auto"
+                (click)="$event.stopPropagation()">
+                <div class="p-6 border-b border-gray-200 flex items-center justify-between">
+                    <h3 class="text-xl font-bold text-gray-800 m-0">
+                        {{ editingProduct ? "Editar Producto" : "Agregar Producto" }}
+                    </h3>
+                    <button class="text-gray-400 hover:text-gray-600 text-2xl w-8 h-8 flex items-center justify-center"
+                        (click)="closeProductModal()">✕</button>
+                </div>
 
-        <!-- Campo de comentario -->
-        <div class="flex flex-col gap-2 mb-4">
-            <label for="comentario" class="font-semibold text-black">Comentario</label>
-            <textarea id="comentario" rows="4"
-                class="w-full p-3 border border-gray-300 rounded-lg bg-white text-black resize-none"
-                placeholder="Escribe tu comentario aquí..." [(ngModel)]="newComentario.texto">
-            </textarea>
-        </div>
+                <div class="p-6">
+                    <form #productFormRef="ngForm" (ngSubmit)="saveProduct()">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <!-- Nombre -->
+                            <div class="flex flex-col gap-2">
+                                <label class="font-semibold text-gray-700 text-sm">Nombre *</label>
+                                <input type="text"
+                                    class="p-3 border-2 border-gray-200 rounded-xl text-sm transition-all duration-300 focus:outline-none focus:border-indigo-600"
+                                    name="nombre" [(ngModel)]="productForm.nombre" required placeholder="Ej: ESP32-CAM"
+                                    [class.border-red-500]="formErrors['nombre']" />
+                                <span *ngIf="formErrors['nombre']" class="text-red-500 text-sm">
+                                    {{ formErrors['nombre'] }}
+                                </span>
+                            </div>
 
-        <!-- Sistema de estrellas -->
-        <div class="flex flex-col gap-2 mb-4">
-            <label class="font-semibold text-black">Calificación</label>
-            <div class="flex gap-1">
-                <i *ngFor="let star of [1,2,3,4,5]; let i = index"
-                    class="pi cursor-pointer text-xl transition-colors duration-200"
-                    [class.pi-star-fill]="(i + 1) <= newComentario.calificacion"
-                    [class.pi-star]="(i + 1) > newComentario.calificacion"
-                    [class.text-yellow-500]="(i + 1) <= newComentario.calificacion"
-                    [class.text-gray-300]="(i + 1) > newComentario.calificacion"
-                    [class.hover:text-yellow-400]="true" 
-                    (click)="setCalificacion(i + 1)"
-                    (mouseenter)="hoverCalificacion = i + 1" 
-                    (mouseleave)="hoverCalificacion = 0">
-                </i>
+                            <!-- Descripción -->
+                            <div class="md:col-span-2 flex flex-col gap-2">
+                                <label class="font-semibold text-gray-700 text-sm">Descripción *</label>
+                                <textarea
+                                    class="p-3 border-2 border-gray-200 rounded-xl text-sm transition-all duration-300 focus:outline-none focus:border-indigo-600 resize-none"
+                                    name="descripcion" [(ngModel)]="productForm.descripcion" required rows="3"
+                                    placeholder="Descripción detallada del producto..."
+                                    [class.border-red-500]="formErrors['descripcion']"></textarea>
+                                <span *ngIf="formErrors['descripcion']" class="text-red-500 text-sm">
+                                    {{ formErrors['descripcion'] }}
+                                </span>
+                            </div>
+
+                            <!-- Precio -->
+                            <div class="flex flex-col gap-2">
+                                <label class="font-semibold text-gray-700 text-sm">Precio * (MXN)</label>
+                                <input type="number"
+                                    class="p-3 border-2 border-gray-200 rounded-xl text-sm transition-all duration-300 focus:outline-none focus:border-indigo-600"
+                                    name="precio" [(ngModel)]="productForm.precio" required placeholder="0.00"
+                                    step="0.01" min="0.01" [class.border-red-500]="formErrors['precio']" />
+                                <span *ngIf="formErrors['precio']" class="text-red-500 text-sm">
+                                    {{ formErrors['precio'] }}
+                                </span>
+                            </div>
+
+                            <!-- Costo -->
+                            <div class="flex flex-col gap-2">
+                                <label class="font-semibold text-gray-700 text-sm">Costo (MXN)</label>
+                                <input type="number"
+                                    class="p-3 border-2 border-gray-200 rounded-xl text-sm transition-all duration-300 focus:outline-none focus:border-indigo-600"
+                                    name="costo" [(ngModel)]="productForm.costo" placeholder="0.00" step="0.01" min="0"
+                                    [class.border-red-500]="formErrors['costo']" />
+                                <span *ngIf="formErrors['costo']" class="text-red-500 text-sm">
+                                    {{ formErrors['costo'] }}
+                                </span>
+                                <small class="text-gray-500 text-xs">
+                                    Margen estimado:
+                                    <span *ngIf="productForm.precio && productForm.costo && productForm.precio > 0">
+                                        {{ ((productForm.precio - productForm.costo) / productForm.precio * 100) |
+                                        number:'1.1-1' }}%
+                                    </span>
+                                    <span *ngIf="!productForm.precio || !productForm.costo || productForm.precio <= 0">
+                                        N/A
+                                    </span>
+                                </small>
+                            </div>
+
+                            <!-- Stock -->
+                            <div class="flex flex-col gap-2">
+                                <label class="font-semibold text-gray-700 text-sm">Stock Inicial</label>
+                                <input type="number"
+                                    class="p-3 border-2 border-gray-200 rounded-xl text-sm transition-all duration-300 focus:outline-none focus:border-indigo-600"
+                                    name="stock" [(ngModel)]="productForm.stock" placeholder="0" min="0"
+                                    [class.border-red-500]="formErrors['stock']" />
+                                <span *ngIf="formErrors['stock']" class="text-red-500 text-sm">
+                                    {{ formErrors['stock'] }}
+                                </span>
+                            </div>
+
+                            <!-- Imagen -->
+                            <div class="md:col-span-2 flex flex-col gap-2">
+                                <label class="font-semibold text-gray-700 text-sm">URL de Imagen</label>
+                                <input type="url"
+                                    class="p-3 border-2 border-gray-200 rounded-xl text-sm transition-all duration-300 focus:outline-none focus:border-indigo-600"
+                                    name="imagen" [(ngModel)]="productForm.imagen"
+                                    placeholder="https://ejemplo.com/imagen.jpg"
+                                    [class.border-red-500]="formErrors['imagen']" />
+                                <span *ngIf="formErrors['imagen']" class="text-red-500 text-sm">
+                                    {{ formErrors['imagen'] }}
+                                </span>
+                            </div>
+
+                            <!-- Vista previa de imagen -->
+                            <div class="md:col-span-2 flex flex-col gap-2" *ngIf="productForm.imagen">
+                                <label class="font-semibold text-gray-700 text-sm">Vista previa</label>
+                                <div class="text-center p-4 border-2 border-dashed border-gray-300 rounded-xl">
+                                    <img [src]="productForm.imagen" [alt]="productForm.nombre || 'Vista previa'"
+                                        class="max-w-52 max-h-40 rounded-lg mx-auto" (error)="onImageError($event)" />
+                                </div>
+                            </div>
+
+                            <!-- Estado activo -->
+                            <div class="md:col-span-2">
+                                <div class="flex items-center gap-3">
+                                    <input type="checkbox" class="w-4 h-4" name="activo"
+                                        [(ngModel)]="productForm.activo" id="productActive" />
+                                    <label for="productActive" class="font-semibold text-gray-700 text-sm">
+                                        Producto activo
+                                        <small class="text-gray-500 block font-normal">
+                                            (Los productos inactivos no aparecerán en las ventas)
+                                        </small>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="p-6 border-t border-gray-200 flex gap-3 justify-end">
+                    <button type="button"
+                        class="px-6 py-3 bg-gray-100 text-gray-700 border-2 border-gray-200 rounded-xl font-semibold cursor-pointer transition-all duration-300 text-sm"
+                        (click)="closeProductModal()">
+                        Cancelar
+                    </button>
+                    <button type="button"
+                        class="px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white border-2 border-transparent rounded-xl font-semibold cursor-pointer transition-all duration-300 text-sm hover:-translate-y-0.5 hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                        (click)="saveProduct()" [disabled]="!productFormRef.valid || isLoadingProductos">
+                        <span *ngIf="isLoadingProductos">⏳</span>
+                        {{ editingProduct ? "Actualizar Producto" : "Guardar Producto" }}
+                    </button>
+                </div>
             </div>
-            <span class="text-sm text-gray-600">
-                {{ newComentario.calificacion > 0 ? newComentario.calificacion + ' de 5 estrellas' : 'Selecciona una calificación' }}
-            </span>
         </div>
 
-        <div class="flex justify-end gap-2">
-            <p-button label="Volver a Comentarios" severity="secondary" (click)="volverAComentarios()" />
-            <p-button label="Guardar" (click)="postComentario()"
-                [disabled]="!newComentario.texto || newComentario.calificacion === 0" />
-        </div>
-    </p-dialog>
+    </div>
 </div>
