@@ -142,9 +142,6 @@ export interface DashboardData {
 }
 
 //CLIENTES //////////////////////////////////////////////////////////////
-export interface Compras { }
-
-
 export interface Comentarios {
   id: number;
   fechaHora: Date;
@@ -174,14 +171,28 @@ export interface Producto{
   stock: number;
 }
 
-export interface Venta{
-  uusarioId: number;
-  ProductoId: number;
-  Cantidad: number;
-  Total: number;
-  Estatus: string;
-  DireccionEnvio: string;
-  Observaciones: string;
+export interface VentaDetalle {
+  id?: number;
+  ventaId?: number;
+  productoId: number;
+  cantidad: number;
+  precioUnitario: number;
+  subTotal: number;
+}
+
+export interface Venta {
+  id?: number;
+  numeroVenta: string;
+  fechaVenta: Date;
+  usuarioId: number;
+  cantidad: number;
+  precioUnitario: number;
+  subTotal: number;
+  total: number;
+  estatus?: string;
+  direccionEnvio?: string;
+  observaciones?: string;
+  detalles?: VentaDetalle[];
 }
 ///////////////////////////////////////////////////////////////////////////
 
@@ -831,9 +842,21 @@ export class BackendService {
       .post<newComent>(`${this.apiUrl}/comentarios`, comentario)
       .pipe(catchError(this.handleError));
   }
+  crearVenta(venta: Partial<Venta>): Observable<Venta> {
+    return this.http
+      .post<Venta>(`${this.apiUrl}/ventas`, venta)
+      .pipe(catchError(this.handleError));
+  }
+
   getVentas(): Observable<Venta[]> {
     return this.http
       .get<Venta[]>(`${this.apiUrl}/ventas`)
+      .pipe(catchError(this.handleError));
+  }
+
+  getVentasByUsuario(usuarioId: number): Observable<Venta[]> {
+    return this.http
+      .get<Venta[]>(`${this.apiUrl}/ventas/usuario/${usuarioId}`)
       .pipe(catchError(this.handleError));
   }
   //////////////////////////////////////////////////////////////////////7

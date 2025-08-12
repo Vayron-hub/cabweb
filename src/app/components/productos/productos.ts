@@ -1,5 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { BackendService, newComent, Producto } from '../../services/backend.service';
+import { BackendService, newComent, Producto, Venta } from '../../services/backend.service'; // Agregar Venta aquí
 import { CommonModule } from '@angular/common';
 import { DialogModule } from 'primeng/dialog';
 import { FormsModule } from '@angular/forms';
@@ -12,8 +12,8 @@ interface Comentario {
   texto: string;
   usuarioId: number;
   calificacion: number;
-  activo: boolean; 
-  productoId?: number; 
+  activo: boolean;
+  productoId?: number;
   usuario?: string;
 }
 export interface User {
@@ -23,13 +23,24 @@ export interface User {
   rol: string;
   ultimoAcceso?: Date;
 }
+
+// Agregar la interfaz VentaDetalle que faltaba
+export interface VentaDetalle {
+  id?: number;
+  ventaId?: number;
+  productoId: number;
+  cantidad: number;
+  precioUnitario: number;
+  subTotal: number;
+}
+
 @Component({
   selector: 'app-productos',
-  imports: [CommonModule,DialogModule, FormsModule, ButtonModule, InputTextModule],
+  imports: [CommonModule, DialogModule, FormsModule, ButtonModule, InputTextModule],
   templateUrl: './productos.html',
 })
 export class ProductosComponent implements OnInit {
-@Input() currentUser: User = {
+  @Input() currentUser: User = {
     id: '',
     nombre: '',
     email: '',
@@ -37,35 +48,54 @@ export class ProductosComponent implements OnInit {
     ultimoAcceso: new Date(),
   };
 
+
+  venta: Venta = {
+    numeroVenta: '',
+    fechaVenta: new Date(),
+    usuarioId: Number(this.currentUser.id),
+    cantidad: 0,
+    precioUnitario: 0,
+    subTotal: 0,
+    total: 0,
+    estatus: 'Pendiente',
+    direccionEnvio: '',
+    observaciones: '',
+    detalles: []
+  };
+
   constructor(
     private backendService: BackendService
-  ){}
+  ) { }
 
-  ngOnInit(){
+  ngOnInit() {
     this.getCurrentUser();
     this.getProductos();
     this.loadComentarios();
+    this.getLastVentaNumero();
   }
 
-  productos: Producto[]=[];
+  productos: Producto[] = [];
   comentarios: Comentario[] = [];
   usercomentarios: Comentario[] = [];
   visible: boolean = false;
   visiblePostC: boolean = false;
+  visibleCompra: boolean = false;
   hoverCalificacion: number = 0;
 
   newComentario: newComent = {
-      texto: '',
-      fechaHora: '',
-      usuarioId: Number(this.currentUser.id),
-      calificacion: 0,
-      activo: true,
-      
-    };
+    texto: '',
+    fechaHora: '',
+    usuarioId: Number(this.currentUser.id),
+    calificacion: 0,
+    activo: true,
+
+  };
 
   visibleComentarios: boolean = false;
   visibleAgregarComentario: boolean = false;
-  productoSeleccionado: number = 0;
+  productoSeleccionado: any = null;
+  anio: number = new Date().getFullYear();
+  templateNV: string = 'V-' + this.anio + '-';
 
   getCurrentUser() {
     const user = this.backendService.getCurrentUser();
@@ -77,16 +107,29 @@ export class ProductosComponent implements OnInit {
         rol: (user as any).rol || '',
         ultimoAcceso: this.convertToDate(user.fechaUltimoAcceso),
       };
-      console.log('Usuario actual:', this.currentUser);
     } else {
       console.warn('Usuario no encontrado');
     }
   }
 
-  getProductos(){
+  getLastVentaNumero(){
+    this.backendService.getVentas().subscribe({
+      next: (numero) => {
+        let numeroF = Number(numero.map((venta: any) => venta.numeroVenta).sort().pop().slice(-3));
+        let numeroFormateado = (numeroF + 1).toString().padStart(3, '0');
+        this.templateNV += numeroFormateado;
+        console.log('Último número de venta:', numeroF, 'Nuevo número:', this.templateNV);
+      },
+      error: (error) => {
+        console.error('Error al obtener el último número de venta:', error);
+        this.templateNV += '000';
+      }
+    });
+  }
+
+  getProductos() {
     this.backendService.getProductos().subscribe({
       next: (productos) => {
-        console.log('Productos obtenidos:', productos);
         this.productos = productos;
       },
       error: (error) => {
@@ -143,7 +186,7 @@ export class ProductosComponent implements OnInit {
 
   showAgregarComentarioDialog() {
     this.visibleComentarios = false;
-    
+
     // Usar setTimeout para evitar conflictos entre modales
     setTimeout(() => {
       this.visibleAgregarComentario = true;
@@ -152,7 +195,7 @@ export class ProductosComponent implements OnInit {
 
   volverAComentarios() {
     this.visibleAgregarComentario = false;
-    
+
     // Usar setTimeout para evitar conflictos entre modales
     setTimeout(() => {
       this.visibleComentarios = true;
@@ -189,7 +232,6 @@ export class ProductosComponent implements OnInit {
   }
 
   postComentario() {
-    // Agregar el ID del producto al comentario
     const comentarioToSend = {
       texto: this.newComentario.texto,
       usuarioId: this.currentUser.id as number,
@@ -200,13 +242,118 @@ export class ProductosComponent implements OnInit {
 
     this.backendService.createComentario(comentarioToSend).subscribe({
       next: (response) => {
-        console.log('Comentario creado:', response);
         this.resetFormulario();
-        this.loadComentariosByProducto(this.productoSeleccionado); // Recargar comentarios
-        this.volverAComentarios(); // Volver al modal de comentarios
+        this.loadComentariosByProducto(this.productoSeleccionado); 
+        this.volverAComentarios(); 
       },
       error: (error) => {
         console.error('Error al crear comentario:', error);
+      }
+    });
+  }
+
+  abrirVenta(productoId: number) {
+    this.productoSeleccionado = this.productos.find(p => p.id === productoId);
+    
+    if (this.productoSeleccionado) {
+      // Crear el detalle de venta
+      const detalle: VentaDetalle = {
+        productoId: productoId,
+        cantidad: 1,
+        precioUnitario: this.productoSeleccionado.precio,
+        subTotal: this.productoSeleccionado.precio
+      };
+
+      this.venta = {
+        numeroVenta: this.templateNV,
+        usuarioId: Number(this.currentUser.id),
+        cantidad: 1,
+        precioUnitario: this.productoSeleccionado.precio,
+        subTotal: this.productoSeleccionado.precio,
+        total: this.productoSeleccionado.precio,
+        fechaVenta: new Date(),
+        estatus: 'Pendiente',
+        direccionEnvio: '',
+        observaciones: '',
+        detalles: [detalle]
+      };
+      
+      this.visibleCompra = true;
+    }
+  }
+
+  calcularTotales() {
+    if (this.productoSeleccionado && this.venta.cantidad && this.venta.cantidad > 0) {
+      this.venta.precioUnitario = this.productoSeleccionado.precio;
+      this.venta.subTotal = this.productoSeleccionado.precio * this.venta.cantidad;
+      this.venta.total = this.venta.subTotal;
+
+      if (this.venta.detalles && this.venta.detalles.length > 0) {
+        this.venta.detalles[0].cantidad = this.venta.cantidad;
+        this.venta.detalles[0].precioUnitario = this.productoSeleccionado.precio;
+        this.venta.detalles[0].subTotal = this.productoSeleccionado.precio * this.venta.cantidad;
+      }
+    } else {
+      this.venta.subTotal = 0;
+      this.venta.total = 0;
+      if (this.venta.detalles && this.venta.detalles.length > 0) {
+        this.venta.detalles[0].subTotal = 0;
+      }
+    }
+  }
+
+  closeVenta() {
+    this.visibleCompra = false;
+    this.productoSeleccionado = null;
+    
+    this.venta = {
+      numeroVenta: '',
+      fechaVenta: new Date(),
+      usuarioId: Number(this.currentUser.id),
+      cantidad: 0,
+      precioUnitario: 0,
+      subTotal: 0,
+      total: 0,
+      estatus: 'Pendiente',
+      direccionEnvio: '',
+      observaciones: '',
+      detalles: []
+    };
+  }
+
+  procesarVenta() {
+    if (!this.venta.cantidad || this.venta.cantidad <= 0) {
+      console.error('Cantidad inválida');
+      return;
+    }
+
+    if (this.venta.cantidad > this.productoSeleccionado?.stock) {
+      console.error('Cantidad excede el stock disponible');
+      return;
+    }
+
+    this.venta.numeroVenta = this.templateNV;
+    this.venta.fechaVenta = new Date();
+    this.calcularTotales(); 
+
+
+    this.backendService.crearVenta(this.venta).subscribe({
+      next: (response) => {
+        console.log('Venta procesada con éxito');
+        
+        // Actualizar stock localmente
+        if (this.productoSeleccionado) {
+          this.productoSeleccionado.stock -= this.venta.cantidad;
+        }
+        
+        this.closeVenta();
+        
+        this.templateNV = 'V-' + this.anio + '-';
+        this.getLastVentaNumero();
+      },
+      error: (error) => {
+        console.error('Error al procesar venta:', error);
+        alert('Error al procesar la venta. Intenta nuevamente.');
       }
     });
   }

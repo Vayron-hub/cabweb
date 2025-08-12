@@ -57,15 +57,15 @@
                         </button>
 
                         <button
-                            class="w-full bg-accent-600 hover:bg-green-700 text-white font-semibold py-3 px-4 rounded-lg transition-colors duration-200 flex items-center justify-center gap-2"
-                            [disabled]="prod.stock === 0">
-                            <i class="pi pi-shopping-cart text-sm"></i>
-                            {{ prod.stock > 0 ? 'Agregar al Carrito' : 'Sin Stock' }}
+                            class="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-4 rounded-lg transition-colors duration-200 flex items-center justify-center gap-2"
+                            [disabled]="prod.stock === 0"
+                            (click)="abrirVenta(prod.id)">
+                            <i class="pi pi-credit-card text-sm"></i>
+                            {{ prod.stock > 0 ? 'Comprar Ahora' : 'Sin Stock' }}
                         </button>
                     </div>
                 </div>
 
-                <!-- Badge de disponibilidad -->
                 <div class="absolute top-4 right-4">
                     <span class="px-3 py-1 text-xs font-semibold rounded-full"
                         [class]="prod.stock > 0 ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'">
@@ -129,7 +129,6 @@
         [style]="{ width: '35rem', background: 'white', color: 'black' }" [modal]="true"
         [closable]="true" [dismissableMask]="false" [blockScroll]="true">
 
-        <!-- Campo de comentario -->
         <div class="flex flex-col gap-2 mb-4">
             <label for="comentario" class="font-semibold text-black">Comentario</label>
             <textarea id="comentario" rows="4"
@@ -138,7 +137,6 @@
             </textarea>
         </div>
 
-        <!-- Sistema de estrellas -->
         <div class="flex flex-col gap-2 mb-4">
             <label class="font-semibold text-black">Calificación</label>
             <div class="flex gap-1">
@@ -165,4 +163,81 @@
                 [disabled]="!newComentario.texto || newComentario.calificacion === 0" />
         </div>
     </p-dialog>
+
+    <!-- Modal para comprar -->
+     <p-dialog header="Confirmar Compra" [(visible)]="visibleCompra"
+        [style]="{ width: '35rem', background: 'white', color: 'black' }" [modal]="true"
+        [closable]="true" [dismissableMask]="false" [blockScroll]="true" (onHide)="closeVenta()">
+        
+        <!-- Información del producto seleccionado -->
+        <div class="bg-gray-50 p-4 rounded-lg mb-4">
+            <h4 class="font-semibold text-lg mb-2">{{ productoSeleccionado?.nombre }}</h4>
+            <div class="flex justify-between">
+                <span>Precio unitario:</span>
+                <span class="font-bold">${{ productoSeleccionado?.precio | number:'1.0-0' }}</span>
+            </div>
+            <div class="flex justify-between">
+                <span>Stock disponible:</span>
+                <span class="font-bold">{{ productoSeleccionado?.stock }}</span>
+            </div>
+        </div>
+
+        <div class="space-y-4">
+            <!-- Cantidad -->
+            <div class="flex flex-col gap-2">
+                <label for="cantidad" class="font-semibold">Cantidad</label>
+                <input 
+                    type="number" 
+                    id="cantidad"
+                    [(ngModel)]="venta.cantidad" 
+                    min="1" 
+                    [max]="productoSeleccionado?.stock"
+                    placeholder="Cantidad"
+                    class="w-full p-3 border border-gray-300 rounded-lg"
+                    (ngModelChange)="calcularTotales()" />
+                <span class="text-sm text-gray-500">Máximo: {{ productoSeleccionado?.stock }}</span>
+            </div>
+
+            <!-- Dirección de envío -->
+            <div class="flex flex-col gap-2">
+                <label for="direccion" class="font-semibold">Dirección de Envío</label>
+                <input 
+                    type="text" 
+                    id="direccion"
+                    [(ngModel)]="venta.direccionEnvio" 
+                    placeholder="Dirección de Envío"
+                    class="w-full p-3 border border-gray-300 rounded-lg" />
+            </div>
+
+            <!-- Observaciones -->
+            <div class="flex flex-col gap-2">
+                <label for="observaciones" class="font-semibold">Observaciones</label>
+                <textarea 
+                    id="observaciones"
+                    [(ngModel)]="venta.observaciones" 
+                    placeholder="Observaciones adicionales"
+                    rows="3"
+                    class="w-full p-3 border border-gray-300 rounded-lg resize-none">
+                </textarea>
+            </div>
+
+            <!-- Totales -->
+            <div class="bg-blue-50 p-4 rounded-lg">
+                <div class="flex justify-between mb-2">
+                    <label for="subTotal" class="font-semibold">Subtotal:</label>
+                    <span class="font-bold">${{ venta.subTotal | number:'1.0-0' }}</span>
+                </div>
+                <div class="flex justify-between">
+                    <label for="total" class="font-semibold text-lg">Total:</label>
+                    <span class="font-bold text-xl text-blue-600">${{ venta.total | number:'1.0-0' }}</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="flex justify-end gap-2 mt-6">
+            <p-button label="Cancelar" severity="secondary" (click)="closeVenta()" />
+            <p-button label="Confirmar" (click)="procesarVenta()" 
+                [disabled]="!venta.cantidad || venta.cantidad <= 0 || venta.cantidad > (productoSeleccionado?.stock || 0)" />
+        </div>
+     </p-dialog>
 </div>
