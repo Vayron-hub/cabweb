@@ -89,11 +89,7 @@ export class Registro implements OnInit {
 
       console.log('📝 Iniciando registro para:', { nombre, correo });
 
-<<<<<<< HEAD
-=======
-      // Usar el nuevo método de registro y login automático
-      
->>>>>>> 1602787d58f7ddca97b8d3a7cf38a466b1fe5f66
+
     } else {
       // Marcar todos los campos como tocados para mostrar errores
       Object.keys(this.registroForm.controls).forEach(key => {

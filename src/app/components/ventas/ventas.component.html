@@ -1,0 +1,1245 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gestión de Ventas</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      background: #f5f7fa;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    .header {
+      background: white;
+      padding: 30px;
+      border-radius: 16px;
+      box-shadow: 0 2px 20px rgba(0, 0, 0, 0.08);
+      margin-bottom: 30px;
+      border-left: 5px solid #10b981;
+    }
+
+    .header h1 {
+      color: #1f2937;
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+
+    .header p {
+      color: #6b7280;
+      font-size: 1.1rem;
+    }
+
+    .ventas-section {
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 2px 20px rgba(0, 0, 0, 0.08);
+      overflow: hidden;
+    }
+
+    .section-header {
+      padding: 30px;
+      border-bottom: 1px solid #e5e7eb;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+
+    .section-title {
+      color: #1f2937;
+      font-size: 1.8rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .controls-group {
+      display: flex;
+      gap: 15px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .btn {
+      padding: 12px 24px;
+      border: none;
+      border-radius: 10px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-size: 0.95rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #10b981, #059669);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(16, 185, 129, 0.4);
+    }
+
+    .btn-secondary {
+      background: #f3f4f6;
+      color: #374151;
+      border: 2px solid #e5e7eb;
+    }
+
+    .btn-secondary:hover {
+      background: #e5e7eb;
+      border-color: #d1d5db;
+    }
+
+    .btn-danger {
+      background: linear-gradient(135deg, #ef4444, #dc2626);
+      color: white;
+    }
+
+    .btn-danger:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(239, 68, 68, 0.4);
+    }
+
+    .filters-section {
+      padding: 30px;
+      border-bottom: 1px solid #e5e7eb;
+      background: #f9fafb;
+    }
+
+    .filters-grid {
+      display: grid;
+      grid-template-columns: 1fr auto auto auto auto;
+      gap: 20px;
+      align-items: end;
+    }
+
+    .filter-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .filter-label {
+      font-weight: 600;
+      color: #374151;
+      font-size: 0.95rem;
+    }
+
+    .filter-input {
+      padding: 12px 16px;
+      border: 2px solid #e5e7eb;
+      border-radius: 10px;
+      font-size: 0.95rem;
+      transition: all 0.3s ease;
+    }
+
+    .filter-input:focus {
+      outline: none;
+      border-color: #10b981;
+      box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+    }
+
+    .table-container {
+      overflow-x: auto;
+    }
+
+    .ventas-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .ventas-table th {
+      background: #f9fafb;
+      padding: 20px;
+      text-align: left;
+      font-weight: 600;
+      color: #374151;
+      border-bottom: 2px solid #e5e7eb;
+      white-space: nowrap;
+    }
+
+    .ventas-table td {
+      padding: 20px;
+      border-bottom: 1px solid #f3f4f6;
+      vertical-align: middle;
+    }
+
+    .ventas-table tr:hover {
+      background: #f9fafb;
+    }
+
+    .venta-numero {
+      font-weight: 700;
+      color: #1f2937;
+      font-size: 1.1rem;
+    }
+
+    .usuario-info {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .usuario-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #10b981, #059669);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
+
+    .price {
+      font-weight: 700;
+      color: #059669;
+      font-size: 1.1rem;
+    }
+
+    .status-badge {
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .status-badge.pendiente {
+      background: #fef3c7;
+      color: #92400e;
+    }
+
+    .status-badge.completado {
+      background: #d1fae5;
+      color: #065f46;
+    }
+
+    .status-badge.cancelado {
+      background: #fecaca;
+      color: #991b1b;
+    }
+
+    .actions-group {
+      display: flex;
+      gap: 8px;
+    }
+
+    .btn-small {
+      padding: 8px 12px;
+      font-size: 0.85rem;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .btn-edit {
+      background: #dbeafe;
+      color: #1d4ed8;
+    }
+
+    .btn-edit:hover {
+      background: #bfdbfe;
+    }
+
+    .btn-delete {
+      background: #fecaca;
+      color: #dc2626;
+    }
+
+    .btn-delete:hover {
+      background: #fca5a5;
+    }
+
+    /* Modal Styles */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+
+    .modal {
+      background: white;
+      border-radius: 16px;
+      width: 90%;
+      max-width: 800px;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    }
+
+    .modal-header {
+      padding: 30px;
+      border-bottom: 1px solid #e5e7eb;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .modal-title {
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: #1f2937;
+    }
+
+    .modal-close {
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      cursor: pointer;
+      color: #6b7280;
+      padding: 4px;
+      border-radius: 8px;
+      transition: all 0.3s ease;
+    }
+
+    .modal-close:hover {
+      background: #f3f4f6;
+      color: #374151;
+    }
+
+    .modal-body {
+      padding: 30px;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .form-group.full-width {
+      grid-column: 1 / -1;
+    }
+
+    .form-label {
+      font-weight: 600;
+      color: #374151;
+      font-size: 0.95rem;
+    }
+
+    .form-input {
+      padding: 12px 16px;
+      border: 2px solid #e5e7eb;
+      border-radius: 10px;
+      font-size: 0.95rem;
+      transition: all 0.3s ease;
+    }
+
+    .form-input:focus {
+      outline: none;
+      border-color: #10b981;
+      box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+    }
+
+    .form-textarea {
+      resize: vertical;
+      min-height: 100px;
+    }
+
+    .modal-footer {
+      padding: 30px;
+      border-top: 1px solid #e5e7eb;
+      display: flex;
+      gap: 15px;
+      justify-content: flex-end;
+    }
+
+    .loading-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 60px 20px;
+    }
+
+    .loading-spinner {
+      width: 50px;
+      height: 50px;
+      border: 4px solid #f3f4f6;
+      border-left: 4px solid #10b981;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+    }
+
+    .empty-icon {
+      font-size: 4rem;
+      margin-bottom: 20px;
+      opacity: 0.5;
+    }
+
+    .empty-title {
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: #374151;
+      margin-bottom: 10px;
+    }
+
+    .empty-text {
+      color: #6b7280;
+      font-size: 1.1rem;
+    }
+
+    .pagination-section {
+      padding: 30px;
+      border-top: 1px solid #e5e7eb;
+      background: #f9fafb;
+    }
+
+    .pagination {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .pagination-btn {
+      padding: 10px 16px;
+      border: 2px solid #e5e7eb;
+      background: white;
+      color: #374151;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-weight: 500;
+    }
+
+    .pagination-btn:hover:not(.active) {
+      border-color: #10b981;
+      color: #10b981;
+    }
+
+    .pagination-btn.active {
+      background: #10b981;
+      color: white;
+      border-color: #10b981;
+    }
+
+    .pagination-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .pagination-info {
+      margin: 0 20px;
+      color: #6b7280;
+      font-weight: 500;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .container {
+        padding: 10px;
+      }
+
+      .header {
+        padding: 20px;
+      }
+
+      .header h1 {
+        font-size: 2rem;
+      }
+
+      .section-header {
+        padding: 20px;
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .filters-grid {
+        grid-template-columns: 1fr;
+        gap: 15px;
+      }
+
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .ventas-table th,
+      .ventas-table td {
+        padding: 15px 10px;
+        font-size: 0.9rem;
+      }
+
+      .modal {
+        width: 95%;
+        margin: 20px;
+      }
+
+      .modal-header,
+      .modal-body,
+      .modal-footer {
+        padding: 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Header -->
+    <div class="header">
+      <h1>Gestión de Ventas</h1>
+      <p>Administre todas las ventas y transacciones del sistema CAB</p>
+    </div>
+
+    <!-- Ventas Section -->
+    <div class="ventas-section">
+      <!-- Section Header -->
+      <div class="section-header">
+        <h2 class="section-title">Ventas</h2>
+        <div class="controls-group">
+          <button class="btn btn-primary" (click)="openAddVentaModal()">
+            Nueva Venta
+          </button>
+        </div>
+      </div>
+
+      <!-- Filters Section -->
+      <div class="filters-section">
+        <div class="filters-grid">
+          <div class="filter-group">
+            <label class="filter-label">Buscar ventas</label>
+            <input
+              type="text"
+              class="filter-input"
+              placeholder="Buscar por número, usuario o producto..."
+              [(ngModel)]="searchTerm"
+              (input)="onSearchChange()"
+            />
+          </div>
+          <div class="filter-group">
+            <label class="filter-label">Estatus</label>
+            <select
+              class="filter-input"
+              [(ngModel)]="selectedStatusFilter"
+              (change)="onStatusFilterChange()"
+            >
+              <option value="all">Todos los estatus</option>
+              <option *ngFor="let est of estatusList" [value]="est.value">{{ est.label }}</option>
+            </select>
+          </div>
+          <div class="filter-group">
+            <label class="filter-label">Cliente</label>
+            <select
+              class="filter-input"
+              [(ngModel)]="selectedClienteFilter"
+              (change)="onClienteFilterChange()"
+            >
+              <option value="all">Todos los clientes</option>
+              <option *ngFor="let cliente of clientes" [value]="cliente.id">{{ cliente.nombre }}</option>
+            </select>
+          </div>
+          <div class="filter-group">
+            <button class="btn btn-secondary" (click)="clearFilters()">
+              🔄 Limpiar
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Loading State -->
+      <div class="loading-container" *ngIf="isLoadingVentas">
+        <div class="loading-spinner"></div>
+      </div>
+
+      <!-- Ventas Table -->
+      <div class="table-container" *ngIf="!isLoadingVentas && paginatedVentas.length > 0">
+        <table class="ventas-table">
+          <thead>
+            <tr>
+              <th># Venta</th>
+              <th>Fecha</th>
+              <th>Usuario</th>
+              <th>Producto</th>
+              <th>Cliente</th>
+              <th>Cantidad</th>
+              <th>Precio Unit.</th>
+              <th>Total</th>
+              <th>Estatus</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let venta of paginatedVentas">
+              <td><span class="venta-numero">{{ venta.numeroVenta }}</span></td>
+              <td>{{ formatDate(venta.fechaVenta) }}</td>
+              <td>
+                <div class="usuario-info">
+                  <div class="usuario-avatar">{{ venta.usuario?.nombre?.charAt(0) || '?' }}</div>
+                  <span>{{ venta.usuario?.nombre || '—' }}</span>
+                </div>
+              </td>
+              <td>{{ venta.producto?.nombre || '—' }}</td>
+              <td>{{ venta.cliente?.nombre || '—' }}</td>
+              <td>{{ venta.cantidad }}</td>
+              <td><span class="price">{{ formatPrice(venta.precioUnitario) }}</span></td>
+              <td><span class="price">{{ formatPrice(venta.total) }}</span></td>
+              <td>
+                <span class="status-badge {{ venta.estatus }}">
+                  {{ getStatusText(venta.estatus) }}
+                </span>
+              </td>
+              <td>
+                <div class="actions-group">
+                  <button class="btn-small btn-edit" (click)="openEditModal(venta)">
+                    ✏️ Editar
+                  </button>
+                  <button class="btn-small btn-delete" (click)="deleteVenta(venta)">
+                    🗑️ Eliminar
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Empty State -->
+      <div class="empty-state" *ngIf="!isLoadingVentas && paginatedVentas.length === 0">
+        <div class="empty-icon">💰</div>
+        <h3 class="empty-title">No hay ventas registradas</h3>
+        <p class="empty-text">Comience registrando su primera venta</p>
+        <button class="btn btn-primary" (click)="openAddVentaModal()" style="margin-top: 20px">
+          ➕ Registrar Primera Venta
+        </button>
+      </div>
+
+      <!-- Pagination -->
+      <div class="pagination-section" *ngIf="paginatedVentas.length > 0">
+        <div class="pagination">
+          <button class="pagination-btn" (click)="prevPage()" [disabled]="currentPage <= 1">
+            ⬅️ Anterior
+          </button>
+          <span class="pagination-info">
+            Página {{ currentPage }} de {{ totalPages }}
+          </span>
+          <button class="pagination-btn" (click)="nextPage()" [disabled]="currentPage >= totalPages">
+            Siguiente ➡️
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal para agregar/editar venta -->
+  <div class="modal-overlay" *ngIf="showModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 class="modal-title">{{ isEditing ? 'Editar Venta' : 'Agregar Venta' }}</h3>
+        <button class="modal-close" (click)="closeModal()">✕</button>
+      </div>
+      <div class="modal-body">
+        <form #ventaFormRef="ngForm">
+          <div class="form-grid">
+            <div class="form-group">
+              <label class="form-label">Número de Venta *</label>
+              <input
+                type="text"
+                class="form-input"
+                name="numeroVenta"
+                [(ngModel)]="ventaForm.numeroVenta"
+                required
+              />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Fecha *</label>
+              <input
+                type="date"
+                class="form-input"
+                name="fechaVenta"
+                [(ngModel)]="ventaForm.fechaVenta"
+                required
+              />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Usuario *</label>
+              <select
+                class="form-input"
+                name="usuarioId"
+                [(ngModel)]="ventaForm.usuarioId"
+                required
+              >
+                <option value="">Selecciona un usuario</option>
+                <option *ngFor="let usuario of usuarios" [value]="usuario.id">{{ usuario.nombre }}</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Producto *</label>
+              <select
+                class="form-input"
+                name="productoId"
+                [(ngModel)]="ventaForm.productoId"
+                required
+              >
+                <option value="">Selecciona un producto</option>
+                <option *ngFor="let producto of productos" [value]="producto.id">{{ producto.nombre }}</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Cliente *</label>
+              <select
+                class="form-input"
+                name="clienteId"
+                [(ngModel)]="ventaForm.clienteId"
+                required
+              >
+                <option value="">Selecciona un cliente</option>
+                <option *ngFor="let cliente of clientes" [value]="cliente.id">{{ cliente.nombre }}</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Cantidad *</label>
+              <input
+                type="number"
+                class="form-input"
+                name="cantidad"
+                [(ngModel)]="ventaForm.cantidad"
+                min="1"
+                required
+                (input)="calculateTotal()"
+              />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Precio Unitario *</label>
+              <input
+                type="number"
+                class="form-input"
+                name="precioUnitario"
+                [(ngModel)]="ventaForm.precioUnitario"
+                step="0.01"
+                min="0"
+                required
+                (input)="calculateTotal()"
+              />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Total *</label>
+              <input
+                type="number"
+                class="form-input"
+                name="total"
+                [(ngModel)]="ventaForm.total"
+                step="0.01"
+                min="0"
+                required
+                readonly
+              />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Estatus *</label>
+              <select
+                class="form-input"
+                name="estatus"
+                [(ngModel)]="ventaForm.estatus"
+                required
+              >
+                <option *ngFor="let est of estatusList" [value]="est.value">{{ est.label }}</option>
+              </select>
+            </div>
+            <div class="form-group full-width">
+              <label class="form-label">Dirección de Envío</label>
+              <textarea
+                class="form-input form-textarea"
+                name="direccionEnvio"
+                [(ngModel)]="ventaForm.direccionEnvio"
+                placeholder="Dirección completa de entrega..."
+              ></textarea>
+            </div>
+            <div class="form-group full-width">
+              <label class="form-label">Observaciones</label>
+              <textarea
+                class="form-input form-textarea"
+                name="observaciones"
+                [(ngModel)]="ventaForm.observaciones"
+                placeholder="Notas adicionales..."
+              ></textarea>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" (click)="closeModal()">Cancelar</button>
+        <button
+          class="btn btn-primary"
+          (click)="saveVenta()"
+          [disabled]="!ventaFormRef.form.valid"
+        >
+          {{ isEditing ? 'Actualizar Venta' : 'Guardar Venta' }}
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Variables globales
+    let ventas = [];
+    let filteredVentas = [];
+    let usuarios = [];
+    let productos = [];
+    let clientes = [];
+    let isLoadingVentas = false;
+    let currentPage = 1;
+    let itemsPerPage = 10;
+    let totalPages = 0;
+    let editingVenta = null;
+
+    // Inicialización
+    document.addEventListener('DOMContentLoaded', function() {
+      loadInitialData();
+    });
+
+    function loadInitialData() {
+      loadVentas();
+      loadUsuarios();
+      loadProductos();
+      loadClientes();
+    }
+
+    function loadVentas() {
+      isLoadingVentas = true;
+      showLoading();
+
+      // Datos de ejemplo
+      setTimeout(() => {
+        ventas = [
+          {
+            id: 1,
+            numeroVenta: 'V001',
+            fechaVenta: new Date('2025-01-10'),
+            usuario: { id: 1, nombre: 'Juan Pérez' },
+            producto: { id: 1, nombre: 'ESP32-CAM' },
+            cliente: { id: 1, nombre: 'TechCorp SA' },
+            cantidad: 2,
+            precioUnitario: 350.00,
+            subTotal: 700.00,
+            total: 812.00,
+            estatus: 'completado',
+            direccionEnvio: 'Av. Tecnología 123, León, Gto.',
+            observaciones: 'Entrega urgente'
+          },
+          {
+            id: 2,
+            numeroVenta: 'V002',
+            fechaVenta: new Date('2025-01-11'),
+            usuario: { id: 2, nombre: 'María García' },
+            producto: { id: 2, nombre: 'Arduino Uno R3' },
+            cliente: { id: 2, nombre: 'InnovaTech' },
+            cantidad: 1,
+            precioUnitario: 450.00,
+            subTotal: 450.00,
+            total: 522.00,
+            estatus: 'pendiente',
+            direccionEnvio: 'Calle Industrial 456, León, Gto.',
+            observaciones: ''
+          }
+        ];
+
+        isLoadingVentas = false;
+        applyFilters();
+        hideLoading();
+      }, 1000);
+    }
+
+    function loadUsuarios() {
+      usuarios = [
+        { id: 1, nombre: 'Juan Pérez' },
+        { id: 2, nombre: 'María García' },
+        { id: 3, nombre: 'Carlos López' }
+      ];
+      populateUsuariosSelect();
+    }
+
+    function loadProductos() {
+      productos = [
+        { id: 1, nombre: 'ESP32-CAM', precio: 350.00 },
+        { id: 2, nombre: 'Arduino Uno R3', precio: 450.00 },
+        { id: 3, nombre: 'Servo Motor SG90', precio: 120.00 }
+      ];
+      populateProductosSelect();
+    }
+
+    function loadClientes() {
+      clientes = [
+        { id: 1, nombre: 'TechCorp SA' },
+        { id: 2, nombre: 'InnovaTech' },
+        { id: 3, nombre: 'ElectroSolutions' }
+      ];
+      populateClientesSelect();
+      populateClientesFilter();
+    }
+
+    function populateUsuariosSelect() {
+      const select = document.getElementById('usuarioId');
+      select.innerHTML = '<option value="">Selecciona un usuario</option>';
+      usuarios.forEach(usuario => {
+        select.innerHTML += `<option value="${usuario.id}">${usuario.nombre}</option>`;
+      });
+    }
+
+    function populateProductosSelect() {
+      const select = document.getElementById('productoId');
+      select.innerHTML = '<option value="">Selecciona un producto</option>';
+      productos.forEach(producto => {
+        select.innerHTML += `<option value="${producto.id}">${producto.nombre}</option>`;
+      });
+    }
+
+    function populateClientesSelect() {
+      const select = document.getElementById('clienteId');
+      select.innerHTML = '<option value="">Selecciona un cliente</option>';
+      clientes.forEach(cliente => {
+        select.innerHTML += `<option value="${cliente.id}">${cliente.nombre}</option>`;
+      });
+    }
+
+    function populateClientesFilter() {
+      const select = document.getElementById('clienteFilter');
+      select.innerHTML = '<option value="all">Todos los clientes</option>';
+      clientes.forEach(cliente => {
+        select.innerHTML += `<option value="${cliente.id}">${cliente.nombre}</option>`;
+      });
+    }
+
+    function applyFilters() {
+      let filtered = [...ventas];
+
+      // Filtro de búsqueda
+      const searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
+      if (searchTerm) {
+        filtered = filtered.filter(venta =>
+          venta.numeroVenta.toLowerCase().includes(searchTerm) ||
+          venta.usuario?.nombre.toLowerCase().includes(searchTerm) ||
+          venta.producto?.nombre.toLowerCase().includes(searchTerm) ||
+          venta.cliente?.nombre.toLowerCase().includes(searchTerm)
+        );
+      }
+
+      // Filtro de estatus
+      const statusFilter = document.getElementById('statusFilter').value;
+      if (statusFilter !== 'all') {
+        filtered = filtered.filter(venta => venta.estatus === statusFilter);
+      }
+
+      // Filtro de cliente
+      const clienteFilter = document.getElementById('clienteFilter').value;
+      if (clienteFilter !== 'all') {
+        filtered = filtered.filter(venta => venta.cliente?.id == clienteFilter);
+      }
+
+      filteredVentas = filtered;
+      updatePagination();
+      renderVentas();
+    }
+
+    function updatePagination() {
+      totalPages = Math.ceil(filteredVentas.length / itemsPerPage);
+      if (currentPage > totalPages) {
+        currentPage = 1;
+      }
+
+      const prevBtn = document.getElementById('prevBtn');
+      const nextBtn = document.getElementById('nextBtn');
+      const paginationInfo = document.getElementById('paginationInfo');
+
+      prevBtn.disabled = currentPage <= 1;
+      nextBtn.disabled = currentPage >= totalPages;
+      paginationInfo.textContent = `Página ${currentPage} de ${totalPages}`;
+    }
+
+    function renderVentas() {
+      const tableBody = document.getElementById('ventasTableBody');
+      const ventasTable = document.getElementById('ventasTable');
+      const emptyState = document.getElementById('emptyState');
+      const paginationSection = document.getElementById('paginationSection');
+
+      if (filteredVentas.length === 0) {
+        ventasTable.style.display = 'none';
+        emptyState.style.display = 'block';
+        paginationSection.style.display = 'none';
+        return;
+      }
+
+      ventasTable.style.display = 'block';
+      emptyState.style.display = 'none';
+      paginationSection.style.display = 'block';
+
+      const startIndex = (currentPage - 1) * itemsPerPage;
+      const paginatedVentas = filteredVentas.slice(startIndex, startIndex + itemsPerPage);
+
+      tableBody.innerHTML = paginatedVentas.map(venta => `
+        <tr>
+          <td><span class="venta-numero">${venta.numeroVenta}</span></td>
+          <td>${formatDate(venta.fechaVenta)}</td>
+          <td>
+            <div class="usuario-info">
+              <div class="usuario-avatar">${venta.usuario?.nombre?.charAt(0) || '?'}</div>
+              <span>${venta.usuario?.nombre || '—'}</span>
+            </div>
+          </td>
+          <td>${venta.producto?.nombre || '—'}</td>
+          <td>${venta.cliente?.nombre || '—'}</td>
+          <td>${venta.cantidad}</td>
+          <td><span class="price">${formatPrice(venta.precioUnitario)}</span></td>
+          <td><span class="price">${formatPrice(venta.total)}</span></td>
+          <td>
+            <span class="status-badge ${venta.estatus}">
+              ${getStatusText(venta.estatus)}
+            </span>
+          </td>
+          <td>
+            <div class="actions-group">
+              <button class="btn-small btn-edit" onclick="openEditVentaModal(${venta.id})">
+                ✏️ Editar
+              </button>
+              <button class="btn-small btn-delete" onclick="deleteVenta(${venta.id})">
+                🗑️ Eliminar
+              </button>
+            </div>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    // Funciones del modal
+    function openAddVentaModal() {
+      editingVenta = null;
+      document.getElementById('modalTitle').textContent = 'Agregar Venta';
+      document.getElementById('saveButton').textContent = 'Guardar Venta';
+      clearVentaForm();
+      document.getElementById('ventaModal').style.display = 'flex';
+    }
+
+    function openEditVentaModal(id) {
+      const venta = ventas.find(v => v.id === id);
+      if (!venta) return;
+
+      editingVenta = venta;
+      document.getElementById('modalTitle').textContent = 'Editar Venta';
+      document.getElementById('saveButton').textContent = 'Actualizar Venta';
+      fillVentaForm(venta);
+      document.getElementById('ventaModal').style.display = 'flex';
+    }
+
+    function closeVentaModal() {
+      document.getElementById('ventaModal').style.display = 'none';
+      editingVenta = null;
+      clearVentaForm();
+    }
+
+    function clearVentaForm() {
+      document.getElementById('numeroVenta').value = '';
+      document.getElementById('fechaVenta').value = '';
+      document.getElementById('usuarioId').value = '';
+      document.getElementById('productoId').value = '';
+      document.getElementById('clienteId').value = '';
+      document.getElementById('cantidad').value = '';
+      document.getElementById('precioUnitario').value = '';
+      document.getElementById('total').value = '';
+      document.getElementById('estatus').value = 'pendiente';
+      document.getElementById('direccionEnvio').value = '';
+      document.getElementById('observaciones').value = '';
+    }
+
+    function fillVentaForm(venta) {
+      document.getElementById('numeroVenta').value = venta.numeroVenta;
+      document.getElementById('fechaVenta').value = venta.fechaVenta.toISOString().split('T')[0];
+      document.getElementById('usuarioId').value = venta.usuario?.id || '';
+      document.getElementById('productoId').value = venta.producto?.id || '';
+      document.getElementById('clienteId').value = venta.cliente?.id || '';
+      document.getElementById('cantidad').value = venta.cantidad;
+      document.getElementById('precioUnitario').value = venta.precioUnitario;
+      document.getElementById('total').value = venta.total;
+      document.getElementById('estatus').value = venta.estatus;
+      document.getElementById('direccionEnvio').value = venta.direccionEnvio || '';
+      document.getElementById('observaciones').value = venta.observaciones || '';
+    }
+
+    function saveVenta() {
+      const form = document.getElementById('ventaForm');
+      if (!form.checkValidity()) {
+        form.reportValidity();
+        return;
+      }
+
+      const ventaData = {
+        numeroVenta: document.getElementById('numeroVenta').value,
+        fechaVenta: new Date(document.getElementById('fechaVenta').value),
+        usuario: usuarios.find(u => u.id == document.getElementById('usuarioId').value),
+        producto: productos.find(p => p.id == document.getElementById('productoId').value),
+        cliente: clientes.find(c => c.id == document.getElementById('clienteId').value),
+        cantidad: parseInt(document.getElementById('cantidad').value),
+        precioUnitario: parseFloat(document.getElementById('precioUnitario').value),
+        total: parseFloat(document.getElementById('total').value),
+        estatus: document.getElementById('estatus').value,
+        direccionEnvio: document.getElementById('direccionEnvio').value,
+        observaciones: document.getElementById('observaciones').value
+      };
+
+      ventaData.subTotal = ventaData.cantidad * ventaData.precioUnitario;
+
+      if (editingVenta) {
+        ventaData.id = editingVenta.id;
+        const index = ventas.findIndex(v => v.id === editingVenta.id);
+        ventas[index] = ventaData;
+        console.log('✅ Venta actualizada:', ventaData);
+      } else {
+        ventaData.id = Date.now();
+        ventas.unshift(ventaData);
+        console.log('✅ Venta creada:', ventaData);
+      }
+
+      applyFilters();
+      closeVentaModal();
+    }
+
+    function deleteVenta(id) {
+      const venta = ventas.find(v => v.id === id);
+      if (!venta) return;
+
+      if (!confirm(`¿Está seguro de eliminar la venta "${venta.numeroVenta}"?`)) {
+        return;
+      }
+
+      ventas = ventas.filter(v => v.id !== id);
+      applyFilters();
+      console.log('✅ Venta eliminada:', id);
+    }
+
+    // Funciones de filtros
+    function onSearchChange() {
+      applyFilters();
+    }
+
+    function onStatusFilterChange() {
+      applyFilters();
+    }
+
+    function onClienteFilterChange() {
+      applyFilters();
+    }
+
+    function clearFilters() {
+      document.getElementById('searchInput').value = '';
+      document.getElementById('statusFilter').value = 'all';
+      document.getElementById('clienteFilter').value = 'all';
+      applyFilters();
+    }
+
+    // Funciones de paginación
+    function goToPage(direction) {
+      if (direction === 'prev' && currentPage > 1) {
+        currentPage--;
+      } else if (direction === 'next' && currentPage < totalPages) {
+        currentPage++;
+      }
+      updatePagination();
+      renderVentas();
+    }
+
+    // Funciones auxiliares
+    function formatPrice(price) {
+      return new Intl.NumberFormat('es-MX', {
+        style: 'currency',
+        currency: 'MXN'
+      }).format(price);
+    }
+
+    function formatDate(date) {
+      return new Date(date).toLocaleDateString('es-ES', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric'
+      });
+    }
+
+    function getStatusText(status) {
+      const statusMap = {
+        'pendiente': 'Pendiente',
+        'completado': 'Completado',
+        'cancelado': 'Cancelado'
+      };
+      return statusMap[status] || status;
+    }
+
+    function showLoading() {
+      document.getElementById('loadingVentas').style.display = 'flex';
+      document.getElementById('ventasTable').style.display = 'none';
+      document.getElementById('emptyState').style.display = 'none';
+    }
+
+    function hideLoading() {
+      document.getElementById('loadingVentas').style.display = 'none';
+    }
+
+    // Auto-calcular total
+    document.getElementById('cantidad').addEventListener('input', calculateTotal);
+    document.getElementById('precioUnitario').addEventListener('input', calculateTotal);
+
+    function calculateTotal() {
+      const cantidad = parseFloat(document.getElementById('cantidad').value) || 0;
+      const precioUnitario = parseFloat(document.getElementById('precioUnitario').value) || 0;
+      const subtotal = cantidad * precioUnitario;
+      const iva = subtotal * 0.16;
+      const total = subtotal + iva;
+      document.getElementById('total').value = total.toFixed(2);
+    }
+
+    // Cerrar modal con Escape
+    document.addEventListener('keydown', function(event) {
+      if (event.key === 'Escape') {
+        closeVentaModal();
+      }
+    });
+  </script>
+</body>
+</html>

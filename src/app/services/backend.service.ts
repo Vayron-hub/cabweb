@@ -3,9 +3,10 @@ import {
   HttpClient,
   HttpHeaders,
   HttpErrorResponse,
+  HttpParams,
 } from '@angular/common/http';
-import { Observable, throwError, BehaviorSubject, forkJoin } from 'rxjs';
-import { catchError, map, tap } from 'rxjs/operators';
+import { Observable, throwError, BehaviorSubject, forkJoin, of } from 'rxjs';
+import { catchError, map, switchMap, tap } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
 
 // Interfaces que coinciden con tu backend
@@ -30,7 +31,7 @@ export interface newUser {
   nombre: string;
   correo: string;
   password: string;
-  rol: string
+  rol: string;
 }
 
 export interface LoginRequest {
@@ -160,6 +161,66 @@ export interface Campana {
   imagen?: string;
 }
 
+export interface CreateProductoDto {
+  nombre: string;
+  descripcion: string;
+  precio: number;
+  costo: number;
+  stock: number;
+  imagen?: string;
+  activo: boolean;
+}
+
+export interface UpdateProductoDto {
+  nombre: string;
+  descripcion: string;
+  precio: number;
+  costo: number;
+  stock: number;
+  imagen?: string;
+  activo: boolean;
+}
+
+export interface ProductoDto {
+  id: number;
+  nombre: string;
+  descripcion: string;
+  precio: number;
+  costo: number;
+  stock: number;
+  imagen?: string;
+  activo: boolean;
+  fechaCreacion: Date | string;
+  estadoStock: string;
+  estado: string;
+  margen?: number;
+}
+
+export interface BulkProductoOperationDto {
+  productoIds: number[];
+  operacion: string; // 'activate', 'deactivate', 'delete'
+}
+
+export interface ProductoFilterDto {
+  searchTerm?: string;
+  statusFilter: string; // 'all', 'active', 'inactive'
+  stockFilter: string; // 'all', 'in-stock', 'low-stock', 'out-of-stock'
+  page: number;
+  pageSize: number;
+  sortBy: string; // 'nombre', 'precio', 'stock', 'fechaCreacion'
+  sortDirection: string; // 'asc', 'desc'
+}
+
+export interface PagedProductoResponseDto {
+  productos: ProductoDto[];
+  totalRecords: number;
+  totalPages: number;
+  currentPage: number;
+  pageSize: number;
+  hasNextPage: boolean;
+  hasPreviousPage: boolean;
+}
+
 @Injectable({
   providedIn: 'root',
 })
@@ -196,9 +257,9 @@ export class BackendService {
       );
   }
 
-  logout(): Observable<{message: string}> {
+  logout(): Observable<{ message: string }> {
     return this.http
-      .post<{message: string}>(`${this.apiUrl}/usuarios/salir`, {})
+      .post<{ message: string }>(`${this.apiUrl}/usuarios/salir`, {})
       .pipe(
         tap((response) => {
           console.log('✅ Logout exitoso:', response.message);
@@ -223,24 +284,364 @@ export class BackendService {
     return token !== null && token !== '';
   }
 
+  getClientes(): Observable<any[]> {
+    return this.http
+      .get<any[]>(`${this.apiUrl}/clientes`)
+      .pipe(catchError(this.handleHttpError));
+  }
+
+  // === PRODUCTOS ===
+
+  /**
+   * Obtener todos los productos (sin paginación)
+   */
+  getProductos(): Observable<ProductoDto[]> {
+    return this.http
+      .get<ProductoDto[]>(`${this.apiUrl}/productos`)
+      .pipe(catchError(this.handleError));
+  }
+
+  /**
+   * Obtener productos con paginación y filtros
+   */
+  getProductosPaginado(
+    filtros: ProductoFilterDto
+  ): Observable<PagedProductoResponseDto> {
+    const params = new HttpParams()
+      .set('searchTerm', filtros.searchTerm || '')
+      .set('statusFilter', filtros.statusFilter)
+      .set('stockFilter', filtros.stockFilter)
+      .set('page', filtros.page.toString())
+      .set('pageSize', filtros.pageSize.toString())
+      .set('sortBy', filtros.sortBy)
+      .set('sortDirection', filtros.sortDirection);
+
+    return this.http
+      .get<PagedProductoResponseDto>(`${this.apiUrl}/productos/paginado`, {
+        params,
+      })
+      .pipe(catchError(this.handleError));
+  }
+
+  /**
+   * Obtener un producto por ID
+   */
+  getProducto(id: number): Observable<ProductoDto> {
+    return this.http
+      .get<ProductoDto>(`${this.apiUrl}/productos/${id}`)
+      .pipe(catchError(this.handleError));
+  }
+
+  /**
+   * Crear un nuevo producto
+   */
+  createProducto(producto: CreateProductoDto): Observable<ProductoDto> {
+    return this.http
+      .post<ProductoDto>(`${this.apiUrl}/productos`, producto)
+      .pipe(catchError(this.handleError));
+  }
+
+  /**
+   * Actualizar un producto existente
+   */
+  updateProducto(
+    id: number,
+    producto: UpdateProductoDto
+  ): Observable<ProductoDto> {
+    return this.http
+      .put<ProductoDto>(`${this.apiUrl}/productos/${id}`, producto)
+      .pipe(catchError(this.handleError));
+  }
+
+  /**
+   * Eliminar un producto
+   */
+  deleteProducto(id: number): Observable<any> {
+    return this.http
+      .delete<any>(`${this.apiUrl}/productos/${id}`)
+      .pipe(catchError(this.handleError));
+  }
+
+  /**
+   * Operaciones masivas en productos
+   */
+  bulkProductoOperation(
+    operationData: BulkProductoOperationDto
+  ): Observable<any> {
+    return this.http
+      .post<any>(`${this.apiUrl}/productos/bulk-operation`, operationData)
+      .pipe(catchError(this.handleError));
+  }
+
+  /**
+   * Activar/Desactivar un producto (método de conveniencia)
+   */
+  toggleProductoStatus(id: number, activo: boolean): Observable<ProductoDto> {
+    return this.getProducto(id).pipe(
+      switchMap((producto) => {
+        const updateDto: UpdateProductoDto = {
+          nombre: producto.nombre,
+          descripcion: producto.descripcion,
+          precio: producto.precio,
+          costo: producto.costo,
+          stock: producto.stock,
+          imagen: producto.imagen,
+          activo: activo,
+        };
+        return this.updateProducto(id, updateDto);
+      }),
+      catchError(this.handleError)
+    );
+  }
+
+  /**
+   * Obtener productos con bajo stock
+   */
+  getProductosBajoStock(limite: number = 10): Observable<ProductoDto[]> {
+    const filtros: ProductoFilterDto = {
+      statusFilter: 'active',
+      stockFilter: 'low-stock',
+      page: 1,
+      pageSize: 100, // Obtener todos los productos con bajo stock
+      sortBy: 'stock',
+      sortDirection: 'asc',
+    };
+
+    return this.getProductosPaginado(filtros).pipe(
+      map((response) => response.productos.filter((p) => p.stock <= limite)),
+      catchError(this.handleError)
+    );
+  }
+
+  /**
+   * Obtener productos más vendidos (necesitaría implementación en backend)
+   */
+  getProductosMasVendidos(limite: number = 10): Observable<ProductoDto[]> {
+    // Este endpoint necesitaría ser implementado en el backend
+    return this.http
+      .get<ProductoDto[]>(
+        `${this.apiUrl}/productos/mas-vendidos?limite=${limite}`
+      )
+      .pipe(catchError(this.handleError));
+  }
+
+  /**
+   * Buscar productos por nombre o descripción
+   */
+  searchProductos(termino: string): Observable<ProductoDto[]> {
+    const filtros: ProductoFilterDto = {
+      searchTerm: termino,
+      statusFilter: 'all',
+      stockFilter: 'all',
+      page: 1,
+      pageSize: 50,
+      sortBy: 'nombre',
+      sortDirection: 'asc',
+    };
+
+    return this.getProductosPaginado(filtros).pipe(
+      map((response) => response.productos),
+      catchError(this.handleError)
+    );
+  }
+
+  /**
+   * Validar si un producto existe por nombre
+   */
+  validarProductoExiste(
+    nombre: string,
+    idExcluir?: number
+  ): Observable<boolean> {
+    return this.searchProductos(nombre).pipe(
+      map((productos) => {
+        const existe = productos.some(
+          (p) =>
+            p.nombre.toLowerCase() === nombre.toLowerCase() &&
+            (idExcluir ? p.id !== idExcluir : true)
+        );
+        return existe;
+      }),
+      catchError(() => of(false))
+    );
+  }
+
+  // Manejo de errores mejorado
+  private handleHttpError = (error: HttpErrorResponse): Observable<never> => {
+    let errorMessage = 'Error desconocido';
+
+    if (error.error instanceof ErrorEvent) {
+      // Error del lado del cliente
+      errorMessage = `Error: ${error.error.message}`;
+    } else {
+      // Error del lado del servidor
+      if (error.status === 0) {
+        errorMessage =
+          'No se puede conectar al servidor. Verifique su conexión.';
+      } else if (error.status >= 400 && error.status < 500) {
+        // Errores 4xx
+        errorMessage =
+          error.error?.message || `Error ${error.status}: ${error.statusText}`;
+      } else if (error.status >= 500) {
+        // Errores 5xx
+        errorMessage =
+          'Error interno del servidor. Intente nuevamente más tarde.';
+      } else {
+        errorMessage = `Error ${error.status}: ${error.statusText}`;
+      }
+    }
+
+    console.error('Error en BackendService:', error);
+    return throwError(() => new Error(errorMessage));
+  };
+
+  // === MateriasPrimas ===
+  getMateriasPrimas(): Observable<any[]> {
+    return this.http
+      .get<any[]>(`${this.apiUrl}/materiasprimas`)
+      .pipe(catchError(this.handleError));
+  }
+
+  getMateriaPrima(id: number): Observable<any> {
+    return this.http
+      .get<any>(`${this.apiUrl}/materiasprimas/${id}`)
+      .pipe(catchError(this.handleError));
+  }
+
+  createMateriaPrima(materiaPrima: any): Observable<any> {
+    return this.http
+      .post<any>(`${this.apiUrl}/materiasprimas`, materiaPrima)
+      .pipe(catchError(this.handleError));
+  }
+
+  updateMateriaPrima(id: number, materiaPrima: any): Observable<any> {
+    return this.http
+      .put<any>(`${this.apiUrl}/materiasprimas/${id}`, materiaPrima)
+      .pipe(catchError(this.handleError));
+  }
+
+  deleteMateriaPrima(id: number): Observable<void> {
+    return this.http
+      .delete<void>(`${this.apiUrl}/materiasprimas/${id}`)
+      .pipe(catchError(this.handleError));
+  }
+
+  // === PROVEEDORES ===
+  getProveedores(): Observable<any[]> {
+    return this.http
+      .get<any[]>(`${this.apiUrl}/proveedores`)
+      .pipe(catchError(this.handleError));
+  }
+
+  getProveedor(id: number): Observable<any> {
+    return this.http
+      .get<any>(`${this.apiUrl}/proveedores/${id}`)
+      .pipe(catchError(this.handleError));
+  }
+
+  createProveedor(proveedor: any): Observable<any> {
+    return this.http
+      .post<any>(`${this.apiUrl}/proveedores`, proveedor)
+      .pipe(catchError(this.handleError));
+  }
+
+  updateProveedor(id: number, proveedor: any): Observable<any> {
+    return this.http
+      .put<any>(`${this.apiUrl}/proveedores/${id}`, proveedor)
+      .pipe(catchError(this.handleError));
+  }
+
+  deleteProveedor(id: number): Observable<void> {
+    return this.http
+      .delete<void>(`${this.apiUrl}/proveedores/${id}`)
+      .pipe(catchError(this.handleError));
+  }
+
+  // === COMPRAS ===
+  getCompras(): Observable<any[]> {
+    return this.http
+      .get<any[]>(`${this.apiUrl}/compras`)
+      .pipe(catchError(this.handleError));
+  }
+
+  getCompra(id: number): Observable<any> {
+    return this.http
+      .get<any>(`${this.apiUrl}/compras/${id}`)
+      .pipe(catchError(this.handleError));
+  }
+
+  createCompra(compra: any): Observable<any> {
+    return this.http
+      .post<any>(`${this.apiUrl}/compras`, compra)
+      .pipe(catchError(this.handleError));
+  }
+
+  updateCompra(id: number, compra: any): Observable<any> {
+    return this.http
+      .put<any>(`${this.apiUrl}/compras/${id}`, compra)
+      .pipe(catchError(this.handleError));
+  }
+
+  deleteCompra(id: number): Observable<void> {
+    return this.http
+      .delete<void>(`${this.apiUrl}/compras/${id}`)
+      .pipe(catchError(this.handleError));
+  }
+
+  // === VENTAS ===
+  getVentas(): Observable<any[]> {
+    return this.http
+      .get<any[]>(`${this.apiUrl}/ventas`)
+      .pipe(catchError(this.handleError));
+  }
+
+  getVenta(id: number): Observable<any> {
+    return this.http
+      .get<any>(`${this.apiUrl}/ventas/${id}`)
+      .pipe(catchError(this.handleError));
+  }
+
+  createVenta(venta: any): Observable<any> {
+    return this.http
+      .post<any>(`${this.apiUrl}/ventas`, venta)
+      .pipe(catchError(this.handleError));
+  }
+
+  updateVenta(id: number, venta: any): Observable<any> {
+    return this.http
+      .put<any>(`${this.apiUrl}/ventas/${id}`, venta)
+      .pipe(catchError(this.handleError));
+  }
+
+  deleteVenta(id: number): Observable<void> {
+    return this.http
+      .delete<void>(`${this.apiUrl}/ventas/${id}`)
+      .pipe(catchError(this.handleError));
+  }
+
   // === REGISTRO PÚBLICO ===
 
-  registrarUsuario(usuario: {nombre: string, correo: string, password: string}): Observable<User> {
-    console.log('📝 REGISTRANDO NUEVO USUARIO:', { nombre: usuario.nombre, correo: usuario.correo });
-    
+  registrarUsuario(usuario: {
+    nombre: string;
+    correo: string;
+    password: string;
+  }): Observable<User> {
+    console.log('📝 REGISTRANDO NUEVO USUARIO:', {
+      nombre: usuario.nombre,
+      correo: usuario.correo,
+    });
+
     const registroData = {
       nombre: usuario.nombre,
       correo: usuario.correo,
-      password: usuario.password
+      password: usuario.password,
     };
 
-    return this.http.post<User>(`${this.apiUrl}/usuarios`, registroData)
-      .pipe(
-        tap(response => {
-          console.log('✅ Usuario registrado exitosamente:', response);
-        }),
-        catchError(this.handleError)
-      );
+    return this.http.post<User>(`${this.apiUrl}/usuarios`, registroData).pipe(
+      tap((response) => {
+        console.log('✅ Usuario registrado exitosamente:', response);
+      }),
+      catchError(this.handleError)
+    );
   }
 
   // === USUARIOS ===
@@ -254,12 +655,11 @@ export class BackendService {
     );
   }
 
-  getRole(id: number): Observable<string>{
-    
-    return this.http.get<User>(`${this.apiUrl}/usuarios/${id}`)
-    .pipe(
-      map(usuario => usuario.rol || 'client'),
-      catchError(this.handleError));
+  getRole(id: number): Observable<string> {
+    return this.http.get<User>(`${this.apiUrl}/usuarios/${id}`).pipe(
+      map((usuario) => usuario.rol || 'client'),
+      catchError(this.handleError)
+    );
   }
 
   // Método helper para transformar usuarios del backend al formato del frontend
@@ -269,7 +669,7 @@ export class BackendService {
       email: backendUser.correo, // Mapear correo -> email
       estado: backendUser.activo ? 'Activo' : 'Inactivo', // Mapear boolean -> string
       ultimoAcceso: backendUser.fechaUltimoAcceso || 'Nunca', // Manejar null
-      rol: backendUser.rol || 'client' // Rol por defecto si no existe
+      rol: backendUser.rol || 'client', // Rol por defecto si no existe
     };
   }
 
@@ -518,9 +918,7 @@ export class BackendService {
     return this.http.get<Deteccion[]>(url).pipe(catchError(this.handleError));
   }
 
-  getDeteccionesPorClasificador(
-    clasificadorId: string | number
-  ): Observable<{
+  getDeteccionesPorClasificador(clasificadorId: string | number): Observable<{
     valorizable: number;
     no_valorizable: number;
     organico: number;

@@ -1,0 +1,972 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gestión de Compras</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      background: #f5f7fa;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    .header {
+      background: white;
+      padding: 30px;
+      border-radius: 16px;
+      box-shadow: 0 2px 20px rgba(0, 0, 0, 0.08);
+      margin-bottom: 30px;
+      border-left: 5px solid #f59e0b;
+    }
+
+    .header h1 {
+      color: #1f2937;
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+
+    .header p {
+      color: #6b7280;
+      font-size: 1.1rem;
+    }
+
+    .compras-section {
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 2px 20px rgba(0, 0, 0, 0.08);
+      overflow: hidden;
+    }
+
+    .section-header {
+      padding: 30px;
+      border-bottom: 1px solid #e5e7eb;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+
+    .section-title {
+      color: #1f2937;
+      font-size: 1.8rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .controls-group {
+      display: flex;
+      gap: 15px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .btn {
+      padding: 12px 24px;
+      border: none;
+      border-radius: 10px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-size: 0.95rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #f59e0b, #d97706);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(245, 158, 11, 0.4);
+    }
+
+    .btn-secondary {
+      background: #f3f4f6;
+      color: #374151;
+      border: 2px solid #e5e7eb;
+    }
+
+    .btn-secondary:hover {
+      background: #e5e7eb;
+      border-color: #d1d5db;
+    }
+
+    .btn-danger {
+      background: linear-gradient(135deg, #ef4444, #dc2626);
+      color: white;
+    }
+
+    .btn-danger:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(239, 68, 68, 0.4);
+    }
+
+    .filters-section {
+      padding: 30px;
+      border-bottom: 1px solid #e5e7eb;
+      background: #f9fafb;
+    }
+
+    .filters-grid {
+      display: grid;
+      grid-template-columns: 1fr auto auto auto;
+      gap: 20px;
+      align-items: end;
+    }
+
+    .filter-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .filter-label {
+      font-weight: 600;
+      color: #374151;
+      font-size: 0.95rem;
+    }
+
+    .filter-input {
+      padding: 12px 16px;
+      border: 2px solid #e5e7eb;
+      border-radius: 10px;
+      font-size: 0.95rem;
+      transition: all 0.3s ease;
+    }
+
+    .filter-input:focus {
+      outline: none;
+      border-color: #f59e0b;
+      box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.1);
+    }
+
+    .table-container {
+      overflow-x: auto;
+    }
+
+    .compras-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .compras-table th {
+      background: #f9fafb;
+      padding: 20px;
+      text-align: left;
+      font-weight: 600;
+      color: #374151;
+      border-bottom: 2px solid #e5e7eb;
+      white-space: nowrap;
+    }
+
+    .compras-table td {
+      padding: 20px;
+      border-bottom: 1px solid #f3f4f6;
+      vertical-align: middle;
+    }
+
+    .compras-table tr:hover {
+      background: #f9fafb;
+    }
+
+    .compra-numero {
+      font-weight: 700;
+      color: #1f2937;
+      font-size: 1.1rem;
+    }
+
+    .proveedor-info {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .proveedor-avatar {
+      width: 50px;
+      height: 50px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, #f59e0b, #d97706);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 600;
+      font-size: 1.2rem;
+    }
+
+    .proveedor-details h4 {
+      color: #1f2937;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .proveedor-details p {
+      color: #6b7280;
+      font-size: 0.9rem;
+    }
+
+    .price {
+      font-weight: 700;
+      color: #d97706;
+      font-size: 1.1rem;
+    }
+
+    .status-badge {
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .status-badge.pendiente {
+      background: #fef3c7;
+      color: #92400e;
+    }
+
+    .status-badge.completado {
+      background: #d1fae5;
+      color: #065f46;
+    }
+
+    .status-badge.cancelado {
+      background: #fecaca;
+      color: #991b1b;
+    }
+
+    .actions-group {
+      display: flex;
+      gap: 8px;
+    }
+
+    .btn-small {
+      padding: 8px 12px;
+      font-size: 0.85rem;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .btn-edit {
+      background: #dbeafe;
+      color: #1d4ed8;
+    }
+
+    .btn-edit:hover {
+      background: #bfdbfe;
+    }
+
+    .btn-delete {
+      background: #fecaca;
+      color: #dc2626;
+    }
+
+    .btn-delete:hover {
+      background: #fca5a5;
+    }
+
+    .btn-view {
+      background: #f3e8ff;
+      color: #7c3aed;
+    }
+
+    .btn-view:hover {
+      background: #e9d5ff;
+    }
+
+    /* Modal Styles */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+
+    .modal {
+      background: white;
+      border-radius: 16px;
+      width: 90%;
+      max-width: 800px;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    }
+
+    .modal-header {
+      padding: 30px;
+      border-bottom: 1px solid #e5e7eb;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .modal-title {
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: #1f2937;
+    }
+
+    .modal-close {
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      cursor: pointer;
+      color: #6b7280;
+      padding: 4px;
+      border-radius: 8px;
+      transition: all 0.3s ease;
+    }
+
+    .modal-close:hover {
+      background: #f3f4f6;
+      color: #374151;
+    }
+
+    .modal-body {
+      padding: 30px;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .form-group.full-width {
+      grid-column: 1 / -1;
+    }
+
+    .form-label {
+      font-weight: 600;
+      color: #374151;
+      font-size: 0.95rem;
+    }
+
+    .form-input {
+      padding: 12px 16px;
+      border: 2px solid #e5e7eb;
+      border-radius: 10px;
+      font-size: 0.95rem;
+      transition: all 0.3s ease;
+    }
+
+    .form-input:focus {
+      outline: none;
+      border-color: #f59e0b;
+      box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.1);
+    }
+
+    .form-textarea {
+      resize: vertical;
+      min-height: 100px;
+    }
+
+    .modal-footer {
+      padding: 30px;
+      border-top: 1px solid #e5e7eb;
+      display: flex;
+      gap: 15px;
+      justify-content: flex-end;
+    }
+
+    .loading-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 60px 20px;
+    }
+
+    .loading-spinner {
+      width: 50px;
+      height: 50px;
+      border: 4px solid #f3f4f6;
+      border-left: 4px solid #f59e0b;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+    }
+
+    .empty-icon {
+      font-size: 4rem;
+      margin-bottom: 20px;
+      opacity: 0.5;
+    }
+
+    .empty-title {
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: #374151;
+      margin-bottom: 10px;
+    }
+
+    .empty-text {
+      color: #6b7280;
+      font-size: 1.1rem;
+    }
+
+    .pagination-section {
+      padding: 30px;
+      border-top: 1px solid #e5e7eb;
+      background: #f9fafb;
+    }
+
+    .pagination {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .pagination-btn {
+      padding: 10px 16px;
+      border: 2px solid #e5e7eb;
+      background: white;
+      color: #374151;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-weight: 500;
+    }
+
+    .pagination-btn:hover:not(.active) {
+      border-color: #f59e0b;
+      color: #f59e0b;
+    }
+
+    .pagination-btn.active {
+      background: #f59e0b;
+      color: white;
+      border-color: #f59e0b;
+    }
+
+    .pagination-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .pagination-info {
+      margin: 0 20px;
+      color: #6b7280;
+      font-weight: 500;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .container {
+        padding: 10px;
+      }
+
+      .header {
+        padding: 20px;
+      }
+
+      .header h1 {
+        font-size: 2rem;
+      }
+
+      .section-header {
+        padding: 20px;
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .filters-grid {
+        grid-template-columns: 1fr;
+        gap: 15px;
+      }
+
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .compras-table th,
+      .compras-table td {
+        padding: 15px 10px;
+        font-size: 0.9rem;
+      }
+
+      .modal {
+        width: 95%;
+        margin: 20px;
+      }
+
+      .modal-header,
+      .modal-body,
+      .modal-footer {
+        padding: 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Header -->
+    <div class="header">
+      <h1>Gestión de Compras</h1>
+      <p>Administre las compras y sus detalles en el sistema CAB</p>
+    </div>
+
+    <!-- Compras Section -->
+    <div class="compras-section">
+      <!-- Section Header -->
+      <div class="section-header">
+        <h2 class="section-title">Compras</h2>
+        <div class="controls-group">
+          <button class="btn btn-primary" (click)="openAddCompraModal()">
+            Nueva Compra
+          </button>
+        </div>
+      </div>
+
+      <!-- Filters Section -->
+      <div class="filters-section">
+        <div class="filters-grid">
+          <div class="filter-group">
+            <label class="filter-label">Buscar compras</label>
+            <input
+              type="text"
+              class="filter-input"
+              placeholder="Buscar por número de compra o proveedor..."
+              [(ngModel)]="searchTerm"
+              (input)="onSearchChange()"
+            />
+          </div>
+          <div class="filter-group">
+            <label class="filter-label">Estatus</label>
+            <select class="filter-input" [(ngModel)]="selectedStatusFilter" (change)="onStatusFilterChange($event)">
+              <option value="all">Todos</option>
+              <option value="pendiente">Pendiente</option>
+              <option value="completado">Completado</option>
+              <option value="cancelado">Cancelado</option>
+            </select>
+          </div>
+          <div class="filter-group">
+            <label class="filter-label">Proveedor</label>
+            <select class="filter-input" [(ngModel)]="selectedProveedorFilter" (change)="onProveedorFilterChange($event)">
+              <option value="all">Todos</option>
+              <option *ngFor="let proveedor of proveedores" [value]="proveedor.id">{{ proveedor.nombre }}</option>
+            </select>
+          </div>
+          <div class="filter-group">
+            <button class="btn btn-secondary" (click)="clearFilters()">
+              🔄 Limpiar
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Loading State -->
+      <div class="loading-container" *ngIf="isLoadingCompras">
+        <div class="loading-spinner"></div>
+      </div>
+
+      <!-- Compras Table -->
+      <div class="table-container" *ngIf="!isLoadingCompras && getPaginatedCompras().length > 0">
+        <table class="compras-table">
+          <thead>
+            <tr>
+              <th>Número Compra</th>
+              <th>Fecha</th>
+              <th>Proveedor</th>
+              <th>Subtotal</th>
+              <th>Total</th>
+              <th>Estatus</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let compra of getPaginatedCompras(); trackBy: trackByCompraId">
+              <td><span class="compra-numero">{{ compra.numeroCompra }}</span></td>
+              <td>{{ formatDate(compra.fechaCompra) }}</td>
+              <td>
+                <div class="proveedor-info">
+                  <div class="proveedor-avatar">{{ compra.proveedor?.nombre?.charAt(0) || '?' }}</div>
+                  <div class="proveedor-details">
+                    <h4>{{ compra.proveedor?.nombre || '—' }}</h4>
+                    <p>{{ compra.proveedor?.email || '' }}</p>
+                  </div>
+                </div>
+              </td>
+              <td><span class="price">{{ formatPrice(compra.subTotal) }}</span></td>
+              <td><span class="price">{{ formatPrice(compra.total) }}</span></td>
+              <td>
+                <span class="status-badge {{ getStatusClass(compra.estatus) }}">
+                  {{ getStatusText(compra.estatus) }}
+                </span>
+              </td>
+              <td>
+                <div class="actions-group">
+                  <button class="btn-small btn-edit" (click)="openEditCompraModal(compra)">
+                    ✏️ Editar
+                  </button>
+                  <button class="btn-small btn-delete" (click)="deleteCompra(compra)">
+                    🗑️ Eliminar
+                  </button>
+                  <button class="btn-small btn-view" (click)="viewCompraDetails(compra)">
+                    👁️ Ver
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Empty State -->
+      <div class="empty-state" *ngIf="!isLoadingCompras && getPaginatedCompras().length === 0">
+        <div class="empty-icon">🛒</div>
+        <h3 class="empty-title">No hay compras registradas</h3>
+        <p class="empty-text">Comience agregando su primera compra</p>
+        <button class="btn btn-primary" (click)="openAddCompraModal()" style="margin-top: 20px">
+          ➕ Agregar Primera Compra
+        </button>
+      </div>
+
+      <!-- Pagination -->
+      <div class="pagination-section" *ngIf="getPaginatedCompras().length > 0">
+        <div class="pagination">
+          <button class="pagination-btn" (click)="goToPreviousPage()" [disabled]="!canGoToPreviousPage()">
+            ⬅️ Anterior
+          </button>
+          <span class="pagination-info">
+            {{ getPaginationInfo() }}
+          </span>
+          <button class="pagination-btn" (click)="goToNextPage()" [disabled]="!canGoToNextPage()">
+            Siguiente ➡️
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal para agregar/editar compra -->
+  <div class="modal-overlay" *ngIf="showCompraModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 class="modal-title">{{ editingCompra ? 'Editar Compra' : 'Agregar Compra' }}</h3>
+        <button class="modal-close" (click)="closeCompraModal()">✕</button>
+      </div>
+      <div class="modal-body">
+        <form #compraFormRef="ngForm">
+          <div class="form-grid">
+            <div class="form-group">
+              <label class="form-label">Número Compra *</label>
+              <input type="text" class="form-input" name="numeroCompra" [(ngModel)]="compraForm.numeroCompra" required />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Fecha *</label>
+              <input type="date" class="form-input" name="fechaCompra" [(ngModel)]="compraForm.fechaCompra" required />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Proveedor *</label>
+              <select class="form-input" name="proveedorId" [(ngModel)]="compraForm.proveedorId" required>
+                <option value="">Selecciona un proveedor</option>
+                <option *ngFor="let proveedor of proveedores" [value]="proveedor.id">{{ proveedor.nombre }}</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Estatus *</label>
+              <select class="form-input" name="estatus" [(ngModel)]="compraForm.estatus" required>
+                <option value="pendiente">Pendiente</option>
+                <option value="completado">Completado</option>
+                <option value="cancelado">Cancelado</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Subtotal *</label>
+              <input type="number" class="form-input" name="subTotal" [(ngModel)]="compraForm.subTotal" step="0.01" min="0" required />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Total *</label>
+              <input type="number" class="form-input" name="total" [(ngModel)]="compraForm.total" step="0.01" min="0" required readonly />
+            </div>
+            <div class="form-group full-width">
+              <label class="form-label">Observaciones</label>
+              <textarea class="form-input form-textarea" name="observaciones" [(ngModel)]="compraForm.observaciones" placeholder="Notas adicionales..."></textarea>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" (click)="closeCompraModal()">Cancelar</button>
+        <button class="btn btn-primary" (click)="saveCompra()" [disabled]="!compraFormRef.form.valid">
+          {{ editingCompra ? 'Actualizar Compra' : 'Guardar Compra' }}
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal para ver detalles -->
+  <div class="modal-overlay" id="detailsModal" style="display: none;">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 class="modal-title">Detalles de la Compra</h3>
+        <button class="modal-close" onclick="closeDetailsModal()">✕</button>
+      </div>
+      <div class="modal-body" id="detailsContent">
+        <!-- Content will be populated by JavaScript -->
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeDetailsModal()">Cerrar</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Script para manejar la lógica de la página
+    const app = {
+      data() {
+        return {
+          searchTerm: '',
+          selectedStatusFilter: 'all',
+          selectedProveedorFilter: 'all',
+          isLoadingCompras: false,
+          compras: [],
+          proveedores: [],
+          currentPage: 1,
+          itemsPerPage: 10,
+          showCompraModal: false,
+          editingCompra: null,
+          compraForm: {
+            numeroCompra: '',
+            fechaCompra: '',
+            proveedorId: '',
+            estatus: 'pendiente',
+            subTotal: 0,
+            total: 0,
+            observaciones: ''
+          }
+        }
+      },
+      methods: {
+        openAddCompraModal() {
+          this.editingCompra = null;
+          this.compraForm = {
+            numeroCompra: '',
+            fechaCompra: '',
+            proveedorId: '',
+            estatus: 'pendiente',
+            subTotal: 0,
+            total: 0,
+            observaciones: ''
+          };
+          this.showCompraModal = true;
+        },
+        closeCompraModal() {
+          this.showCompraModal = false;
+        },
+        saveCompra() {
+          // Lógica para guardar la compra
+          const isEdit = this.editingCompra !== null;
+          const url = isEdit ? `/api/compras/${this.editingCompra.id}` : '/api/compras';
+          const method = isEdit ? 'PUT' : 'POST';
+
+          fetch(url, {
+            method: method,
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(this.compraForm)
+          })
+          .then(response => response.json())
+          .then(data => {
+            this.closeCompraModal();
+            this.fetchCompras();
+          })
+          .catch(error => {
+            console.error('Error al guardar la compra:', error);
+          });
+        },
+        fetchCompras() {
+          this.isLoadingCompras = true;
+          fetch('/api/compras')
+            .then(response => response.json())
+            .then(data => {
+              this.compras = data;
+              this.isLoadingCompras = false;
+            })
+            .catch(error => {
+              console.error('Error al cargar las compras:', error);
+              this.isLoadingCompras = false;
+            });
+        },
+        formatDate(dateString) {
+          const options = { year: 'numeric', month: '2-digit', day: '2-digit' };
+          return new Date(dateString).toLocaleDateString('es-ES', options);
+        },
+        formatPrice(price) {
+          return new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'EUR' }).format(price);
+        },
+        getStatusClass(status) {
+          switch (status) {
+            case 'pendiente':
+              return 'status-badge pendiente';
+            case 'completado':
+              return 'status-badge completado';
+            case 'cancelado':
+              return 'status-badge cancelado';
+            default:
+              return '';
+          }
+        },
+        getStatusText(status) {
+          switch (status) {
+            case 'pendiente':
+              return 'Pendiente';
+            case 'completado':
+              return 'Completado';
+            case 'cancelado':
+              return 'Cancelado';
+            default:
+              return '';
+          }
+        },
+        onSearchChange() {
+          this.currentPage = 1;
+          this.fetchCompras();
+        },
+        onStatusFilterChange() {
+          this.currentPage = 1;
+          this.fetchCompras();
+        },
+        onProveedorFilterChange() {
+          this.currentPage = 1;
+          this.fetchCompras();
+        },
+        clearFilters() {
+          this.searchTerm = '';
+          this.selectedStatusFilter = 'all';
+          this.selectedProveedorFilter = 'all';
+          this.currentPage = 1;
+          this.fetchCompras();
+        },
+        getPaginatedCompras() {
+          const start = (this.currentPage - 1) * this.itemsPerPage;
+          const end = start + this.itemsPerPage;
+          return this.compras.slice(start, end);
+        },
+        goToPreviousPage() {
+          if (this.canGoToPreviousPage()) {
+            this.currentPage--;
+          }
+        },
+        goToNextPage() {
+          if (this.canGoToNextPage()) {
+            this.currentPage++;
+          }
+        },
+        canGoToPreviousPage() {
+          return this.currentPage > 1;
+        },
+        canGoToNextPage() {
+          return this.currentPage < Math.ceil(this.compras.length / this.itemsPerPage);
+        },
+        getPaginationInfo() {
+          const totalItems = this.compras.length;
+          const totalPages = Math.ceil(totalItems / this.itemsPerPage);
+          return `Página ${this.currentPage} de ${totalPages}`;
+        },
+        openEditCompraModal(compra) {
+          this.editingCompra = compra;
+          this.compraForm = { ...compra };
+          this.showCompraModal = true;
+        },
+        deleteCompra(compra) {
+          if (confirm(`¿Estás seguro de que deseas eliminar la compra ${compra.numeroCompra}?`)) {
+            fetch(`/api/compras/${compra.id}`, {
+              method: 'DELETE'
+            })
+            .then(response => response.json())
+            .then(data => {
+              this.fetchCompras();
+            })
+            .catch(error => {
+              console.error('Error al eliminar la compra:', error);
+            });
+          }
+        },
+        viewCompraDetails(compra) {
+          // Lógica para ver detalles de la compra
+          const detailsContent = `
+            <p><strong>Número Compra:</strong> ${compra.numeroCompra}</p>
+            <p><strong>Fecha:</strong> ${this.formatDate(compra.fechaCompra)}</p>
+            <p><strong>Proveedor:</strong> ${compra.proveedor?.nombre || '—'}</p>
+            <p><strong>Subtotal:</strong> ${this.formatPrice(compra.subTotal)}</p>
+            <p><strong>Total:</strong> ${this.formatPrice(compra.total)}</p>
+            <p><strong>Estatus:</strong> ${this.getStatusText(compra.estatus)}</p>
+            <p><strong>Observaciones:</strong> ${compra.observaciones || 'Ninguna'}</p>
+          `;
+          document.getElementById('detailsContent').innerHTML = detailsContent;
+          this.openDetailsModal();
+        },
+        openDetailsModal() {
+          document.getElementById('detailsModal').style.display = 'flex';
+        },
+        closeDetailsModal() {
+          document.getElementById('detailsModal').style.display = 'none';
+        }
+      },
+      mounted() {
+        this.fetchCompras();
+        // Cargar proveedores para el filtro
+        fetch('/api/proveedores')
+          .then(response => response.json())
+          .then(data => {
+            this.proveedores = data;
+          })
+          .catch(error => {
+            console.error('Error al cargar los proveedores:', error);
+          });
+      }
+    }
+
+    Vue.createApp(app).mount('.container');
+  </script>
+</body>
+</html>

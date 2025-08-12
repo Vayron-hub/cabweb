@@ -86,15 +86,35 @@ export const routes: Routes = [
   // RUTAS SUPERADMIN
   {
     path: 'superadmin',
-    component: SuperadminLayout, // o crear un SuperAdminLayoutComponent
+    component: SuperadminLayout,
     canActivate: [AuthGuard, SuperAdminGuard],
     children: [
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
       {
         path: 'dashboard',
-        component: SuperadminDashboard // o crear SuperAdminDashboardComponent
+        component: SuperadminDashboard
       },
-      // Rutas específicas de superadmin
+      // Rutas específicas de superadmin como componentes separados si lo prefieres
+      {
+        path: 'productos',
+        loadComponent: () => import('./components/productos/productos.component').then(m => m.ProductosComponent)
+      },
+      {
+        path: 'materiasprimas',
+        loadComponent: () => import('./components/materiasprimas/materiasprimas.component').then(m => m.MateriasPrimasComponent)
+      },
+      {
+        path: 'proveedores', 
+        loadComponent: () => import('./components/proveedores/proveedores.component').then(m => m.ProveedoresComponent)
+      },
+      {
+        path: 'compras',
+        loadComponent: () => import('./components/compras/compras.component').then(m => m.ComprasComponent)
+      },
+      {
+        path: 'ventas',
+        loadComponent: () => import('./components/ventas/ventas.component').then(m => m.VentasComponent)
+      },
       {
         path: 'usuarios',
         loadComponent: () => import('./components/usuarios/usuarios.js').then(m => m.UsuariosComponent)
