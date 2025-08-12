@@ -12,24 +12,7 @@
 
     <div class="flex-1 flex justify-end gap-2.5">
       <div class="flex items-center bg-white rounded-lg px-3 py-2 min-w-50" *ngIf="currentUser.rol !== 'Cliente'">
-        <i class="pi pi-map-marker text-gray-600 mr-2 text-base"></i>
-        <select
-          [(ngModel)]="selectedLocation"
-          (change)="onLocationChange()"
-          class="border-0 bg-transparent outline-none text-gray-800 cursor-pointer flex-1"
-          [disabled]="isLoadingZonas"
-        >
-          <option value="" disabled *ngIf="isLoadingZonas">
-            Cargando zonas...
-          </option>
-          <option *ngFor="let location of locations" [value]="location">
-            {{location}}
-          </option>
-        </select>
-        <i
-          class="pi pi-spin pi-spinner ml-2 text-gray-600"
-          *ngIf="isLoadingZonas"
-        ></i>
+        
       </div>
       
       <div class="relative">
@@ -89,6 +72,14 @@
     <button class="flex items-center gap-2 px-4 py-2 font-medium transition-all duration-200 text-primary-100 hover:bg-primary-700 hover:text-white border-b-2 border-transparent"
             routerLink="/app/dashboard" routerLinkActive="text-white border-b-primary-100">
       <i class="pi pi-chart-bar"></i><span>Dashboard</span>
+    </button>
+    <button *ngIf="currentUser.rol==='Cliente'" class="flex items-center gap-2 px-4 py-2 font-medium transition-all duration-200 text-primary-100 hover:bg-primary-700 hover:text-white border-b-2 border-transparent"
+            routerLink="/app/comentarios" routerLinkActive="text-white border-b-primary-100">
+      <i class="pi pi-chart-bar"></i><span>Comentarios</span>
+    </button>
+    <button *ngIf="currentUser.rol==='Cliente'" class="flex items-center gap-2 px-4 py-2 font-medium transition-all duration-200 text-primary-100 hover:bg-primary-700 hover:text-white border-b-2 border-transparent"
+            routerLink="/app/productos" routerLinkActive="text-white border-b-primary-100">
+      <i class="pi pi-chart-bar"></i><span>Productos</span>
     </button>
     <button *ngIf="currentUser.rol==='Admin' || currentUser.rol==='SuperAdmin'"
             class="flex items-center gap-2 px-4 py-2 font-medium transition-all duration-200 text-primary-100 hover:bg-primary-700 hover:text-white border-b-2 border-transparent"

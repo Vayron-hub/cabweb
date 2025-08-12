@@ -151,8 +151,9 @@ export interface Comentarios {
   texto: string;
   usuarioId: number;
   calificacion: number;
-  Activo: boolean;
-
+  activo: boolean; // Cambiar de 'Activo' a 'activo' para consistencia
+  productoId?: number; // Agregar referencia al producto
+  usuario?: string; // Para mostrar el nombre del usuario
 }
 
 export interface newComent {
@@ -161,18 +162,27 @@ export interface newComent {
   usuarioId: number;
   calificacion: number;
   activo: boolean;
+  productoId?: number;
 }
 
-export interface inventario {
-  FechaVenta: Date | string;
-  UsuarioId: number;
-  ProductoId: number
+export interface Producto{
+  id:number;
+  nombre: string;
+  descripcion: string;
+  precio:string;
+  activo: boolean;
+  stock: number;
+}
+
+export interface Venta{
+  uusarioId: number;
+  ProductoId: number;
   Cantidad: number;
-  Total: number
-  Estado:string; 
-  DireccionEnvio: string
-  Observaciones: string
- }
+  Total: number;
+  Estatus: string;
+  DireccionEnvio: string;
+  Observaciones: string;
+}
 ///////////////////////////////////////////////////////////////////////////
 
 // Interfaces para contenido
@@ -794,10 +804,25 @@ export class BackendService {
       .pipe(catchError(this.handleError));
   }
 
+  // PRODUCTOS
+  getProductos(): Observable<Producto[]> {
+    return this.http
+      .get<Producto[]>(`${this.apiUrl}/productos`)
+      .pipe(catchError(this.handleError));
+  }
+  ////////////////////////////////////////////////////////////////////
+
   // CLIENTES ENDPOINTS
   getComentarios(): Observable<Comentarios[]> {
     return this.http
       .get<Comentarios[]>(`${this.apiUrl}/comentarios`)
+      .pipe(catchError(this.handleError));
+  }
+
+  // Nuevo método para obtener comentarios por producto
+  getComentariosByProducto(productoId: number): Observable<Comentarios[]> {
+    return this.http
+      .get<Comentarios[]>(`${this.apiUrl}/comentarios/producto/${productoId}`)
       .pipe(catchError(this.handleError));
   }
 
@@ -806,4 +831,10 @@ export class BackendService {
       .post<newComent>(`${this.apiUrl}/comentarios`, comentario)
       .pipe(catchError(this.handleError));
   }
+  getVentas(): Observable<Venta[]> {
+    return this.http
+      .get<Venta[]>(`${this.apiUrl}/ventas`)
+      .pipe(catchError(this.handleError));
+  }
+  //////////////////////////////////////////////////////////////////////7
 }

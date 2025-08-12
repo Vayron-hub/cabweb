@@ -15,7 +15,6 @@ import { ProveedoresComponent } from './components/proveedores/proveedores';
 import { MateriasPrimasComponent } from './components/materiasprimas/materiasprimas';
 import { ComprasComponent } from './components/compras/compras';
 import { CotizacionesComponent } from './components/cotizaciones/cotizaciones';
-import { ClienteComentarios } from './components/cliente-comentarios/cliente-comentarios';
 import { InventarioComponent } from './components/inventario/inventario';
 
 export const routes: Routes = [
@@ -27,37 +26,17 @@ export const routes: Routes = [
     path: 'cotizacion',
     component: CotizacionComponent,
   },
-  { 
-    path: 'comentarios', 
-    redirectTo: '/cliente/comentarios',
-    pathMatch: 'full',
-  },
-  { 
-    path: 'superadmindashboard', 
-    redirectTo: '/superadmin/dashboard',
-    pathMatch: 'full',
-  },
-  { 
-    path: 'dashboard/:type',
-    redirectTo: '/admin/dashboard',
-    pathMatch: 'full'
-  },
-  
-  // RUTAS ADMIN
-  { 
-    path: 'admin', 
-    component: AdminLayoutComponent,
-    canActivate: [AuthGuard, AdminGuard],
+
+  {
+    path: 'app',
+    component: LayoutComponent,
+    canActivate: [AuthGuard],
     children: [
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
       { path: 'dashboard', component: DashboardComponent },
       {
         path: 'estadisticas',
-        loadComponent: () => import('./components/estadisticas/estadisticas').then(m => m.EstadisticasComponent)
-      },
-      {
-        path: 'usuarios',
-        loadComponent: () => import('./components/usuarios/usuarios').then(m => m.UsuariosComponent)
+        component: EstadisticasComponent,
       },
       {
         path: 'zonas',
