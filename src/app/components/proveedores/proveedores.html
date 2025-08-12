@@ -1,1056 +1,377 @@
-<!DOCTYPE html>
-<html lang="es">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Gestión de Proveedores</title>
-    <style>
-      /* Copia el estilo de productos y ajusta colores e íconos para proveedores */
-      body {
-        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-        background: #f5f7fa;
-        min-height: 100vh;
-        padding: 20px;
-      }
-      .container {
-        max-width: 1400px;
-        margin: 0 auto;
-      }
-      .header {
-        background: white;
-        padding: 30px;
-        border-radius: 16px;
-        box-shadow: 0 2px 20px rgba(0, 0, 0, 0.08);
-        margin-bottom: 30px;
-        border-left: 5px solid #059669;
-      }
-      .header h1 {
-        color: #1f2937;
-        font-size: 2.5rem;
-        font-weight: 700;
-        margin-bottom: 10px;
-      }
-      .header p {
-        color: #6b7280;
-        font-size: 1.1rem;
-      }
-      .suppliers-section {
-        background: white;
-        border-radius: 16px;
-        box-shadow: 0 2px 20px rgba(0, 0, 0, 0.08);
-        overflow: hidden;
-      }
-      .section-header {
-        padding: 30px;
-        border-bottom: 1px solid #e5e7eb;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        flex-wrap: wrap;
-        gap: 20px;
-      }
-      .section-title {
-        color: #1f2937;
-        font-size: 1.8rem;
-        font-weight: 600;
-        display: flex;
-        align-items: center;
-        gap: 12px;
-      }
+<div class="max-w-7xl mx-auto p-5 space-y-8">
+  <!-- Header -->
+  <div class="bg-white rounded-2xl shadow-sm p-8 border-l-4 border-emerald-600">
+    <h1 class="text-3xl font-bold text-gray-800 mb-2">
+      Gestión de Proveedores
+    </h1>
+    <p class="text-gray-500 text-sm">
+      Administre los proveedores del sistema CAB
+    </p>
+  </div>
 
-      .controls-group {
-        display: flex;
-        gap: 15px;
-        flex-wrap: wrap;
-        align-items: center;
-      }
-      .btn {
-        padding: 12px 24px;
-        border: none;
-        border-radius: 10px;
-        font-weight: 600;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        font-size: 0.95rem;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-      }
-      .btn-primary {
-        background: linear-gradient(135deg, #059669, #10b981);
-        color: white;
-      }
-      .btn-primary:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 8px 25px rgba(5, 150, 105, 0.4);
-      }
-      .btn-secondary {
-        background: #f3f4f6;
-        color: #374151;
-        border: 2px solid #e5e7eb;
-      }
-      .btn-secondary:hover {
-        background: #e5e7eb;
-        border-color: #d1d5db;
-      }
-      .btn-danger {
-        background: linear-gradient(135deg, #ef4444, #dc2626);
-        color: white;
-      }
-      .btn-danger:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 8px 25px rgba(239, 68, 68, 0.4);
-      }
-      .btn:disabled {
-        opacity: 0.5;
-        cursor: not-allowed;
-      }
-      .filters-section {
-        padding: 30px;
-        border-bottom: 1px solid #e5e7eb;
-        background: #f9fafb;
-      }
-      .filters-grid {
-        display: grid;
-        grid-template-columns: 1fr auto auto;
-        gap: 20px;
-        align-items: end;
-      }
-      .filter-group {
-        display: flex;
-        flex-direction: column;
-        gap: 8px;
-      }
-      .filter-label {
-        font-weight: 600;
-        color: #374151;
-        font-size: 0.95rem;
-      }
-      .filter-input {
-        padding: 12px 16px;
-        border: 2px solid #e5e7eb;
-        border-radius: 10px;
-        font-size: 0.95rem;
-        transition: all 0.3s ease;
-      }
-      .filter-input:focus {
-        outline: none;
-        border-color: #059669;
-        box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.1);
-      }
-      .bulk-actions {
-        padding: 20px 30px;
-        background: #f8fafc;
-        border-bottom: 1px solid #e5e7eb;
-        display: flex;
-        gap: 15px;
-        align-items: center;
-      }
-      .bulk-actions-text {
-        color: #6b7280;
-        font-weight: 500;
-      }
-      .table-container {
-        overflow-x: auto;
-      }
-      .suppliers-table {
-        width: 100%;
-        border-collapse: collapse;
-      }
-      .suppliers-table th {
-        background: #f9fafb;
-        padding: 20px;
-        text-align: left;
-        font-weight: 600;
-        color: #374151;
-        border-bottom: 2px solid #e5e7eb;
-        white-space: nowrap;
-      }
-      .suppliers-table td {
-        padding: 20px;
-        border-bottom: 1px solid #f3f4f6;
-        vertical-align: middle;
-      }
-      .suppliers-table tr:hover {
-        background: #f9fafb;
-      }
-      .supplier-info {
-        display: flex;
-        align-items: center;
-        gap: 15px;
-      }
-      .supplier-icon {
-        font-size: 2rem;
-        color: #059669;
-      }
-      .supplier-details h4 {
-        color: #1f2937;
-        font-weight: 600;
-        margin-bottom: 4px;
-      }
-      .supplier-details p {
-        color: #6b7280;
-        font-size: 0.9rem;
-        max-width: 300px;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-      }
-      .contact-info {
-        color: #374151;
-        font-size: 0.95rem;
-      }
-      .status-badge {
-        padding: 6px 12px;
-        border-radius: 20px;
-        font-size: 0.85rem;
-        font-weight: 600;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-      }
-      .status-badge.active {
-        background: #d1fae5;
-        color: #065f46;
-      }
-      .status-badge.inactive {
-        background: #fecaca;
-        color: #991b1b;
-      }
-      .actions-group {
-        display: flex;
-        gap: 8px;
-      }
-      .btn-small {
-        padding: 8px 12px;
-        font-size: 0.85rem;
-        border-radius: 8px;
-        border: none;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        display: flex;
-        align-items: center;
-        gap: 4px;
-      }
-      .btn-edit {
-        background: #dbeafe;
-        color: #1d4ed8;
-      }
-      .btn-edit:hover {
-        background: #bfdbfe;
-      }
-      .btn-delete {
-        background: #fecaca;
-        color: #dc2626;
-      }
-      .btn-delete:hover {
-        background: #fca5a5;
-      }
-      .btn-toggle {
-        background: #f3f4f6;
-        color: #374151;
-      }
-      .btn-toggle:hover {
-        background: #e5e7eb;
-      }
-      .modal-overlay {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, 0.5);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        z-index: 1000;
-      }
-      .modal {
-        background: white;
-        border-radius: 16px;
-        width: 90%;
-        max-width: 600px;
-        max-height: 90vh;
-        overflow-y: auto;
-        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-      }
-      .modal-header {
-        padding: 30px;
-        border-bottom: 1px solid #e5e7eb;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-      }
-      .modal-title {
-        font-size: 1.5rem;
-        font-weight: 600;
-        color: #1f2937;
-      }
-      .modal-close {
-        background: none;
-        border: none;
-        font-size: 1.5rem;
-        cursor: pointer;
-        color: #6b7280;
-        padding: 4px;
-        border-radius: 8px;
-        transition: all 0.3s ease;
-      }
-      .modal-close:hover {
-        background: #f3f4f6;
-        color: #374151;
-      }
-      .modal-body {
-        padding: 30px;
-      }
-      .form-grid {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 20px;
-      }
-      .form-group {
-        display: flex;
-        flex-direction: column;
-        gap: 8px;
-      }
-      .form-group.full-width {
-        grid-column: 1 / -1;
-      }
-      .form-label {
-        font-weight: 600;
-        color: #374151;
-        font-size: 0.95rem;
-      }
-      .form-input {
-        padding: 12px 16px;
-        border: 2px solid #e5e7eb;
-        border-radius: 10px;
-        font-size: 0.95rem;
-        transition: all 0.3s ease;
-      }
-      .form-input:focus {
-        outline: none;
-        border-color: #059669;
-        box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.1);
-      }
-      .form-textarea {
-        resize: vertical;
-        min-height: 100px;
-      }
-      .form-checkbox {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        padding: 12px 0;
-      }
-      .checkbox-input {
-        width: 20px;
-        height: 20px;
-        accent-color: #059669;
-      }
-      .modal-footer {
-        padding: 30px;
-        border-top: 1px solid #e5e7eb;
-        display: flex;
-        gap: 15px;
-        justify-content: flex-end;
-      }
-      .pagination-section {
-        padding: 30px;
-        border-top: 1px solid #e5e7eb;
-        background: #f9fafb;
-      }
-      .pagination {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        gap: 8px;
-      }
-      .pagination-btn {
-        padding: 10px 16px;
-        border: 2px solid #e5e7eb;
-        background: white;
-        color: #374151;
-        border-radius: 8px;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        font-weight: 500;
-      }
-      .pagination-btn:hover:not(.active) {
-        border-color: #059669;
-        color: #059669;
-      }
-      .pagination-btn.active {
-        background: #059669;
-        color: white;
-        border-color: #059669;
-      }
-      .pagination-btn:disabled {
-        opacity: 0.5;
-        cursor: not-allowed;
-      }
-      .pagination-info {
-        margin: 0 20px;
-        color: #6b7280;
-        font-weight: 500;
-      }
-      .loading-container {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        padding: 60px 20px;
-      }
-      .loading-spinner {
-        width: 50px;
-        height: 50px;
-        border: 4px solid #f3f4f6;
-        border-left: 4px solid #059669;
-        border-radius: 50%;
-        animation: spin 1s linear infinite;
-      }
-      @keyframes spin {
-        0% { transform: rotate(0deg);}
-        100% { transform: rotate(360deg);}
-      }
-      .empty-state {
-        text-align: center;
-        padding: 60px 20px;
-      }
-      .empty-icon {
-        font-size: 4rem;
-        margin-bottom: 20px;
-        opacity: 0.5;
-      }
-      .empty-title {
-        font-size: 1.5rem;
-        font-weight: 600;
-        color: #374151;
-        margin-bottom: 10px;
-      }
-      .empty-text {
-        color: #6b7280;
-        font-size: 1.1rem;
-      }
-      @media (max-width: 768px) {
-        .container { padding: 10px;}
-        .header { padding: 20px;}
-        .header h1 { font-size: 2rem;}
-        .section-header { padding: 20px; flex-direction: column; align-items: stretch;}
-        .controls-group { justify-content: stretch;}
-        .filters-grid { grid-template-columns: 1fr; gap: 15px;}
-        .form-grid { grid-template-columns: 1fr;}
-        .suppliers-table th, .suppliers-table td { padding: 15px 10px; font-size: 0.9rem;}
-        .supplier-details p { max-width: 200px;}
-        .modal { width: 95%; margin: 20px;}
-        .modal-header, .modal-body, .modal-footer { padding: 20px;}
-      }
-    </style>
-  </head>
-  <body>
-    <div class="container">
-      <!-- Header -->
-      <div class="header">
-        <h1>Gestión de Proveedores</h1>
-        <p>Administre los proveedores del sistema CAB</p>
-      </div>
-      <!-- Suppliers Section -->
-      <div class="suppliers-section">
-        <!-- Section Header -->
-        <div class="section-header">
-          <h2 class="section-title">Proveedores</h2>
-          <div class="controls-group">
-            <button class="btn btn-primary" (click)="openAddSupplierModal()">
-              Agregar Proveedor
-            </button>
-          </div>
+  <!-- Card principal -->
+  <div class="bg-white rounded-2xl shadow-sm overflow-hidden">
+    <!-- Top bar -->
+    <div
+      class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 p-6 border-b border-gray-200"
+    >
+      <div class="flex items-center gap-3">
+        <div
+          class="w-12 h-12 rounded-xl bg-emerald-100 text-emerald-600 flex items-center justify-center text-2xl"
+        >
+          <i class="pi pi-truck"></i>
         </div>
-        <!-- Filters Section -->
-        <div class="filters-section">
-          <div class="filters-grid">
-            <div class="filter-group">
-              <label class="filter-label">Buscar proveedores</label>
-              <input
-                type="text"
-                class="filter-input"
-                placeholder="Buscar por nombre o correo..."
-                [(ngModel)]="searchTerm"
-                (input)="applyFilters()"
-              />
-            </div>
-            <div class="filter-group">
-              <label class="filter-label">Estado</label>
-              <select
-                class="filter-input"
-                [(ngModel)]="selectedStatusFilter"
-                (change)="applyFilters()"
-              >
-                <option value="all">Todos los estados</option>
-                <option value="active">Activos</option>
-                <option value="inactive">Inactivos</option>
-              </select>
-            </div>
-            <div class="filter-group">
-              <button class="btn btn-secondary" (click)="clearFilters()">
-                🔄 Limpiar
-              </button>
-            </div>
-          </div>
-        </div>
-        <!-- Bulk Actions -->
-        <div class="bulk-actions" *ngIf="selectedProveedores.length > 0">
-          <span class="bulk-actions-text">
-            {{ selectedProveedores.length }} proveedor(es) seleccionado(s)
-          </span>
-          <button class="btn btn-secondary" (click)="bulkActivateSuppliers()">
-            ✅ Activar
-          </button>
-          <button class="btn btn-secondary" (click)="bulkDeactivateSuppliers()">
-            ❌ Desactivar
-          </button>
-          <button class="btn btn-danger" (click)="bulkDeleteSuppliers()">
-            🗑️ Eliminar
-          </button>
-        </div>
-        <!-- Loading State -->
-        <div class="loading-container" *ngIf="isLoadingProveedores">
-          <div class="loading-spinner"></div>
-        </div>
-        <!-- Suppliers Table -->
-        <div class="table-container" *ngIf="!isLoadingProveedores && filteredProveedores.length > 0">
-          <table class="suppliers-table">
-            <thead>
-              <tr>
-                <th>
-                  <input
-                    type="checkbox"
-                    [checked]="allProductsSelected()"
-                    (change)="selectAllSuppliers($event)"
-                  />
-                </th>
-                <th>Proveedor</th>
-                <th>Correo</th>
-                <th>Productos</th>
-                <th>Estado</th>
-                <th>Fecha Registro</th>
-                <th>Acciones</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr *ngFor="let proveedor of getPaginatedProveedores()">
-                <td>
-                  <input
-                    type="checkbox"
-                    [checked]="selectedProveedores.includes(proveedor.id)"
-                    (change)="toggleSupplierSelection(proveedor.id, $event)"
-                  />
-                </td>
-                <td>
-                  <div class="supplier-info">
-                    <div class="supplier-icon">🏢</div>
-                    <div class="supplier-details">
-                      <h4>{{ proveedor.nombre }}</h4>
-                    </div>
-                  </div>
-                </td>
-                <td>
-                  <div class="contact-info">
-                    ✉️ {{ proveedor.email }}
-                  </div>
-                </td>
-                <td>
-                  {{ proveedor.productos }}
-                </td>
-                <td>
-                  <span class="status-badge" [ngClass]="getStatusClass(proveedor.activo)">
-                    {{ getStatusText(proveedor.activo) }}
-                  </span>
-                </td>
-                <td>{{ formatDate(proveedor.fechaRegistro) }}</td>
-                <td>
-                  <div class="actions-group">
-                    <button class="btn-small btn-edit" (click)="openEditSupplierModal(proveedor)">
-                      ✏️ Editar
-                    </button>
-                    <button class="btn-small btn-toggle" (click)="toggleSupplierStatus(proveedor)">
-                      {{ proveedor.activo ? "❌" : "✅" }}
-                    </button>
-                    <button class="btn-small btn-delete" (click)="deleteSupplier(proveedor)">
-                      🗑️
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-        <!-- Empty State -->
-        <div class="empty-state" *ngIf="!isLoadingProveedores && filteredProveedores.length === 0">
-          <div class="empty-icon">🏢</div>
-          <h3 class="empty-title">No hay proveedores</h3>
-          <p class="empty-text">
-            Comience agregando su primer proveedor al sistema
+        <div>
+          <h2 class="text-xl font-semibold text-gray-800">Proveedores</h2>
+          <p class="text-xs text-gray-500">
+            {{filteredProveedores.length}} resultado(s)
           </p>
-          <button class="btn btn-primary" (click)="openAddSupplierModal()" style="margin-top: 20px">
-            ➕ Agregar Primer Proveedor
-          </button>
         </div>
-        <!-- Pagination -->
-        <div class="pagination-section" *ngIf="filteredProveedores.length > 0">
-          <div class="pagination">
-            <button
-              class="pagination-btn"
-              [disabled]="currentPage <= 1"
-              (click)="goToPage(currentPage - 1)"
-            >
-              ⬅️ Anterior
-            </button>
-            <span class="pagination-info">
-              Página {{ currentPage }} de {{ totalPages }}
-            </span>
-            <button
-              class="pagination-btn"
-              [disabled]="currentPage >= totalPages"
-              (click)="goToPage(currentPage + 1)"
-            >
-              Siguiente ➡️
-            </button>
-          </div>
+      </div>
+      <div class="flex flex-wrap gap-3">
+        <button
+          (click)="openAddSupplierModal()"
+          class="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white font-medium px-5 py-2.5 rounded-xl text-sm shadow"
+        >
+          <i class="pi pi-plus"></i> Nuevo
+        </button>
+        <!-- <button
+          (click)="exportSuppliersData()"
+          class="inline-flex items-center gap-2 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium px-5 py-2.5 rounded-xl text-sm"
+        >
+          <i class="pi pi-download"></i> Exportar
+        </button> -->
+        <button
+          (click)="loadProveedores()"
+          [disabled]="isLoadingProveedores"
+          class="inline-flex items-center gap-2 bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 font-medium px-5 py-2.5 rounded-xl text-sm disabled:opacity-50"
+        >
+          <i
+            class="pi"
+            [ngClass]="isLoadingProveedores ? 'pi-spin pi-spinner' : 'pi-refresh'"
+          ></i>
+          {{isLoadingProveedores ? 'Actualizando...' : 'Actualizar'}}
+        </button>
+      </div>
+    </div>
+
+    <!-- Filtros -->
+    <div class="p-6 bg-gray-50 border-b border-gray-200">
+      <div class="grid gap-5 md:grid-cols-3">
+        <div class="flex flex-col gap-2">
+          <label
+            class="text-xs font-semibold uppercase tracking-wide text-gray-500"
+            >Buscar</label
+          >
+          <input
+            type="text"
+            [(ngModel)]="searchTerm"
+            (ngModelChange)="applyFilters()"
+            placeholder="Nombre, producto o contacto..."
+            class="px-4 py-2.5 rounded-xl border-2 border-gray-200 focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 text-sm"
+          />
+        </div>
+        <div class="flex flex-col gap-2">
+          <label
+            class="text-xs font-semibold uppercase tracking-wide text-gray-500"
+            >Estado</label
+          >
+          <select
+            [(ngModel)]="selectedStatusFilter"
+            (change)="applyFilters()"
+            class="px-4 py-2.5 rounded-xl border-2 border-gray-200 focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 text-sm"
+          >
+            <option value="all">Todos</option>
+            <option value="active">Activos</option>
+            <option value="inactive">Inactivos</option>
+          </select>
+        </div>
+        <div class="flex items-end">
+          <button
+            (click)="clearFilters()"
+            class="w-full inline-flex items-center justify-center gap-2 bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 font-medium px-5 py-2.5 rounded-xl text-sm"
+          >
+            <i class="pi pi-filter-slash"></i> Limpiar filtros
+          </button>
         </div>
       </div>
     </div>
-    <!-- Supplier Modal -->
-    <div class="modal-overlay" *ngIf="showSupplierModal">
-      <div class="modal">
-        <div class="modal-header">
-          <h3 class="modal-title">
-            {{ editingSupplier ? "Editar Proveedor" : "Agregar Proveedor" }}
-          </h3>
-          <button class="modal-close" (click)="closeSupplierModal()">✕</button>
-        </div>
-        <div class="modal-body">
-          <form #supplierForm="ngForm">
-            <div class="form-grid">
-              <div class="form-group full-width">
-                <label class="form-label">Nombre *</label>
-                <input
-                  type="text"
-                  class="form-input"
-                  name="nombre"
-                  [(ngModel)]="supplierFormData.nombre"
-                  required
-                  placeholder="Ej: Electrónica Mexicana S.A."
-                />
-              </div>
-              <div class="form-group">
-                <label class="form-label">Correo *</label>
-                <input
-                  type="email"
-                  class="form-input"
-                  name="email"
-                  [(ngModel)]="supplierFormData.email"
-                  required
-                  placeholder="contacto@empresa.com"
-                />
-              </div>
-              <div class="form-group full-width">
-                <label class="form-label">Productos que provee</label>
-                <textarea
-                  class="form-input form-textarea"
-                  name="productos"
-                  [(ngModel)]="supplierFormData.productos"
-                  placeholder="Lista de productos principales..."
-                ></textarea>
-              </div>
-              <div class="form-group full-width">
-                <div class="form-checkbox">
-                  <input
-                    type="checkbox"
-                    class="checkbox-input"
-                    name="activo"
-                    [(ngModel)]="supplierFormData.activo"
-                  />
-                  <label for="activo" class="form-label">Proveedor activo</label>
+
+    <!-- Acciones masivas -->
+    <div
+      *ngIf="selectedProveedores.length > 0"
+      class="flex flex-wrap items-center gap-4 px-6 py-4 bg-emerald-50 border-b border-emerald-100"
+    >
+      <div class="text-sm text-emerald-800 font-medium">
+        {{selectedProveedores.length}} seleccionado(s)
+      </div>
+      <div class="flex flex-wrap gap-2">
+        <button
+          (click)="bulkActivateSuppliers()"
+          class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold rounded-lg shadow"
+        >
+          Activar
+        </button>
+        <button
+          (click)="bulkDeactivateSuppliers()"
+          class="px-4 py-2 bg-neutral-500 hover:bg-neutral-600 text-white text-xs font-semibold rounded-lg"
+        >
+          Desactivar
+        </button>
+        <button
+          (click)="bulkDeleteSuppliers()"
+          class="px-4 py-2 bg-danger-600 hover:bg-danger-700 text-white text-xs font-semibold rounded-lg"
+        >
+          Eliminar
+        </button>
+      </div>
+    </div>
+
+    <!-- Loading -->
+    <div
+      *ngIf="isLoadingProveedores"
+      class="flex flex-col items-center justify-center py-24 gap-4"
+    >
+      <i class="pi pi-spin pi-spinner text-3xl text-emerald-500"></i>
+      <p class="text-sm text-gray-500">Cargando proveedores...</p>
+    </div>
+
+    <!-- Tabla -->
+    <div
+      *ngIf="!isLoadingProveedores && filteredProveedores.length > 0"
+      class="overflow-x-auto"
+    >
+      <table class="min-w-full text-sm">
+        <thead>
+          <tr class="bg-gray-50 text-gray-600">
+            <th class="px-6 py-4 text-left w-10">
+              <input
+                type="checkbox"
+                (change)="selectAllSuppliers($event)"
+                [checked]="allProductsSelected()"
+                class="w-4 h-4 rounded border-gray-300 text-emerald-600 focus:ring-emerald-500"
+              />
+            </th>
+            <th class="px-6 py-4 text-left">Proveedor</th>
+            <th class="px-6 py-4 text-left">Contacto</th>
+            <th class="px-6 py-4 text-center">Activo</th>
+            <th class="px-6 py-4 text-right">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr
+            *ngFor="let p of getPaginatedProveedores(); trackBy: trackByProveedorId"
+            class="border-b border-gray-100 hover:bg-gray-50 transition-colors"
+          >
+            <td class="px-6 py-3 align-top">
+              <input
+                type="checkbox"
+                (change)="toggleSupplierSelection(p.id, $event)"
+                [checked]="selectedProveedores.includes(p.id)"
+                class="w-4 h-4 rounded border-gray-300 text-emerald-600 focus:ring-emerald-500"
+              />
+            </td>
+            <td class="px-6 py-3 align-top">
+              <div class="flex items-start gap-3">
+                <div
+                  class="w-10 h-10 rounded-lg bg-emerald-100 text-emerald-600 flex items-center justify-center"
+                >
+                  <i class="pi pi-truck"></i>
+                </div>
+                <div>
+                  <h3 class="font-semibold text-gray-800 leading-tight">
+                    {{p.nombre}}
+                  </h3>
                 </div>
               </div>
-            </div>
-          </form>
-        </div>
-        <div class="modal-footer">
-          <button class="btn btn-secondary" (click)="closeSupplierModal()">
-            Cancelar
-          </button>
+            </td>
+            <td class="px-6 py-3 align-top">
+              <ul class="space-y-1 text-gray-600 text-xs">
+                <li *ngFor="let c of p.contacto">{{c}}</li>
+              </ul>
+            </td>
+            <td class="px-6 py-3 align-top text-center">
+              <span
+                [ngClass]="p.activo ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-700'"
+                class="px-3 py-1 rounded-full text-[10px] font-semibold tracking-wide uppercase"
+                >{{getStatusText(p.activo)}}</span
+              >
+            </td>
+            <td class="px-6 py-3 align-top">
+              <div class="flex justify-end gap-2">
+                <button
+                  (click)="openEditSupplierModal(p)"
+                  title="Editar"
+                  class="p-2 rounded-lg bg-primary-100 hover:bg-primary-200 text-primary-600 text-xs"
+                >
+                  <i class="pi pi-pencil"></i>
+                </button>
+                <button
+                  (click)="toggleSupplierStatus(p)"
+                  title="{{p.activo ? 'Desactivar' : 'Activar'}}"
+                  class="p-2 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-600 text-xs"
+                >
+                  <i
+                    class="pi"
+                    [ngClass]="p.activo ? 'pi-ban' : 'pi-check'"
+                  ></i>
+                </button>
+                <button
+                  (click)="deleteSupplier(p)"
+                  title="Eliminar"
+                  class="p-2 rounded-lg bg-red-100 hover:bg-red-200 text-red-600 text-xs"
+                >
+                  <i class="pi pi-trash"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Empty state -->
+    <div
+      *ngIf="!isLoadingProveedores && filteredProveedores.length === 0"
+      class="py-24 flex flex-col items-center justify-center text-center gap-4"
+    >
+      <div
+        class="w-20 h-20 rounded-full bg-gray-100 flex items-center justify-center text-4xl text-gray-400"
+      >
+        <i class="pi pi-truck"></i>
+      </div>
+      <h3 class="text-lg font-semibold text-gray-700">
+        No se encontraron proveedores
+      </h3>
+      <p class="text-sm text-gray-500 max-w-md">
+        Prueba ajustando los filtros o agrega un nuevo proveedor al sistema.
+      </p>
+      <button
+        (click)="openAddSupplierModal()"
+        class="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white font-medium px-5 py-2.5 rounded-xl text-sm shadow"
+      >
+        <i class="pi pi-plus"></i> Agregar primero
+      </button>
+    </div>
+
+    <!-- Paginación -->
+    <div
+      *ngIf="!isLoadingProveedores && filteredProveedores.length > 0"
+      class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 p-6 border-t border-gray-200"
+    >
+      <div class="text-xs text-gray-500">
+        Página {{currentPage}} de {{totalPages}}
+      </div>
+      <div class="flex items-center gap-2">
+        <button
+          (click)="goToPage(currentPage-1)"
+          [disabled]="currentPage===1"
+          class="px-3 py-2 rounded-lg border text-xs font-medium disabled:opacity-40 disabled:cursor-not-allowed bg-white hover:bg-gray-50 border-gray-300"
+        >
+          Anterior
+        </button>
+        <ng-container
+          *ngFor="let page of [].constructor(totalPages); let i = index"
+        >
           <button
-            class="btn btn-primary"
-            (click)="saveSupplier()"
-            [disabled]="!supplierForm.valid"
+            (click)="goToPage(i+1)"
+            [ngClass]="i+1===currentPage ? 'bg-emerald-600 text-white border-emerald-600' : 'bg-white hover:bg-gray-50 border-gray-300 text-gray-700'"
+            class="px-3 py-2 rounded-lg border text-xs font-medium"
           >
-            {{ editingSupplier ? "Actualizar Proveedor" : "Guardar Proveedor" }}
+            {{i+1}}
           </button>
-        </div>
+        </ng-container>
+        <button
+          (click)="goToPage(currentPage+1)"
+          [disabled]="currentPage===totalPages"
+          class="px-3 py-2 rounded-lg border text-xs font-medium disabled:opacity-40 disabled:cursor-not-allowed bg-white hover:bg-gray-50 border-gray-300"
+        >
+          Siguiente
+        </button>
       </div>
     </div>
-    <script>
-      // Variables globales
-      let proveedores = [];
-      let filteredProveedores = [];
-      let selectedProveedores = [];
-      let isLoadingProveedores = false;
-      let supplierCurrentPage = 1;
-      let supplierItemsPerPage = 10;
-      let supplierTotalPages = 0;
-      let editingSupplier = null;
+  </div>
+</div>
 
-      document.addEventListener("DOMContentLoaded", function () {
-        loadProveedores();
-      });
-
-      function loadProveedores() {
-        isLoadingProveedores = true;
-        showSupplierLoading();
-        setTimeout(() => {
-          proveedores = [
-            {
-              id: 1,
-              nombre: "Electrónica Mexicana S.A.",
-              email: "ventas@emex.com.mx",
-              productos: "Microcontroladores, sensores, cables",
-              activo: true,
-              fechaRegistro: new Date("2025-01-10"),
-            },
-            {
-              id: 2,
-              nombre: "Distribuidora Robótica",
-              email: "contacto@robotica.mx",
-              productos: "Motores, placas Arduino, servos",
-              activo: true,
-              fechaRegistro: new Date("2025-01-12"),
-            },
-            {
-              id: 3,
-              nombre: "Proveedor Inactivo",
-              email: "info@inactivo.com",
-              productos: "Componentes varios",
-              activo: false,
-              fechaRegistro: new Date("2025-01-15"),
-            },
-          ];
-          isLoadingProveedores = false;
-          applySupplierFilters();
-          hideSupplierLoading();
-        }, 1000);
-      }
-
-      function applySupplierFilters() {
-        let filtered = [...proveedores];
-        const searchTerm = document
-          .getElementById("supplierSearchInput")
-          .value.toLowerCase()
-          .trim();
-        if (searchTerm) {
-          filtered = filtered.filter(
-            (proveedor) =>
-              proveedor.nombre.toLowerCase().includes(searchTerm) ||
-              proveedor.email.toLowerCase().includes(searchTerm)
-          );
-        }
-        const statusFilter = document.getElementById("supplierStatusFilter").value;
-        if (statusFilter !== "all") {
-          filtered = filtered.filter((proveedor) =>
-            statusFilter === "active" ? proveedor.activo : !proveedor.activo
-          );
-        }
-        filteredProveedores = filtered;
-        updateSupplierPagination();
-        renderProveedores();
-      }
-
-      function updateSupplierPagination() {
-        supplierTotalPages = Math.ceil(filteredProveedores.length / supplierItemsPerPage);
-        if (supplierCurrentPage > supplierTotalPages) {
-          supplierCurrentPage = 1;
-        }
-        document.getElementById("supplierPrevBtn").disabled = supplierCurrentPage <= 1;
-        document.getElementById("supplierNextBtn").disabled = supplierCurrentPage >= supplierTotalPages;
-        document.getElementById("supplierPaginationInfo").textContent = `Página ${supplierCurrentPage} de ${supplierTotalPages}`;
-      }
-
-      function renderProveedores() {
-        const tableBody = document.getElementById("suppliersTableBody");
-        const suppliersTable = document.getElementById("suppliersTable");
-        const emptyState = document.getElementById("emptySupplierState");
-        const paginationSection = document.getElementById("supplierPaginationSection");
-        if (filteredProveedores.length === 0) {
-          suppliersTable.style.display = "none";
-          emptyState.style.display = "block";
-          paginationSection.style.display = "none";
-          hideSupplierLoading(); // <-- Agrega esta línea
-          return;
-        }
-        suppliersTable.style.display = "block";
-        emptyState.style.display = "none";
-        paginationSection.style.display = "block";
-        const startIndex = (supplierCurrentPage - 1) * supplierItemsPerPage;
-        const paginatedProveedores = filteredProveedores.slice(
-          startIndex,
-          startIndex + supplierItemsPerPage
-        );
-        tableBody.innerHTML = paginatedProveedores
-          .map(
-            (proveedor) => `
-              <tr>
-                <td>
-                  <input type="checkbox" onchange="toggleSupplierSelection(${proveedor.id}, event)" ${
-              selectedProveedores.includes(proveedor.id) ? "checked" : ""
-            }>
-                </td>
-                <td>
-                  <div class="supplier-info">
-                    <div class="supplier-icon">🏢</div>
-                    <div class="supplier-details">
-                      <h4>${proveedor.nombre}</h4>
-                    </div>
-                  </div>
-                </td>
-                <td>
-                  <div class="contact-info">
-                    ✉️ ${proveedor.email}
-                  </div>
-                </td>
-                <td>
-                  ${proveedor.productos}
-                </td>
-                <td>
-                  <span class="status-badge ${proveedor.activo ? "active" : "inactive"}">
-                    ${proveedor.activo ? "Activo" : "Inactivo"}
-                  </span>
-                </td>
-                <td>${formatDate(proveedor.fechaRegistro)}</td>
-                <td>
-                  <div class="actions-group">
-                    <button class="btn-small btn-edit" onclick="openEditSupplierModal(${proveedor.id})">
-                      ✏️ Editar
-                    </button>
-                    <button class="btn-small btn-toggle" onclick="toggleSupplierStatus(${proveedor.id})">
-                      ${proveedor.activo ? "❌" : "✅"}
-                    </button>
-                    <button class="btn-small btn-delete" onclick="deleteSupplier(${proveedor.id})">
-                      🗑️
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            `
-          )
-          .join("");
-        hideSupplierLoading(); // <-- Agrega esta línea al final
-        updateBulkSupplierActions();
-      }
-
-      // Modal funciones
-      function openAddSupplierModal() {
-        editingSupplier = null;
-        document.getElementById("supplierModalTitle").textContent = "Agregar Proveedor";
-        document.getElementById("saveSupplierButtonText").textContent = "Guardar Proveedor";
-        clearSupplierForm();
-        document.getElementById("supplierModal").style.display = "flex";
-      }
-      function openEditSupplierModal(id) {
-        const proveedor = proveedores.find((p) => p.id === id);
-        if (!proveedor) return;
-        editingSupplier = proveedor;
-        document.getElementById("supplierModalTitle").textContent = "Editar Proveedor";
-        document.getElementById("saveSupplierButtonText").textContent = "Actualizar Proveedor";
-        fillSupplierForm(proveedor);
-        document.getElementById("supplierModal").style.display = "flex";
-      }
-      function closeSupplierModal() {
-        document.getElementById("supplierModal").style.display = "none";
-        editingSupplier = null;
-        clearSupplierForm();
-      }
-      function clearSupplierForm() {
-        document.getElementById("supplierName").value = "";
-        document.getElementById("supplierEmail").value = "";
-        document.getElementById("supplierProducts").value = "";
-        document.getElementById("supplierActive").checked = true;
-      }
-      function fillSupplierForm(proveedor) {
-        document.getElementById("supplierName").value = proveedor.nombre;
-        document.getElementById("supplierEmail").value = proveedor.email;
-        document.getElementById("supplierProducts").value = proveedor.productos || "";
-        document.getElementById("supplierActive").checked = proveedor.activo;
-      }
-      function saveSupplier() {
-        const form = document.getElementById("supplierForm");
-        if (!form.checkValidity()) {
-          form.reportValidity();
-          return;
-        }
-        const supplierData = {
-          nombre: document.getElementById("supplierName").value,
-          email: document.getElementById("supplierEmail").value,
-          productos: document.getElementById("supplierProducts").value,
-          activo: document.getElementById("supplierActive").checked,
-          fechaRegistro: editingSupplier ? editingSupplier.fechaRegistro : new Date(),
-        };
-        if (editingSupplier) {
-          supplierData.id = editingSupplier.id;
-          const index = proveedores.findIndex((p) => p.id === editingSupplier.id);
-          proveedores[index] = supplierData;
-        } else {
-          supplierData.id = Date.now();
-          proveedores.unshift(supplierData);
-        }
-        applySupplierFilters();
-        closeSupplierModal();
-      }
-      function deleteSupplier(id) {
-        const proveedor = proveedores.find((p) => p.id === id);
-        if (!proveedor) return;
-        if (!confirm(`¿Está seguro de eliminar el proveedor "${proveedor.nombre}"?`)) {
-          return;
-        }
-        proveedores = proveedores.filter((p) => p.id !== id);
-        selectedProveedores = selectedProveedores.filter((selectedId) => selectedId !== id);
-        applySupplierFilters();
-      }
-      function toggleSupplierStatus(id) {
-        const proveedor = proveedores.find((p) => p.id === id);
-        if (!proveedor) return;
-        proveedor.activo = !proveedor.activo;
-        applySupplierFilters();
-      }
-
-      // Selección masiva
-      function toggleSupplierSelection(id, event) {
-        if (event.target.checked) {
-          selectedProveedores.push(id);
-        } else {
-          selectedProveedores = selectedProveedores.filter((selectedId) => selectedId !== id);
-        }
-        updateBulkSupplierActions();
-      }
-      function selectAllSuppliers(event) {
-        const startIndex = (supplierCurrentPage - 1) * supplierItemsPerPage;
-        const paginatedProveedores = filteredProveedores.slice(
-          startIndex,
-          startIndex + supplierItemsPerPage
-        );
-        if (event.target.checked) {
-          selectedProveedores = [
-            ...new Set([
-              ...selectedProveedores,
-              ...paginatedProveedores.map((p) => p.id),
-            ]),
-          ];
-        } else {
-          const currentPageIds = paginatedProveedores.map((p) => p.id);
-          selectedProveedores = selectedProveedores.filter(
-            (id) => !currentPageIds.includes(id)
-          );
-        }
-        updateBulkSupplierActions();
-        renderProveedores();
-      }
-      function updateBulkSupplierActions() {
-        const bulkActions = document.getElementById("bulkSupplierActions");
-        const selectedCount = document.getElementById("selectedSupplierCount");
-        if (selectedProveedores.length > 0) {
-          bulkActions.style.display = "flex";
-          selectedCount.textContent = selectedProveedores.length;
-        } else {
-          bulkActions.style.display = "none";
-        }
-        // Actualizar checkbox "Seleccionar todo"
-        const selectAllCheckbox = document.getElementById("selectAllSuppliers");
-        const startIndex = (supplierCurrentPage - 1) * supplierItemsPerPage;
-        const paginatedProveedores = filteredProveedores.slice(
-          startIndex,
-          startIndex + supplierItemsPerPage
-        );
-        const currentPageIds = paginatedProveedores.map((p) => p.id);
-        const allCurrentSelected = currentPageIds.every((id) =>
-          selectedProveedores.includes(id)
-        );
-        selectAllCheckbox.checked = allCurrentSelected && currentPageIds.length > 0;
-      }
-      function bulkActivateSuppliers() {
-        if (selectedProveedores.length === 0) return;
-        selectedProveedores.forEach((id) => {
-          const proveedor = proveedores.find((p) => p.id === id);
-          if (proveedor) proveedor.activo = true;
-        });
-        selectedProveedores = [];
-        applySupplierFilters();
-      }
-      function bulkDeactivateSuppliers() {
-        if (selectedProveedores.length === 0) return;
-        selectedProveedores.forEach((id) => {
-          const proveedor = proveedores.find((p) => p.id === id);
-          if (proveedor) proveedor.activo = false;
-        });
-        selectedProveedores = [];
-        applySupplierFilters();
-      }
-      function bulkDeleteSuppliers() {
-        if (selectedProveedores.length === 0) return;
-        if (
-          !confirm(
-            `¿Está seguro de eliminar ${selectedProveedores.length} proveedores?`
-          )
-        ) {
-          return;
-        }
-        proveedores = proveedores.filter((p) => !selectedProveedores.includes(p.id));
-        selectedProveedores = [];
-        applySupplierFilters();
-      }
-
-      // Filtros
-      function onSupplierSearchChange() {
-        applySupplierFilters();
-      }
-      function onSupplierStatusFilterChange(event) {
-        applySupplierFilters();
-      }
-      function clearSupplierFilters() {
-        document.getElementById("supplierSearchInput").value = "";
-        document.getElementById("supplierStatusFilter").value = "all";
-        applySupplierFilters();
-      }
-
-      // Paginación
-      function goToSupplierPage(direction) {
-        if (direction === "prev" && supplierCurrentPage > 1) {
-          supplierCurrentPage--;
-        } else if (direction === "next" && supplierCurrentPage < supplierTotalPages) {
-          supplierCurrentPage++;
-        }
-        selectedProveedores = [];
-        updateSupplierPagination();
-        renderProveedores();
-      }
-
-      // Auxiliares
-      function formatDate(date) {
-        return new Date(date).toLocaleDateString("es-ES", {
-          year: "numeric",
-          month: "short",
-          day: "numeric",
-        });
-      }
-      function showSupplierLoading() {
-        document.getElementById("loadingSuppliers").style.display = "flex";
-        document.getElementById("suppliersTable").style.display = "none";
-        document.getElementById("emptySupplierState").style.display = "none";
-      }
-      function hideSupplierLoading() {
-        document.getElementById("loadingSuppliers").style.display = "none";
-      }
-      document.addEventListener("keydown", function (event) {
-        if (event.key === "Escape") {
-          closeSupplierModal();
-        }
-      });
-    </script>
-  </body>
-</html>
+<!-- Modal -->
+<div
+  *ngIf="showSupplierModal"
+  class="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+  (click)="closeSupplierModal()"
+>
+  <div
+    class="bg-white rounded-2xl shadow-xl w-full max-w-xl max-h-[90vh] overflow-y-auto animate-slide-up"
+    (click)="$event.stopPropagation()"
+  >
+    <div class="flex items-center justify-between p-6 border-b border-gray-200">
+      <h3 class="text-xl font-semibold text-gray-800">
+        {{editingSupplier ? 'Editar Proveedor' : 'Nuevo Proveedor'}}
+      </h3>
+      <button
+        (click)="closeSupplierModal()"
+        class="w-9 h-9 rounded-lg flex items-center justify-center hover:bg-gray-100 text-gray-500"
+      >
+        <i class="pi pi-times"></i>
+      </button>
+    </div>
+    <form
+      class="p-6 space-y-6"
+      (ngSubmit)="saveSupplier()"
+      #supplierForm="ngForm"
+    >
+      <div class="grid md:grid-cols-2 gap-5">
+        <div class="flex flex-col gap-2 md:col-span-2">
+          <label
+            class="text-xs font-semibold uppercase tracking-wide text-gray-500"
+            >Nombre *</label
+          >
+          <input
+            type="text"
+            [(ngModel)]="supplierFormData.nombre"
+            name="nombre"
+            required
+            class="px-4 py-2.5 rounded-xl border-2 border-gray-200 focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 text-sm"
+          />
+        </div>
+        <div class="flex flex-col gap-2 md:col-span-2">
+          <label
+            class="text-xs font-semibold uppercase tracking-wide text-gray-500"
+            >Contacto (una línea por dato)</label
+          >
+          <textarea
+            [(ngModel)]="contactoInput"
+            name="contacto"
+            rows="4"
+            class="px-4 py-2.5 rounded-xl border-2 border-gray-200 focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 text-sm resize-y"
+          ></textarea>
+        </div>
+        <div class="flex items-center gap-3 md:col-span-2" *ngIf="editingSupplier">
+          <input
+            type="checkbox"
+            [(ngModel)]="supplierFormData.activo"
+            name="activo"
+            class="w-5 h-5 rounded border-gray-300 text-emerald-600 focus:ring-emerald-500"
+          />
+          <span class="text-sm text-gray-700">Activo</span>
+        </div>
+      </div>
+      <div class="flex justify-end gap-3 pt-2">
+        <button
+          type="button"
+          (click)="closeSupplierModal()"
+          class="px-5 py-2.5 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-600 text-sm font-medium"
+        >
+          Cancelar
+        </button>
+        <button
+          type="submit"
+          [disabled]="supplierForm.invalid"
+          class="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white text-sm font-medium inline-flex items-center gap-2"
+        >
+          <i class="pi pi-save"></i> {{editingSupplier ? 'Actualizar' :
+          'Guardar'}}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

@@ -8,7 +8,6 @@ export interface MateriaPrima {
   id: number;
   nombre: string;
   descripcion: string;
-  precioUnitario: number;
   stock: number;
   activo: boolean;
   fechaCreacion: Date | string;
@@ -18,8 +17,7 @@ export interface MateriaPrima {
   selector: 'app-materias-primas',
   standalone: true,
   imports: [CommonModule, FormsModule],
-  templateUrl: './materiasprimas.component.html',
-  styleUrls: ['./materiasprimas.component.css']
+  templateUrl: './materiasprimas.html',
 })
 export class MateriasPrimasComponent implements OnInit, OnDestroy {
   
@@ -201,8 +199,6 @@ export class MateriasPrimasComponent implements OnInit, OnDestroy {
     return `Página ${this.currentPage} de ${this.totalPages}`;
   }
   
-  // === OPERACIONES CRUD ===
-  
   openAddMaterialModal() {
     this.editingMaterial = null;
     this.materialForm = this.getEmptyMaterialForm();
@@ -233,8 +229,7 @@ export class MateriasPrimasComponent implements OnInit, OnDestroy {
     const materialData = {
       nombre: this.materialForm.nombre.trim(),
       descripcion: this.materialForm.descripcion.trim(),
-      precioUnitario: Number(this.materialForm.precioUnitario),
-      stock: Number(this.materialForm.stock) || 0,
+      stock: this.materialForm.stock,
       activo: this.materialForm.activo
     };
 
@@ -247,7 +242,7 @@ export class MateriasPrimasComponent implements OnInit, OnDestroy {
       }).subscribe({
         next: () => {
           this.closeMaterialModal();
-          this.loadMateriasPrimas(); // <-- recarga desde la API
+          this.loadMateriasPrimas();
         },
         error: (error) => {
           alert('Error al actualizar la materia prima. Por favor, inténtelo de nuevo.');
@@ -259,7 +254,7 @@ export class MateriasPrimasComponent implements OnInit, OnDestroy {
       const subscription = this.backendService.createMateriaPrima(materialData).subscribe({
         next: () => {
           this.closeMaterialModal();
-          this.loadMateriasPrimas(); // <-- recarga desde la API
+          this.loadMateriasPrimas();
         },
         error: (error) => {
           alert('Error al crear la materia prima. Por favor, inténtelo de nuevo.');
@@ -276,7 +271,7 @@ export class MateriasPrimasComponent implements OnInit, OnDestroy {
 
     const subscription = this.backendService.deleteMateriaPrima(material.id).subscribe({
       next: () => {
-        this.loadMateriasPrimas(); // <-- recarga desde la API
+        this.loadMateriasPrimas();
       },
       error: (error) => {
         alert('Error al eliminar la materia prima. Por favor, inténtelo de nuevo.');
@@ -293,7 +288,7 @@ export class MateriasPrimasComponent implements OnInit, OnDestroy {
       activo: newStatus 
     }).subscribe({
       next: () => {
-        this.loadMateriasPrimas(); // <-- recarga desde la API
+        this.loadMateriasPrimas();
       },
       error: (error) => {
         alert('Error al actualizar el estado de la materia prima');
@@ -315,7 +310,7 @@ export class MateriasPrimasComponent implements OnInit, OnDestroy {
 
     Promise.all(updates).then(() => {
       this.selectedMaterials = [];
-      this.loadMateriasPrimas(); // <-- recarga desde la API
+      this.loadMateriasPrimas();
     }).catch(error => {
       alert('Error al activar algunas materias primas');
     });
@@ -333,7 +328,7 @@ export class MateriasPrimasComponent implements OnInit, OnDestroy {
 
     Promise.all(updates).then(() => {
       this.selectedMaterials = [];
-      this.loadMateriasPrimas(); // <-- recarga desde la API
+      this.loadMateriasPrimas();
     }).catch(error => {
       alert('Error al desactivar algunas materias primas');
     });
@@ -350,13 +345,11 @@ export class MateriasPrimasComponent implements OnInit, OnDestroy {
 
     Promise.all(deletions).then(() => {
       this.selectedMaterials = [];
-      this.loadMateriasPrimas(); // <-- recarga desde la API
+      this.loadMateriasPrimas();
     }).catch(error => {
       alert('Error al eliminar algunas materias primas');
     });
   }
-  
-  // === SELECCIÓN MASIVA ===
   
   toggleMaterialSelection(materialId: number, event: any) {
     if (event.target.checked) {
@@ -372,11 +365,9 @@ export class MateriasPrimasComponent implements OnInit, OnDestroy {
     const paginatedMaterials = this.getPaginatedMaterials();
     
     if (event.target.checked) {
-      // Agregar todos los IDs de la página actual
       const currentPageIds = paginatedMaterials.map(m => m.id);
       this.selectedMaterials = [...new Set([...this.selectedMaterials, ...currentPageIds])];
     } else {
-      // Remover todos los IDs de la página actual
       const currentPageIds = paginatedMaterials.map(m => m.id);
       this.selectedMaterials = this.selectedMaterials.filter(id => !currentPageIds.includes(id));
     }
@@ -389,14 +380,11 @@ export class MateriasPrimasComponent implements OnInit, OnDestroy {
     return paginatedMaterials.every(material => this.selectedMaterials.includes(material.id));
   }
   
-  // === MÉTODOS AUXILIARES ===
-  
   getEmptyMaterialForm(): MateriaPrima {
     return {
       id: 0,
       nombre: '',
       descripcion: '',
-      precioUnitario: 0,
       stock: 0,
       activo: true,
       fechaCreacion: new Date()
@@ -406,8 +394,7 @@ export class MateriasPrimasComponent implements OnInit, OnDestroy {
   isValidMaterialForm(): boolean {
     return !!(
       this.materialForm.nombre.trim() &&
-      this.materialForm.descripcion.trim() &&
-      this.materialForm.precioUnitario > 0
+      this.materialForm.descripcion.trim()
     );
   }
   
@@ -420,13 +407,6 @@ export class MateriasPrimasComponent implements OnInit, OnDestroy {
     }).format(price);
   }
   
-  formatStock(stock: number): string {
-    return new Intl.NumberFormat('es-MX', {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2
-    }).format(stock);
-  }
-  
   formatDate(date: Date | string): string {
     if (!date) return 'N/A';
     const dateObj = typeof date === 'string' ? new Date(date) : date;
@@ -437,15 +417,9 @@ export class MateriasPrimasComponent implements OnInit, OnDestroy {
     });
   }
   
-  getStockStatusClass(stock: number): string {
-    if (stock === 0) return 'out-of-stock';
-    if (stock <= 10) return 'low-stock';
-    return 'in-stock';
-  }
-  
   getStockStatusText(stock: number): string {
-    if (stock === 0) return '(Sin stock)';
-    if (stock <= 10) return '(Stock bajo)';
+    if (stock === 0) return '(agotado)';
+    if (stock <= 10) return '(bajo)';
     return '';
   }
   
