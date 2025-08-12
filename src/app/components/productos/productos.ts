@@ -1,5 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { BackendService, newComent, Producto, Venta } from '../../services/backend.service'; // Agregar Venta aquí
+import { BackendService, newComent, Producto, ProductoDto, Venta } from '../../services/backend.service'; // Agregar Venta aquí
 import { CommonModule } from '@angular/common';
 import { DialogModule } from 'primeng/dialog';
 import { FormsModule } from '@angular/forms';
@@ -74,7 +74,7 @@ export class ProductosComponent implements OnInit {
     this.getLastVentaNumero();
   }
 
-  productos: Producto[] = [];
+  productos: ProductoDto[] = [];
   comentarios: Comentario[] = [];
   usercomentarios: Comentario[] = [];
   visible: boolean = false;
@@ -130,15 +130,7 @@ export class ProductosComponent implements OnInit {
   getProductos() {
     this.backendService.getProductos().subscribe({
       next: (productos) => {
-<<<<<<< HEAD
         this.productos = productos;
-=======
-        console.log('Productos obtenidos:', productos);
-        this.productos = productos.map(p => ({
-          ...p,
-          precio: String(p.precio)
-        }));
->>>>>>> e541e4af15220dadd3b21ea3b0046e0b65a639d7
       },
       error: (error) => {
         console.error('Error al obtener productos:', error);

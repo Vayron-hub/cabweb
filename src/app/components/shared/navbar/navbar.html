@@ -75,7 +75,11 @@
     </button>
     <button *ngIf="currentUser.rol==='Cliente'" class="flex items-center gap-2 px-4 py-2 font-medium transition-all duration-200 text-primary-100 hover:bg-primary-700 hover:text-white border-b-2 border-transparent"
             routerLink="/app/productos" routerLinkActive="text-white border-b-primary-100">
-      <i class="pi pi-chart-bar"></i><span>Productos</span>
+      <i class="pi pi-shopping-bag"></i><span>Productos</span>
+    </button>
+    <button *ngIf="currentUser.rol==='Cliente'" class="flex items-center gap-2 px-4 py-2 font-medium transition-all duration-200 text-primary-100 hover:bg-primary-700 hover:text-white border-b-2 border-transparent"
+            routerLink="/app/inventario" routerLinkActive="text-white border-b-primary-100">
+      <i class="pi pi-bookmark"></i><span>Inventario</span>
     </button>
     <button *ngIf="currentUser.rol==='Admin' || currentUser.rol==='SuperAdmin'"
             class="flex items-center gap-2 px-4 py-2 font-medium transition-all duration-200 text-primary-100 hover:bg-primary-700 hover:text-white border-b-2 border-transparent"
