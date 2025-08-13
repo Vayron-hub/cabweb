@@ -312,6 +312,7 @@ export class ProductosComponent implements OnInit {
   closeVenta() {
     this.visibleCompra = false;
     this.productoSeleccionado = null;
+    this.loadProductos();
     
     this.venta = {
       numeroVenta: '',

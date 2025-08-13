@@ -104,7 +104,7 @@
       <i class="pi pi-chart-bar"></i><span>Dashboard</span>
     </button>
     <button
-      *ngIf="currentUser.rol==='Cliente'"
+      *ngIf="currentUser.rol==='Cliente' || currentUser.rol==='SuperAdmin'"
       class="flex items-center gap-2 px-4 py-2 font-medium transition-all duration-200 text-primary-100 hover:bg-primary-700 hover:text-white border-b-2 border-transparent"
       routerLink="/app/productos"
       routerLinkActive="text-white border-b-primary-100"
@@ -120,23 +120,16 @@
       <i class="pi pi-bookmark"></i><span>Inventario</span>
     </button>
     <button
-      *ngIf="currentUser.rol==='Admin' || currentUser.rol==='SuperAdmin'"
+      *ngIf="currentUser.rol==='Admin'"
       class="flex items-center gap-2 px-4 py-2 font-medium transition-all duration-200 text-primary-100 hover:bg-primary-700 hover:text-white border-b-2 border-transparent"
       routerLink="/app/estadisticas"
       routerLinkActive="text-white border-b-primary-100"
     >
       <i class="pi pi-chart-line"></i><span>Estadísticas</span>
     </button>
+
     <button
-      *ngIf="currentUser.rol==='Admin' || currentUser.rol==='SuperAdmin'"
-      class="flex items-center gap-2 px-4 py-2 font-medium transition-all duration-200 text-primary-100 hover:bg-primary-700 hover:text-white border-b-2 border-transparent"
-      routerLink="/app/productos"
-      routerLinkActive="text-white border-b-primary-100"
-    >
-      <i class="pi pi-microchip"></i><span>Productos</span>
-    </button>
-    <button
-      *ngIf="currentUser.rol==='Admin' || currentUser.rol==='SuperAdmin'"
+      *ngIf="currentUser.rol==='SuperAdmin'"
       class="flex items-center gap-2 px-4 py-2 font-medium transition-all duration-200 text-primary-100 hover:bg-primary-700 hover:text-white border-b-2 border-transparent"
       routerLink="/app/proveedores"
       routerLinkActive="text-white border-b-primary-100"
@@ -144,7 +137,7 @@
       <i class="pi pi-truck"></i><span>Proveedores</span>
     </button>
     <button
-      *ngIf="currentUser.rol==='Admin' || currentUser.rol==='SuperAdmin'"
+      *ngIf="currentUser.rol==='SuperAdmin'"
       class="flex items-center gap-2 px-4 py-2 font-medium transition-all duration-200 text-primary-100 hover:bg-primary-700 hover:text-white border-b-2 border-transparent"
       routerLink="/app/materiasprimas"
       routerLinkActive="text-white border-b-primary-100"
@@ -152,23 +145,16 @@
       <i class="pi pi-cog"></i><span>Materias Primas</span>
     </button>
     <button
-      *ngIf="currentUser.rol==='Admin' || currentUser.rol==='SuperAdmin'"
+      *ngIf="currentUser.rol==='SuperAdmin'"
       class="flex items-center gap-2 px-4 py-2 font-medium transition-all duration-200 text-primary-100 hover:bg-primary-700 hover:text-white border-b-2 border-transparent"
       routerLink="/app/compras"
       routerLinkActive="text-white border-b-primary-100"
     >
       <i class="pi pi-shopping-cart"></i><span>Compras</span>
     </button>
+
     <button
-      *ngIf="currentUser.rol==='Admin' || currentUser.rol==='SuperAdmin'"
-      class="flex items-center gap-2 px-4 py-2 font-medium transition-all duration-200 text-primary-100 hover:bg-primary-700 hover:text-white border-b-2 border-transparent"
-      routerLink="/app/cotizaciones"
-      routerLinkActive="text-white border-b-primary-100"
-    >
-      <i class="pi pi-file"></i><span>Cotizaciones</span>
-    </button>
-    <button
-      *ngIf="currentUser.rol==='Admin' || currentUser.rol==='SuperAdmin'"
+      *ngIf="currentUser.rol==='Admin' "
       class="flex items-center gap-2 px-4 py-2 font-medium transition-all duration-200 text-primary-100 hover:bg-primary-700 hover:text-white border-b-2 border-transparent"
       routerLink="/app/zonas"
       routerLinkActive="text-white border-b-primary-100"
@@ -176,7 +162,7 @@
       <i class="pi pi-map"></i><span>Zonas</span>
     </button>
     <button
-      *ngIf="currentUser.rol==='Admin' || currentUser.rol==='SuperAdmin'"
+      *ngIf="currentUser.rol==='Admin' "
       class="flex items-center gap-2 px-4 py-2 font-medium transition-all duration-200 text-primary-100 hover:bg-primary-700 hover:text-white border-b-2 border-transparent"
       routerLink="/app/clasificadores"
       routerLinkActive="text-white border-b-primary-100"
